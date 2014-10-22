@@ -10,6 +10,3 @@ fi
 if [[ "$(cat /proc/cmdline | grep -io 'fdi.ssh=\S*')" == "fdi.ssh=1" ]]; then
   systemctl start sshd
 fi
-
-
-touch /tmp/test

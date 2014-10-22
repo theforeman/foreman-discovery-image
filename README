@@ -12,7 +12,6 @@
                                         |___/
 
 
-
 Foreman Discovery Image
 =======================
 
@@ -50,4 +49,20 @@ Downstream
 ----------
 
 This repostirory is downstream friendly for koji/brew. The generated
-fdi-image.ks kickstart file is self-containing.
+fdi-image.ks kickstart file is self-containing. After running build-livecd
+script use koji/brew to build the image.
+
+  brew spin-livecd \
+    fdi-image-rhel_7_0 \
+    $(cat root/usr/share/fdi/VERSION) \
+    --release $(cat root/usr/share/fdi/RELEASE) \
+    --repo=http://my.repo/1 \
+    --scratch \
+    my-tag-image
+    x86_64 \
+    fdi-image.ks
+
+Then extract the kernel and initial RAM disk:
+
+  mv fdi-image-rhel_7_0-1.9.90-20141022.1.iso fdi.iso
+  livecd-iso-to-pxeboot fdi.iso

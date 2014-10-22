@@ -1,6 +1,11 @@
 # Try to minimize the image a bit
 %post
-# ensure we don't have the same random seed on every image, which
+
+# But first ensure that /etc/os-release is installed
+echo " * ensure /etc/os-release is present"
+yum -y install fedora-release centos-release redhat-release-server
+
+# Ensure we don't have the same random seed on every image, which
 # could be bad for security at a later point...
 echo " * purge existing random seed to avoid identical seeds everywhere"
 rm -f /var/lib/random-seed
