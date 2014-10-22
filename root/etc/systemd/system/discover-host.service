@@ -1,0 +1,14 @@
+[Unit]
+Description=Discover this host to Foreman
+Wants=basic.target
+After=basic.target network.target network-online.target nss-lookup.target network-dynamic
+
+[Service]
+Type=idle
+Environment="FACTERLIB=/usr/share/fdi/facts"
+ExecStart=/usr/bin/discover-host
+KillMode=process
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

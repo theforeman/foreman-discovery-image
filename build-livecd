@@ -1,0 +1,35 @@
+#!/bin/bash
+
+[[ -z "$1" ]] && echo "Usage: $0 fdi-name.ks" && exit 1
+
+TOP_DIR=$(realpath $(dirname $0))
+VERSION=$(git describe --abbrev=0 --tags)
+
+# XXX not working in brew
+cat > fdi-install.ks <<EOF
+%post --nochroot
+echo " * copying root directory"
+cp -r $TOP_DIR/root \$INSTALL_ROOT/var/tmp/
+%end
+
+%post
+echo " * executing root installation"
+pushd /var/tmp/root
+bash install chroot
+popd
+%end
+
+# XXX TODO
+# brew spin-livecd fdi-image 2.0.0 --release 1 --scratch --repo=http://download.eng.bos.redhat.com/brewroot/repos/satellite-6.0.4-rhel-7-build/latest/x86_64 satellite-6.0.4-rhel-7-image x86_64 test.ks
+%post
+cat > /usr/local/bin/mk-update <<'CODE'
+$(cat bin/mk-update)
+CODE
+chmod +rx /usr/local/bin/mk-update
+%end
+EOF
+
+ksflatten "$1" -o fdi-image.ks
+
+echo "Now run as root"
+echo "$TOP_DIR/build-livecd-root"

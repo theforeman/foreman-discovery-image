@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# setup root password
+ROOTPW=$(cat /proc/cmdline | grep -io 'fdi.rootpw=\S*' | sed 's/fdi.rootpw=//')
+if [[ ! -z "$ROOTPW" ]]; then
+  echo "root:$ROOTPW" | chpasswd >/dev/null
+fi
+
+# enable ssh
+if [[ "$(cat /proc/cmdline | grep -io 'fdi.ssh=\S*')" == "fdi.ssh=1" ]]; then
+  systemctl start sshd
+fi
+
+
+touch /tmp/test
