@@ -35,6 +35,18 @@ def discovery_bootif
   cmdline('BOOTIF', Facter.fact("macaddress").value).gsub(/^[a-fA-F0-9]+-/, '').gsub('-', ':') rescue '00:00:00:00:00:00'
 end
 
+Facter.add("discovery_version") do
+  setcode do
+    File.open('/usr/share/fdi/VERSION') {|f| f.readline}
+  end
+end
+
+Facter.add("discovery_release") do
+  setcode do
+    File.open('/usr/share/fdi/RELEASE') {|f| f.readline}
+  end
+end
+
 Facter.add("discovery_bootif") do
   setcode do
     discovery_bootif

@@ -1,0 +1,28 @@
+#!/bin/bash
+
+echo "* PROCESSES *"
+ps axww
+
+echo "* JOURNAL (last 500 lines) *"
+journalctl | tail -n500
+
+echo "* PROXY LOG *"
+tail -n 200 /var/log/foreman-proxy/proxy.log
+
+echo "* KERNEL COMMAND LINE *"
+cat /proc/cmdline
+
+echo "* FACTER *"
+FACTERLIB=/usr/share/fdi/facts/ facter
+
+echo "* IP ADDRESSES *"
+ip addr show
+
+echo "* ROUTES *"
+ip route
+
+echo "* DHCP LEASES *"
+cat /var/lib/NetworkManager/dhclient-*.lease
+
+echo "* DNS *"
+cat /etc/resolv.conf

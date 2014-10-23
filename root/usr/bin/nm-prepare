@@ -1,0 +1,34 @@
+#!/bin/bash
+
+log() {
+  echo "$1" | systemd-cat -t nm-prepare -p ${2:-info}
+}
+
+log "Kernel command line: $(cat /proc/cmdline)"
+bootif=$(cat /proc/cmdline | grep -io 'BOOTIF=\S*' | tail -n1 | tr A-F- a-f: | cut -d: -f2-7)
+log "Parsed booting interface: $bootif"
+
+for i in /sys/class/net/*; do
+  dev=$(basename $i)
+  [[ "$dev" == "lo" ]] && continue
+  mac=$(cat /sys/class/net/$dev/address | tr A-F- a-f:)
+  if [[ "$mac" == "$bootif" ]]; then
+    peerdns=yes
+    defroute=yes
+  else
+    peerdns=no
+    defroute=no
+  fi
+  script=/etc/sysconfig/network-scripts/ifcfg-$dev
+  cat > $script <<EONS
+DEVICE=$dev
+TYPE=Ethernet
+BOOTPROTO=dhcp
+ONBOOT=yes
+USERCTL=yes
+IPV6INIT=no
+PEERDNS=$peerdns
+DEFROUTE=$defroute
+EONS
+  echo
+done

@@ -1,5 +1,20 @@
 %post
 
+echo " * ensure /etc/os-release is present (needed for RHEL 7.0)"
+yum -y install fedora-release centos-release redhat-release-server || \
+  touch /etc/os-release
+
+echo " * disabling legacy network services (needed for RHEL 7.0)"
+systemctl disable network.service
+
+echo " * enabling NetworkManager system services (needed for RHEL 7.0)"
+systemctl enable NetworkManager.service
+systemctl enable NetworkManager-dispatcher.service
+systemctl enable NetworkManager-wait-online.service
+
+echo " * enabling nm-prepare service"
+systemctl enable nm-prepare.service
+
 echo " * enabling required system services"
 systemctl enable ipmi.service
 systemctl enable foreman-proxy.service

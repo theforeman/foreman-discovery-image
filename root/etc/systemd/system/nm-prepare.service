@@ -1,0 +1,11 @@
+[Unit]
+Description=Prepares default GW and DNS DHCP confuration for NetworkManager
+Wants=basic.target
+Before=NetworkManager.target network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/nm-prepare
+
+[Install]
+WantedBy=multi-user.target
