@@ -18,6 +18,8 @@
 # MA  02110-1301, USA.  A copy of the GNU General Public License is
 # also available at http://www.gnu.org/copyleft/gpl.html.
 
+require 'facter/util/ip'
+
 def cmdline option=nil, default=nil
   line = File.open("/proc/cmdline", 'r') { |f| f.read }
   if option
@@ -28,15 +30,28 @@ def cmdline option=nil, default=nil
   end
 end
 
+def discovery_bootif
+  # PXELinux dash-separated hexadecimal *without* the leading hardware type
+  cmdline('BOOTIF', Facter.fact("macaddress").value).gsub(/^[a-fA-F0-9]+-/, '').gsub('-', ':') rescue '00:00:00:00:00:00'
+end
+
 Facter.add("discovery_bootif") do
   setcode do
-    # PXELinux dash-separated hexadecimal *without* the leading hardware type
-    cmdline('BOOTIF', Facter.fact("macaddress").value).gsub(/^[a-fA-F0-9]+-/, '').gsub('-', ':') rescue '00:00:00:00:00:00'
+    discovery_bootif
   end
 end
 
-# Additional interface facts
-require 'facter/util/ip'
+Facter.add("discovery_bootip") do
+  setcode do
+    result = Facter.fact("ipaddress").value
+    required = discovery_bootif
+    Facter::Util::IP.get_interfaces.each do |iface|
+      mac = Facter::Util::IP.get_interface_value(iface, "macaddress")
+      result = Facter::Util::IP.get_interface_value(iface, "ipaddress") if mac == required
+    end
+    result
+  end
+end
 
 Facter::Util::IP.get_interfaces.each do |interface|
   Facter.debug("Running ethtool on interface #{interface}")
