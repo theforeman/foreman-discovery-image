@@ -60,11 +60,16 @@ and set root password using the following kernel command line options:
 Downstream
 ----------
 
-This repostirory is downstream friendly for koji/brew. The generated
-fdi-image.ks kickstart file is self-containing. After running build-livecd
-script use koji/brew to build the image.
+This repostirory is downstream friendly for koji. The generated fdi-image.ks
+kickstart file is self-containing. First of all, run the initial script and
+provide empty base kickstart without any repositories (they will be added via
+koji:
 
-  brew spin-livecd \
+  $ ./build-livecd fdi-empty.ks
+
+Then simply build the image from kickstart called fdi-image.ks:
+
+  koji spin-livecd \
     fdi-image-rhel_7_0 \
     $(cat root/usr/share/fdi/VERSION) \
     --release $(cat root/usr/share/fdi/RELEASE) \
