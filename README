@@ -52,10 +52,20 @@ discovery_bootip - IP of the interface it was booted from
 Troubleshooting
 ---------------
 
+The first virtual console is reserved for logs, all systemd logging is shown
+there. Particulary useful system logs are tagged with:
+
+  * discover-host - initial facts upload
+  * foreman-discovery - facts refresh, reboot remote commands
+  * nm-prepare - boot script which pre-configures NetworkManager
+  * NetworkManager - networking information
+
 The root account and ssh access are disabled by default, but you can enable ssh
 and set root password using the following kernel command line options:
 
   fdi.ssh=1 fdi.rootpw=redhat
+
+You can use tty2 console (or higher) to login as well.
 
 Downstream
 ----------

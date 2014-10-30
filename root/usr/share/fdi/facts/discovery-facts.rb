@@ -37,13 +37,13 @@ end
 
 Facter.add("discovery_version") do
   setcode do
-    File.open('/usr/share/fdi/VERSION') {|f| f.readline}
+    File.open('/usr/share/fdi/VERSION') {|f| f.readline.chomp}
   end
 end
 
 Facter.add("discovery_release") do
   setcode do
-    File.open('/usr/share/fdi/RELEASE') {|f| f.readline}
+    File.open('/usr/share/fdi/RELEASE') {|f| f.readline.chomp}
   end
 end
 
