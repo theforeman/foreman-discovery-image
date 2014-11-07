@@ -1,9 +1,0 @@
-#!/bin/bash
-if [ -x /tmp/discovery-nm ]; then
-  # for debugging purposes (this file is read-only)
-  /tmp/discovery-nm $*
-else
-  exit 0
-fi
-
-exit 0

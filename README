@@ -15,6 +15,23 @@
 Foreman Discovery Image
 =======================
 
+This is a small redhat-based image that boots via PXE into memory, initializes
+all network interfaces using NetworkManager and spawns small script called
+"discover-host" via systemd. This script determines foreman URL either via DNS
+SRV or via kernel command line and uploads facts via Foreman Discovery plugin
+API.
+
+The image has foreman-proxy installed with BMC API configured to "shell"
+provider. Upon request of Foreman, it reboots the node via /usr/bin/reboot
+command.
+
+Planned features
+----------------
+
+* Possibility to download additional packages (ZIP files) with extra content.
+* Remote firmware upgrade.
+* Remote OS image deployment.
+
 Building
 --------
 
