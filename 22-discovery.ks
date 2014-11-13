@@ -38,7 +38,7 @@ echo " * configuring foreman-proxy"
 # required foreman-proxy 1.6.3+ - http://projects.theforeman.org/issues/8006
 sed -i 's|.*:log_file:.*|:log_file: STDOUT|' /etc/foreman-proxy/settings.yml
 # facts API is disabled by default
-echo -e "----\n:enabled: true" > /etc/foreman-proxy/settings.d/facts.yml
+echo -e "---\n:enabled: true" > /etc/foreman-proxy/settings.d/facts.yml
 /sbin/usermod -a -G tty foreman-proxy
 
 echo " * setting suid bits"
@@ -56,7 +56,8 @@ echo "foreman-proxy ALL=NOPASSWD: /sbin/shutdown" >> /etc/sudoers
 
 echo " * dropping some friendly aliases"
 echo "alias vim=vi" >> /root/.bashrc
-echo "alias rpm=echo DO NOT USE RPM; rpm" >> /root/.bashrc
-echo "alias yum=echo DO NOT USE YUM; yum" >> /root/.bashrc
+echo "alias halt=poweroff" >> /root/.bashrc
+echo "alias 'rpm=echo DO NOT USE RPM; rpm'" >> /root/.bashrc
+echo "alias 'yum=echo DO NOT USE YUM; yum'" >> /root/.bashrc
 
 %end

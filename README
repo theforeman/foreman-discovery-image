@@ -76,6 +76,10 @@ discovery_bootip - IP of the interface it was booted from
 Troubleshooting
 ---------------
 
+First of all make sure your server (or VM) has more than 500 MB of memory because
+less memory can lead to various random kernel panic errors as the image needs to be
+extracted in-place (150 MB * 2).
+
 The first virtual console is reserved for logs, all systemd logging is shown
 there. Particulary useful system logs are tagged with:
 
