@@ -3,11 +3,11 @@
 set -x
 export repoowner=${1:-theforeman}
 export branch=${2:-master}
-export proxy_repo=${3:-http://yum.theforeman.org/nightly/el6/x86_64/}
+export proxy_repo=${3:-http://yum.theforeman.org/nightly/el7/x86_64/}
 NAME=foreman-discovery-image
 
 # give the VM some time to finish booting and network configuration
-sleep 30
+ping -c1 8.8.8.8 2>&1 >/dev/null && echo OK || echo FAIL
 yum -y install livecd-tools appliance-tools-minimizer fedora-packager \
   python-devel rpm-build createrepo selinux-policy-doc checkpolicy \
   selinux-policy-devel autoconf automake python-mock python-lockfile \
