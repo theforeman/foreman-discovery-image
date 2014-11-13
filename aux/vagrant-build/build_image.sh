@@ -11,7 +11,7 @@ ping -c1 8.8.8.8 2>&1 >/dev/null && echo OK || echo FAIL
 yum -y install livecd-tools appliance-tools-minimizer fedora-packager \
   python-devel rpm-build createrepo selinux-policy-doc checkpolicy \
   selinux-policy-devel autoconf automake python-mock python-lockfile \
-  python-nose git-review qemu-kvm hardlink git wget
+  python-nose git-review qemu-kvm hardlink git wget pykickstart
 
 # build plugin
 pushd /root
