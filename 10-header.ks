@@ -10,3 +10,5 @@ bootloader --timeout=1 --append="acpi=force"
 # root password is "redhat" but account is locked - use fdi.rootpw kernel option
 rootpw --iscrypted $1$_redhat_$i3.3Eg7ko/Peu/7Q/1.wJ/
 part / --size 1024 --fstype ext4 --ondisk sda
+
+services --disabled=network,sshd --enabled=NetworkManager

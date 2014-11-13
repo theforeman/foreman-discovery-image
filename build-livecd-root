@@ -27,6 +27,7 @@ tmpdir=$(mktemp -d /tmp/build-fdi-XXXXXX)
 
 cd $srcdir
 last_tag=$(git describe --abbrev=0 --tags)
+last_sha=$(git log --pretty=format:'%h' -n 1)
 
 cd $tmpdir
 echo Working in directory $tmpdir
@@ -80,7 +81,7 @@ To get instructions how to use the image head over to
 
 https://github.com/theforeman/foreman_discovery
 
-Image was built from $last_tag
+Image was built from $last_tag ($last_sha)
 
 To verify the kernel and initrd in this tar, run
 
@@ -90,12 +91,11 @@ EOF
 sha256sum initrd0.img vmlinuz0 > SHA256SUM
 
 cd ..
-mkdir pkg
 tarball=$srcdir/fdi-image-${last_tag#release-}.tar
 tar cf $tarball fdi-image/
 ls -lh $tarball
 chown --reference $srcdir/build-livecd $tarball
 
 echo "* Done"
-echo "The microkernel is in $tarball"
+echo "The image was built: $tarball"
 exit 0

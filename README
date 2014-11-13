@@ -23,7 +23,10 @@ API.
 
 The image has foreman-proxy installed with BMC API configured to "shell"
 provider. Upon request of Foreman, it reboots the node via /usr/bin/reboot
-command.
+command. To initiate the restart, use the following command:
+
+  curl -3 -H "Accept:application/json" -H "Content-Length:0" -k -X PUT \
+    http://192.168.100.100:8443/bmc/ignored/chassis/power/cycle
 
 Planned features
 ----------------
@@ -35,11 +38,11 @@ Planned features
 Building
 --------
 
-To prepare CentOS 7 build:
+To prepare CentOS 7 kickstart do:
 
   $ ./build-livecd fdi-centos7.ks
 
-To prepare Fedora 19 build:
+To prepare Fedora 19 kickstart do:
 
   $ ./build-livecd fdi-fedora19.ks
 
@@ -53,6 +56,10 @@ Copy the resulting tarball to the TFTP boot directory:
 
 And visit https://github.com/theforeman/foreman_discovery for more information
 about how to configure Foreman and how to use the plugin.
+
+The image is built in /tmp directory because in most modern distributions this is
+mapped to memory. This is intentional, so make sure you have enough RAM or you can
+experience some swapping. Alternatively, change the temp directory in the scripts.
 
 Additional facts
 ----------------
