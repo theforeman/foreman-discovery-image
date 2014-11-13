@@ -45,9 +45,6 @@ mv /usr/lib/locale/locale-archive /usr/lib/locale/locale-archive.tmpl
 echo " * purging all other locale data"
 rm -rf /usr/share/locale*
 
-echo " * cleaning up yum cache, etc"
-yum clean all
-
 echo " * truncating various logfiles"
 for log in yum.log dracut.log lastlog yum.log; do
     truncate -c -s 0 /var/log/${log}
@@ -68,6 +65,11 @@ echo fdi > /etc/hostname
 
 echo " * locking root account"
 passwd -l root
+
+echo " * cleaning up yum cache and removing rpm database"
+yum clean all
+rm -rf /var/lib/{yum,rpm}/*
+# fix the vim syntax markup */
 %end
 
 %post --nochroot

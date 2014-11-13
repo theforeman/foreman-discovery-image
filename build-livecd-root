@@ -97,5 +97,6 @@ ls -lh $tarball
 chown --reference $srcdir/build-livecd $tarball
 
 echo "* Done"
-echo "The image was built: $tarball"
+echo "The image was built:"
+du -h $tarball
 exit 0

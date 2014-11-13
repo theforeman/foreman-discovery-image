@@ -35,8 +35,8 @@ echo "ForwardToConsole=yes" >> /etc/systemd/journald.conf
 echo "TTYPath=/dev/tty1" >> /etc/systemd/journald.conf
 
 echo " * configuring foreman-proxy"
-# XXX not implemented yet - http://projects.theforeman.org/issues/8006
-#sed -i 's|.*:log_file:.*|:log_file: STDOUT|' /etc/foreman-proxy/settings.yml
+# required foreman-proxy 1.6.3+ - http://projects.theforeman.org/issues/8006
+sed -i 's|.*:log_file:.*|:log_file: STDOUT|' /etc/foreman-proxy/settings.yml
 /sbin/usermod -a -G tty foreman-proxy
 
 echo " * setting suid bits"
@@ -54,5 +54,7 @@ echo "foreman-proxy ALL=NOPASSWD: /sbin/shutdown" >> /etc/sudoers
 
 echo " * dropping some friendly aliases"
 echo "alias vim=vi" >> /root/.bashrc
+echo "alias rpm=echo DO NOT USE RPM; rpm" >> /root/.bashrc
+echo "alias yum=echo DO NOT USE YUM; yum" >> /root/.bashrc
 
 %end
