@@ -8,17 +8,15 @@ NAME=foreman-discovery-image
 
 # give the VM some time to finish booting and network configuration
 ping -c1 8.8.8.8 2>&1 >/dev/null && echo OK || echo FAIL
-yum -y install livecd-tools appliance-tools-minimizer fedora-packager \
-  python-devel rpm-build createrepo selinux-policy-doc checkpolicy \
-  selinux-policy-devel autoconf automake python-mock python-lockfile \
-  python-nose git-review qemu-kvm hardlink git wget pykickstart
+yum -y install livecd-tools appliance-tools-minimizer \
+  hardlink git wget pykickstart
 
 # build plugin
 pushd /root
 SELINUXMODE=$(getenforce)
 setenforce 1
 
-[ -d $NAME ] || git clone --depth 1 https://github.com/$repoowner/$NAME.git -b $branch
+[ -d $NAME ] || git clone https://github.com/$repoowner/$NAME.git -b $branch
 pushd $NAME
 git pull
 
