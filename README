@@ -1,5 +1,4 @@
 
-
   _____
  |  ___|__  _ __ ___ _ __ ___   __ _ _ __
  | |_ / _ \| '__/ _ \ '_ ` _ \ / _` | '_ \
@@ -15,11 +14,11 @@
 Foreman Discovery Image
 =======================
 
-This is a small redhat-based image that boots via PXE into memory, initializes
-all network interfaces using NetworkManager and spawns small script called
-"discover-host" via systemd. This script determines foreman URL either via DNS
-SRV or via kernel command line and uploads facts via Foreman Discovery plugin
-API.
+This is a small redhat-based image that boots via PXE into memory,
+initializes all network interfaces using NetworkManager and spawns small
+script called "discover-host" via systemd. This script determines foreman
+URL either via DNS SRV or via kernel command line and uploads facts via
+Foreman Discovery plugin API.
 
 The image has foreman-proxy installed with BMC API configured to "shell"
 provider. Upon request of Foreman, it reboots the node via /usr/bin/reboot
@@ -31,7 +30,8 @@ command. To initiate the restart, use the following command:
 Planned features
 ----------------
 
-* Possibility to download additional packages (ZIP files) with extra content.
+* Possibility to download additional packages (ZIP files) with extra
+  content.
 * Remote firmware upgrade.
 * Remote OS image deployment.
 
@@ -54,17 +54,19 @@ Copy the resulting tarball to the TFTP boot directory:
 
   $ tar xvf fdi-image-*.tar -C /var/tftproot/boot
 
-And visit https://github.com/theforeman/foreman_discovery for more information
-about how to configure Foreman and how to use the plugin.
+And visit https://github.com/theforeman/foreman_discovery for more
+information about how to configure Foreman and how to use the plugin.
 
-The image is built in /tmp directory because in most modern distributions this is
-mapped to memory. This is intentional, so make sure you have enough RAM or you can
-experience some swapping. Alternatively, change the temp directory in the scripts.
+The image is built in /tmp directory because in most modern distributions
+this is mapped to memory. This is intentional, so make sure you have enough
+RAM or you can experience some swapping. Alternatively, change the temp
+directory in the scripts.
 
 Additional facts
 ----------------
 
-Some extra facts are reported in addition to the standard ones reported by Facter:
+Some extra facts are reported in addition to the standard ones reported by
+Facter:
 
   FACTERLIB=/usr/share/fdi/facts/ facter | grep discovery
   discovery_bootif => 52:54:00:94:9e:52
@@ -76,20 +78,20 @@ discovery_bootip - IP of the interface it was booted from
 Troubleshooting
 ---------------
 
-First of all make sure your server (or VM) has more than 500 MB of memory because
-less memory can lead to various random kernel panic errors as the image needs to be
-extracted in-place (150 MB * 2).
+First of all make sure your server (or VM) has more than 500 MB of memory
+because less memory can lead to various random kernel panic errors as the
+image needs to be extracted in-place (150 MB * 2).
 
-The first virtual console is reserved for logs, all systemd logging is shown
-there. Particulary useful system logs are tagged with:
+The first virtual console is reserved for logs, all systemd logging is
+shown there. Particulary useful system logs are tagged with:
 
   * discover-host - initial facts upload
   * foreman-discovery - facts refresh, reboot remote commands
   * nm-prepare - boot script which pre-configures NetworkManager
   * NetworkManager - networking information
 
-The root account and ssh access are disabled by default, but you can enable ssh
-and set root password using the following kernel command line options:
+The root account and ssh access are disabled by default, but you can enable
+ssh and set root password using the following kernel command line options:
 
   fdi.ssh=1 fdi.rootpw=redhat
 
@@ -98,10 +100,10 @@ You can use tty2 console (or higher) to login as well.
 Downstream
 ----------
 
-This repostirory is downstream friendly for koji. The generated fdi-image.ks
-kickstart file is self-containing. First of all, run the initial script and
-provide empty base kickstart without any repositories (they will be added via
-koji:
+This repostirory is downstream friendly for koji. The generated
+fdi-image.ks kickstart file is self-containing. First of all, run the
+initial script and provide empty base kickstart without any repositories
+(they will be added via koji:
 
   $ ./build-livecd fdi-empty.ks
 
@@ -121,3 +123,5 @@ Then extract the kernel and initial RAM disk:
 
   mv fdi-image-rhel_7_0-1.9.90-20141022.1.iso fdi.iso
   livecd-iso-to-pxeboot fdi.iso
+
+vim:tw=75
