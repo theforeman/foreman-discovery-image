@@ -33,8 +33,12 @@ Usage
 The full installation and setup is described on the foreman_discovery
 plugin site: https://github.com/theforeman/foreman_discovery
 
-Once you extract the tarball into /var/lib/tftpboot/boot directory, the most
-important part is the PXELinux configuration in the Foreman application.
+To extract the tarball into the correct directory you can use this command:
+
+wget http://downloads.theforeman.org/discovery/releases/X.X/fdi-image-X.X.X.tar \
+  -O - | tar x --overwrite -C /var/lib/tftpboot/boot
+
+Integrate it via the PXELinux templates in the Foreman application.
 
 LABEL discovery
 MENU LABEL Foreman Discovery Image
@@ -43,8 +47,11 @@ KERNEL boot/fdi-image/vmlinuz0
 APPEND initrd=boot/fdi-image/initrd0.img rootflags=loop root=live:/fdi.iso rootfstype=auto ro rd.live.image acpi=force rd.luks=0 rd.md=0 rd.dm=0 rd.lvm=0 rd.bootif=0 rd.neednet=0 nomodeset foreman.url=http://YOURFOREMAN
 IPAPPEND 2
 
-Make sure the APPEND statement is on the *single line*.
+Make sure the APPEND statement is on *single line*.
 
+You can also use the image standalone (without TFTP under Foreman's
+control). In this case, edit your pxelinux.cfg/default file directly and
+make sure the foreman.url points correctly.
 
 Planned features
 ----------------
