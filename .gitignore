@@ -3,3 +3,4 @@ fdi-install.ks
 root/usr/share/fdi/VERSION
 root/usr/share/fdi/RELEASE
 *.tar
+.idea/

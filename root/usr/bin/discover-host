@@ -54,30 +54,11 @@ end
 
 def discover_server
   log_msg "Parsing kernel line: #{cmdline}"
-  discover_by_url or discover_by_ip or
-    discover_by_server or discover_by_dns_srv
-end
-
-# kept for backward compatibility
-def discover_by_ip
-  ip = cmdline 'foreman.ip'
-  log_msg "Discovered by PXE: #{ip}" if ip
-  URI.parse("http://#{ip}")
-rescue
-  return nil
-end
-
-# kept for backward compatibility
-def discover_by_server
-  server = cmdline 'foreman.server'
-  log_msg "Discovered by SERVER: #{server}" if server
-  URI.parse("http://#{server}")
-rescue
-  return nil
+  discover_by_url || discover_by_dns_srv
 end
 
 def discover_by_url
-  url = cmdline 'foreman.url'
+  url = cmdline 'proxy.url'
   log_msg "Discovered by URL: #{url}" if url
   URI.parse(url)
 rescue
@@ -102,6 +83,12 @@ rescue
   return nil
 end
 
+def proxy_type
+  type = cmdline('proxy.type', 'proxy')
+  log_err('*** proxy.type should be either "foreman" or "proxy" ***') unless ['foreman', 'proxy'].include? type
+  type
+end
+
 def upload
   uri = discover_server
   log_err "Could not determine Foreman instance, add kernel command option" unless uri
@@ -111,7 +98,12 @@ def upload
     http.use_ssl = true
     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
   end
-  req = Net::HTTP::Post.new("#{uri.path}/api/v2/discovered_hosts/facts", {'Content-Type' =>'application/json'})
+  facts_url = if proxy_type == 'proxy'
+                "#{uri.path}/discovery/create"
+              else
+                "#{uri.path}/api/v2/discovered_hosts/facts"
+              end
+  req = Net::HTTP::Post.new(facts_url, {'Content-Type' => 'application/json'})
   req.body = {'facts' => Facter.to_hash }.to_json
   response = http.request(req)
   if ['200','201'].include? response.code
