@@ -58,7 +58,7 @@ def discover_server
 end
 
 def discover_by_url
-  url = cmdline 'proxy.url'
+  url = cmdline('proxy.url') || cmdline('foreman.url')
   log_msg "Discovered by URL: #{url}" if url
   URI.parse(url)
 rescue
@@ -84,14 +84,14 @@ rescue
 end
 
 def proxy_type
-  type = cmdline('proxy.type', 'proxy')
+  type = cmdline('proxy.type', 'foreman')
   log_err('*** proxy.type should be either "foreman" or "proxy" ***') unless ['foreman', 'proxy'].include? type
   type
 end
 
 def upload
   uri = discover_server
-  log_err "Could not determine Foreman instance, add kernel command option" unless uri
+  log_err "Could not determine Foreman instance, add foreman.url or proxy.url kernel command parameter" unless uri
   log_msg "Registering host with Foreman (#{uri})"
   http = Net::HTTP.new(uri.host, uri.port)
   if uri.scheme == 'https' then
