@@ -38,38 +38,6 @@ livecd-creator -v --cache /var/cache/build-fdi --config $srcdir/fdi-image.ks -f 
 echo "* Converting to initrd"
 livecd-iso-to-pxeboot $tmpdir/fdi.iso || KEEP_TMPDIR=yes
 
-## Work around dracut not configuring udev correctly for the loopback kernel module
-## See: http://git.kernel.org/cgit/boot/dracut/dracut.git/commit/?id=ba9368fa4fedda0f72d84f910d01d7da201405a3
-mkdir $tmpdir/initrd_root
-# Unpack the first archive, which is the initramfs.  The ISO is second.
-echo "* Unpacking initrd0.img"
-gzip -d -c tftpboot/initrd0.img | (cd $tmpdir/initrd_root; cpio -id)
-# Apply the dracut patch
-echo "* Applying dracut initrd loop patch"
-(cd "$tmpdir"/initrd_root; patch -f -p0) <<-'DRACUTPATCH'
---- lib/dracut/hooks/pre-udev/30-dmsquash-liveiso-genrules.sh.bak	2014-03-18 20:16:01.472869714 -0700
-+++ lib/dracut/hooks/pre-udev/30-dmsquash-liveiso-genrules.sh	2014-03-18 20:16:49.779746408 -0700
-@@ -4,5 +4,5 @@
- if [ "${root%%:*}" = "liveiso" ]; then
-     {
--        printf 'KERNEL=="loop0", RUN+="/sbin/initqueue --settled --onetime --unique /sbin/dmsquash-live-root `/sbin/losetup -f --show %s`"\n' \
-+        printf 'KERNEL=="loop-control", RUN+="/sbin/initqueue --settled --onetime --unique /sbin/dmsquash-live-root `/sbin/losetup -f --show %s`"\n' \
-             ${root#liveiso:}
-     } >> /etc/udev/rules.d/99-liveiso-mount.rules
-DRACUTPATCH
-# rebuild the PXE initrd
-echo "* Repacking patched initrd"
-( cd "$tmpdir/initrd_root";
-  find . \
-  | cpio --create --format='newc' \
-  | gzip -c -9 ) \
-    > "$tmpdir"/initrd.gz
-# Append the ISO image to the initrd image.
-echo "* Rebuilding tftpboot/initrd0.img"
-( cd "$tmpdir" && echo "fdi.iso" | cpio -H newc --quiet -L -o ) |
-  gzip -9 |
-  cat "$tmpdir"/initrd.gz - > tftpboot/initrd0.img
-
 echo "* Building tarball"
 mkdir fdi-image
 mv tftpboot/initrd0.img tftpboot/vmlinuz0 fdi-image || KEEP_TMPDIR=yes
