@@ -10,6 +10,7 @@ rootfiles
 yum
 vim-minimal
 acpid
+tftp
 
 # Facter
 facter

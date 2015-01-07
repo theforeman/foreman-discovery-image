@@ -1,8 +1,8 @@
-#!/usr/bin/env ruby
+# Library of functions for use with Foreman Discovery
 #
 # vim: ts=2:sw=2:et
 #
-# Copyright (C) 2012-2013 Red Hat, Inc.
+# Copyright (C) 2012-2014 Red Hat, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,20 +19,12 @@
 # MA  02110-1301, USA.  A copy of the GNU General Public License is
 # also available at http://www.gnu.org/copyleft/gpl.html.
 
-PROXY_CACHE = '/tmp/proxy_cache'
-
 require 'fileutils'
 require 'net/http'
 require 'net/https'
 require 'uri'
 require 'socket'
 require 'resolv'
-
-# For comparison
-require 'rubygems'
-require 'facter'
-require 'yaml'
-require 'json'
 
 def log_msg msg
   puts msg
@@ -89,59 +81,11 @@ def proxy_type
   type
 end
 
-def upload
-  uri = discover_server
-  log_err "Could not determine Foreman instance, add foreman.url or proxy.url kernel command parameter" unless uri
-  log_msg "Registering host with Foreman (#{uri})"
-  http = Net::HTTP.new(uri.host, uri.port)
-  if uri.scheme == 'https' then
-    http.use_ssl = true
-    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-  end
-  facts_url = if proxy_type == 'proxy'
-                "#{uri.path}/discovery/create"
-              else
-                "#{uri.path}/api/v2/discovered_hosts/facts"
-              end
-  req = Net::HTTP::Post.new(facts_url, {'Content-Type' => 'application/json'})
-  req.body = {'facts' => Facter.to_hash }.to_json
-  response = http.request(req)
-  if ['200','201'].include? response.code
-    log_msg "Response from Foreman #{response.code}: #{response.body}"
-    return true
+# Quick function to append to ENV vars correctly
+def env_append(env,string)
+  if ENV[env].nil? or ENV[env].empty?
+    "#{env}=#{string}\n"
   else
-    log_err "Response from Foreman #{response.code}: #{response.body}"
-    return false
+    "#{env}=#{ENV[env]}:#{string}\n"
   end
-rescue => e
-  log_err "Could not send facts to Foreman: #{e}"
-  return false
-end
-
-def write_cache(data)
-  File.open(PROXY_CACHE, 'w') {|f| f.write(data) }
-end
-
-def read_cache
-  File.read(PROXY_CACHE)
-rescue => _
-  "empty cache"
-end
-
-# Script was (re)started - delete old data
-File.unlink(PROXY_CACHE) if File.exists?(PROXY_CACHE)
-
-log_msg "Some interesting facts about this system:"
-facts = Hash[Facter.to_hash.select {|k,v| k =~ /address|hardware|manufacturer|productname|memorytotal/}]
-facts.keys.sort.each {|k| log_msg " #{k}: #{facts[k]}"}
-
-# loop, but only upload on changes
-while true do
-  uninteresting_facts=/kernel|operatingsystem|osfamily|ruby|path|time|swap|free|filesystem|version|selinux/i
-  facts = Facter.to_hash.reject! {|k,v| k =~ uninteresting_facts }
-  unless YAML.load(read_cache) == facts
-    log_msg "Fact cache invalid, reloading to foreman"
-    write_cache(YAML.dump(facts)) if upload
-  end
-  sleep 30
 end

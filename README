@@ -16,7 +16,7 @@ Foreman Discovery Image
 
 This is a small redhat-based image that boots via PXE into memory,
 initializes all network interfaces using NetworkManager and spawns small
-script called "discover-host" via systemd. This script determines foreman
+script called "discovery-register" via systemd. This script determines foreman
 URL either via DNS SRV or via kernel command line and uploads facts via
 Foreman Discovery plugin API.
 
@@ -53,11 +53,57 @@ You can also use the image standalone (without TFTP under Foreman's
 control). In this case, edit your pxelinux.cfg/default file directly and
 make sure the foreman.url points correctly.
 
+Extending the image at runtime with a ZIPfile
+---------------------------------------------
+
+It's possible to provide a zip file containing extra code for the image to use.
+First, create a directory structure like:
+
+```
+.
+├── autostart.d
+│   └── 01_zip.sh
+├── bin
+│   └── ntpdate
+├── facts
+│   └── test.rb
+└── lib
+    ├── libcrypto.so.1.0.0
+    └── ruby
+        └── test.rb
+```
+
+`autostart.d` contains scripts that will be executed in POSIX order by the
+image as it starts up, before the host is registered to Foreman. `bin` is
+added to PATH, you can place binaries here and use them in the autostart
+scripts. `facts` is added to FACTERLIB so that custom facts may be
+configured and sent to Foreman. `lib` is added to LD_LIBRARY_PATH and
+`lib/ruby` is added to RUBYLIB, so that binaries in `bin` can be executed
+properly.
+
+Environment variables (PATH, LD_LIBRARY_PATH, RUBYLIB and FACTERLIB) are
+appended to. If you need to specify the path to something explicitly in
+your scripts, the zip contents are extracted to `/opt/extension` on the
+image.
+
+An example structure is provided in `example_zip` in this repo. You can zip
+up your structure with `zip -r my_extension.zip .`
+
+You can create multiple zip files, but be aware they will be extracted to
+the same place on the discovery image, so files in later zips will overwrite
+earlier ones if they have the same filename.
+
+To inform the image of the extensions it should use, place your zip(s) on
+your TFTP server along with the discovery image, and then update your
+PXELinux APPEND line with `fdi.zips=<path-to-zip>,<path-to-zip>`, where the
+paths are relative to the TFTP root. So if you have two zips at
+$TFTP/zip1.zip and $TFTP/boot/zip2.zip, you would use
+`fdi.zips=zip1.zip,boot/zip2.zip`.
+
 Planned features
 ----------------
 
-* Possibility to download additional packages (ZIP files) with extra
-  content.
+* Adding smart-proxy plugins to the proxy inside the image, from a zipfile ext
 * Remote firmware upgrade.
 * Remote OS image deployment.
 
@@ -111,7 +157,7 @@ image needs to be extracted in-place (150 MB * 2).
 The first virtual console is reserved for logs, all systemd logging is
 shown there. Particulary useful system logs are tagged with:
 
-  * discover-host - initial facts upload
+  * discovery-register - initial facts upload
   * foreman-discovery - facts refresh, reboot remote commands
   * nm-prepare - boot script which pre-configures NetworkManager
   * NetworkManager - networking information

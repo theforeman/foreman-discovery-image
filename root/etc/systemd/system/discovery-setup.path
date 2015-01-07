@@ -1,0 +1,11 @@
+[Unit]
+# Network-Manager-wait-online doesn't seem to wait *quite* long enough
+# for the custom post-up command to write the next-server environment
+# file. So we use a path target to wait for it to be written.
+Description=Waiting for ZIP_SERVER environment file to be created
+
+[Path]
+PathExists=/etc/default/discovery-zip-server
+
+[Install]
+WantedBy=multi-user.target
