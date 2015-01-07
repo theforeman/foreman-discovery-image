@@ -18,7 +18,10 @@ systemctl enable nm-prepare.service
 echo " * enabling required system services"
 systemctl enable ipmi.service
 systemctl enable foreman-proxy.service
-systemctl enable discover-host.service
+systemctl enable discovery-setup.path
+systemctl enable discovery-setup.service
+systemctl enable discovery-autostart.service
+systemctl enable discovery-register.service
 
 echo " * setting up foreman proxy"
 sed -i "s/.*:http_port:.*/:http_port: 8443/" /etc/foreman-proxy/settings.yml
@@ -47,7 +50,7 @@ chmod +s /usr/sbin/dmidecode
 chmod +s /usr/bin/ipmitool
 
 echo " * setting up FACTERLIB"
-sed -i '/\[Service\]/a Environment="FACTERLIB=/usr/share/fdi/facts"' /usr/lib/systemd/system/foreman-proxy.service
+sed -i '/\[Service\]/a EnvironmentFile=-/etc/default/discovery' /usr/lib/systemd/system/foreman-proxy.service
 
 # Add foreman-proxy user to sudo and disable interactive tty for reboot
 echo " * setting up sudo"
@@ -59,5 +62,8 @@ echo "alias vim=vi" >> /root/.bashrc
 echo "alias halt=poweroff" >> /root/.bashrc
 echo "alias 'rpm=echo DO NOT USE RPM; rpm'" >> /root/.bashrc
 echo "alias 'yum=echo DO NOT USE YUM; yum'" >> /root/.bashrc
+
+# Base env for extracting zip extensions
+mkdir -p /opt/extension/{bin,lib,lib/ruby,facts}
 
 %end
