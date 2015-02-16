@@ -82,7 +82,7 @@ Facter::Util::IP.get_interfaces.each do |interface|
       when /Port: (.*)/
         attributes[:port] = $1
       when /Auto-negotiation: (.*)/
-        attributes[:auto_negotitation] = ($1 == 'on').to_s
+        attributes[:auto_negotiation] = ($1 == 'on').to_s
       when /^Wake-on: (.*)/
         attributes[:wol] = $1.include?('g')
       when /Link detected: (.*)/
