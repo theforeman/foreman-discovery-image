@@ -108,35 +108,55 @@ end
 %x{dmidecode -t 38 2>/dev/null|grep -q "IPMI Device"}
 has_ipmi = $?.exitstatus == 0
 
-if has_ipmi
-  output = Facter::Util::Resolution.exec("ipmitool lan print 1 2>/dev/null")
-  attributes = {}
-  output.each_line do |line|
-    case line.strip
-    when /^IP Address Source\s+: (.*)/
-      attributes[:ipaddress_source] = $1
-    when /^IP Address\s+: (.*)/
-      attributes[:ipaddress] = $1
-    when /^Subnet Mask\s+: (.*)/
-      attributes[:subnet_mask] = $1
-    when /^MAC Address\s+: (.*)/
-      attributes[:macaddress] = $1
-    when /^Default Gateway IP\s+: (.*)/
-      attributes[:gateway] = $1
-    end
-  end if output
-
-  if attributes.keys.empty?
-    Facter.debug("Running ipmitool didn't give any information")
+def add_ipmi_facts fact, value, channel = nil
+  if channel
+    fact = "ipmi_#{channel}_#{fact}"
+  else
+    fact = "ipmi_#{fact}"
   end
-  attributes[:enabled] = true
-  attributes.each do |fact, value|
-    Facter.add("ipmi_#{fact}") do
-      confine :kernel => "Linux"
-      setcode do
-        value
+  Facter.add(fact) do
+    confine :kernel => "Linux"
+    setcode do
+      value
+    end
+  end
+end
+
+if has_ipmi
+  Facter.add("ipmi_enabled") do
+    confine :kernel => "Linux"
+    setcode do
+      true
+    end
+  end
+  default_found = false
+  (0..15).each do |n|
+    output = Facter::Util::Resolution.exec("ipmitool lan print #{n} 2>/dev/null")
+    attributes = {}
+    output.each_line do |line|
+      case line.strip
+      when /^IP Address Source\s+: (.*)/
+        attributes[:ipaddress_source] = $1
+      when /^IP Address\s+: (.*)/
+        attributes[:ipaddress] = $1
+      when /^Subnet Mask\s+: (.*)/
+        attributes[:subnet_mask] = $1
+      when /^MAC Address\s+: (.*)/
+        attributes[:macaddress] = $1
+      when /^Default Gateway IP\s+: (.*)/
+        attributes[:gateway] = $1
+      end
+    end if output
+
+    unless default_found
+      Facter.debug("Running ipmitool on port #{n} didn't give any information") if attributes.keys.empty?
+      attributes.each do |fact, value|
+        add_ipmi_facts fact, value
+        default_found = true
       end
     end
+    attributes.each do |fact, value|
+      add_ipmi_facts fact, value, n
+    end
   end
-
 end
