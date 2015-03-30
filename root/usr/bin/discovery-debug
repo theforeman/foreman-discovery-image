@@ -6,17 +6,21 @@ ps axww
 echo "* JOURNAL (last 500 lines) *"
 journalctl | tail -n500
 
-echo "* PROXY (LEGACY) LOG *"
-tail -n 200 /var/log/foreman-proxy/proxy.log
+if [ -f /var/log/foreman-proxy/proxy.log]; then
+  echo "* PROXY (LEGACY) LOG *"
+  tail -n 200 /var/log/foreman-proxy/proxy.log
+fi
 
 echo "* KERNEL COMMAND LINE *"
 cat /proc/cmdline
 
 echo "* NETWORK CONFIGURATION *"
+ls /etc/sysconfig/network-scripts/ifcfg*
 for C in /etc/sysconfig/network-scripts/ifcfg-*; do cat $C; echo; done
 
 echo "* FACTER *"
 FACTERLIB=/usr/share/fdi/facts/ facter
+FACTERLIB=/usr/share/fdi/facts/ facter --json
 
 echo "* IP ADDRESSES *"
 ip addr show
