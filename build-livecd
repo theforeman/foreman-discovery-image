@@ -54,7 +54,7 @@ chmod +x \
   /usr/bin/discovery-setup \
   /usr/bin/find-largest-rpms \
   /usr/bin/find-missing-libs \
-  /usr/bin/get-zip-server_config
+  /usr/bin/get-zip-server_config \
   /usr/bin/nm-prepare
 %end
 KS
