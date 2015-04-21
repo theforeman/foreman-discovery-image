@@ -25,27 +25,38 @@ require 'net/https'
 require 'uri'
 require 'socket'
 require 'resolv'
+require 'syslog'
+require 'facter'
+require 'yaml'
+require 'json'
 
 def log_msg msg
-  puts msg
+  Syslog.open($0, Syslog::LOG_PID | Syslog::LOG_CONS) { |s| s.info msg.to_s }
 end
 
 def log_err msg
-  $stderr.puts msg
+  Syslog.open($0, Syslog::LOG_PID | Syslog::LOG_CONS) { |s| s.err msg.to_s }
+end
+
+def log_debug msg
+  Syslog.open($0, Syslog::LOG_PID | Syslog::LOG_CONS) { |s| s.debug msg.to_s }
 end
 
 def cmdline option=nil, default=nil
-  line = File.open("/proc/cmdline", 'r') { |f| f.read }
+  @cmdline ||= File.open("/proc/cmdline", 'r') { |f| f.read }
   if option
-    result = line.split.map { |x| $1 if x.match(/^#{option}=(.*)/)}.compact
+    result = @cmdline.split.map { |x| $1 if x.match(/^#{option}=(.*)/)}.compact
     result.size == 1 ? result.first : default
   else
-    line
+    @cmdline
   end
 end
 
+def normalize_mac mac
+  mac.split('-')[1..6].join(':') rescue nil
+end
+
 def discover_server
-  log_msg "Parsing kernel line: #{cmdline}"
   discover_by_url || discover_by_dns_srv
 end
 
@@ -81,6 +92,56 @@ def proxy_type
   type
 end
 
+def write_tui result = 'success', code, body
+  File.open("/tmp/discovery-http-#{result}", 'w') do |file|
+    file.write("#{code}: #{body}")
+  end
+end
+
+def upload(uri = discover_server, type = proxy_type, custom_facts = {})
+  unless uri
+    log_err "Could not determine Foreman instance, add foreman.url or proxy.url kernel command parameter"
+    return
+  end
+  if uri.host.nil? or uri.port.nil?
+    log_err "Foreman URI host or port was not specified, cannot continue"
+    return
+  end
+  log_msg "Registering host with Foreman (#{uri})"
+  http = Net::HTTP.new(uri.host, uri.port)
+  if uri.scheme == 'https' then
+    http.use_ssl = true
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+  end
+  facts_url = if type == 'proxy'
+                "#{uri.path}/discovery/create"
+              else
+                "#{uri.path}/api/v2/discovered_hosts/facts"
+              end
+  req = Net::HTTP::Post.new(facts_url, {'Content-Type' => 'application/json'})
+  facts = Facter.to_hash
+  facts.merge!(custom_facts)
+  req.body = {'facts' => facts }.to_json
+  response = http.request(req)
+  if ['200','201'].include? response.code
+    log_msg "Response from Foreman #{response.code}: #{response.body}"
+    body = response.nil? ? 'N/A' : response.body
+    write_tui 'success', response.code, body
+    return true
+  else
+    log_err "Response from Foreman #{response.code}: #{response.body}"
+    body = response.nil? ? 'N/A' : response.body
+    write_tui 'failure', response.code, body
+    return false
+  end
+rescue => e
+  log_err "Could not send facts to Foreman: #{e}"
+  log_debug e.backtrace.join("\n")
+  body = response.nil? ? 'N/A' : response.body
+  write_tui 'failure', 1001, "#{e}, body: #{body}"
+  return false
+end
+
 # Quick function to append to ENV vars correctly
 def env_append(env,string)
   if ENV[env].nil? or ENV[env].empty?
@@ -88,4 +149,15 @@ def env_append(env,string)
   else
     "#{env}=#{ENV[env]}:#{string}\n"
   end
+end
+
+def detect_ipv4_credentials(interface)
+  res = {}
+  str = `nmcli -t -f IP4.ADDRESS,IP4.GATEWAY,IP4.DNS con show #{interface}`
+  return ["", "", ""] if $? != 0
+  str.each_line { |x| kv = x.split(':'); res[kv[0]] = kv[1].chomp }
+  [res["IP4.ADDRESS[1]"] || '', res["IP4.GATEWAY"] || '', res["IP4.DNS[1]"] || '']
+rescue => e
+  log_err e.message
+  ["", "", ""]
 end

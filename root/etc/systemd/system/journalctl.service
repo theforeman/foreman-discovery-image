@@ -1,0 +1,16 @@
+[Unit]
+Description=Display journal on tty2
+Wants=basic.target
+After=basic.target
+ConditionPathExists=/dev/tty2
+
+[Service]
+Type=idle
+ExecStart=/usr/bin/journalctl --full --all --follow --merge --no-pager
+KillMode=process
+StandardOutput=tty
+StandardError=tty
+TTYPath=/dev/tty2
+
+[Install]
+WantedBy=multi-user.target

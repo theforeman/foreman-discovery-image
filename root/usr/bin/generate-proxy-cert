@@ -1,0 +1,18 @@
+#!/bin/bash
+
+source /usr/share/fdi/commonfunc.sh
+exportKCL
+
+DIR=/etc/foreman-proxy
+DAYS=${KCL_FDI_PROXY_CERT_DAYS:-999}
+IP=$(nmcli -t -f IP4.ADDRESS con show primary | cut -f2 -d: | cut -f1 -d/)
+
+openssl req -x509 \
+  -newkey rsa:2048 \
+  -keyout $DIR/key.pem \
+  -out $DIR/cert.pem \
+  -nodes \
+  -subj "/CN=$IP" \
+  -rand /dev/urandom \
+  -batch \
+  -days $DAYS

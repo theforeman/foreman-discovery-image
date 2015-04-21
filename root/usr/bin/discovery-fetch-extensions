@@ -13,7 +13,9 @@ exportKCL
 for zip in ${KCL_FDI_ZIPS//,/ }
 do
   tempfile="$(mktemp)"
-  curl --fail --silent "tftp://${ZIP_SERVER}/${zip}" -o "${tempfile}"
+  URL="tftp://${ZIP_SERVER}/${zip}"
+  echo "Downloading $URL"
+  curl --fail --silent "$URL" -o "${tempfile}"
   curl_rc="$?"
   if [ "${curl_rc}" -ne 0 ]
   then

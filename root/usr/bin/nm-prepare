@@ -7,10 +7,8 @@
 # via systemd (nm-prepare) for primary interface.
 
 source /usr/share/fdi/commonfunc.sh
-
 exportKCL
 bootif="$(normalizeHwAddr "${BOOTMAC}")"
-initnet="${KCL_FDI_INITNET}"
 
 configure_secondary_device() {
     # device name can still change after configuration is deployed - we don't use it
@@ -20,59 +18,19 @@ configure_secondary_device() {
     read mac < "/sys/class/net/$dev/address"
     mac="$(normalizeHwAddr "$mac")"
     [[ "$mac" == "$bootif" ]] && return
-    if [[ "${initnet,,}" == "all" ]]; then
+    if [[ "${KCL_FDI_INITNET,,}" == "all" ]]; then
         autoconnect=true
     else
         autoconnect=false
     fi
-    id=secondary-$mac
-    script=/etc/NetworkManager/system-connections/$id
-    uuid=$(/usr/bin/uuid)
-    echo "Dropping nm config $script ($mac)"
-    cat > $script <<EONS
-[connection]
-id=$id
-uuid=$uuid
-type=802-3-ethernet
-autoconnect=$autoconnect
-[802-3-ethernet]
-mac-address=$mac
-[ipv4]
-method=auto
-ignore-auto-dns=true
-ignore-auto-routes=true
-never-default=true
-[ipv6]
-method=ignore
-EONS
-    chown root:root $script
-    chmod 600 $script
+    echo "Configuring secondary interface via udev script: $mac"
+    /usr/bin/nm-configure secondary "$mac" "$autoconnect"
 }
 
 if [[ -z "$1" ]]; then
     for device in /sys/class/net/*; do
         configure_secondary_device $device
     done
-elif [[ "$1" == "primary" ]]; then
-    script=/etc/NetworkManager/system-connections/primary
-    uuid=$(/usr/bin/uuid)
-    echo "Dropping nm config $script ($bootif)"
-    cat > $script <<EONS
-[connection]
-id=primary
-uuid=$uuid
-type=802-3-ethernet
-autoconnect=true
-autoconnect-priority=1
-[802-3-ethernet]
-mac-address=$bootif
-[ipv4]
-method=auto
-[ipv6]
-method=ignore
-EONS
-    chown root:root $script
-    chmod 600 $script
 else
     configure_secondary_device $1
 fi
