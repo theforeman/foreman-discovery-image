@@ -1,0 +1,22 @@
+[Unit]
+Description=Display interactive TUI on tty1
+Wants=basic.target
+After=basic.target network.target network-online.target nss-lookup.target
+ConditionPathExists=/dev/tty1
+
+[Service]
+Type=idle
+EnvironmentFile=/etc/default/discovery
+ExecStart=/usr/bin/discovery-menu
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=3
+KillMode=process
+StandardInput=tty
+StandardError=tty
+StandardOutput=tty
+TTYPath=/dev/tty1
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

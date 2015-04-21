@@ -12,6 +12,7 @@ vim-minimal
 acpid
 tftp
 lldpad
+isomd5sum
 
 # Facter
 facter
@@ -24,7 +25,13 @@ virt-what
 sudo
 OpenIPMI
 OpenIPMI-tools
+openssl
 foreman-proxy
+rubygem-smart_proxy_discovery_image
+
+# Interactive discovery
+kexec-tools
+rubygem-newt
 
 # Debugging support
 less
@@ -64,7 +71,6 @@ binutils
 -usermode
 
 # file system stuff
--kpartx
 -dmraid
 -mdadm
 -lvm2

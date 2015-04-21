@@ -1,0 +1,17 @@
+#!/usr/bin/ruby
+
+require 'discovery/menu'
+require 'discovery/screen/countdown'
+require 'discovery/screen/facts'
+require 'discovery/screen/foreman'
+require 'discovery/screen/network'
+require 'discovery/screen/primary_iface'
+require 'discovery/screen/ssh'
+require 'discovery/screen/status'
+require 'discovery/screen/welcome'
+
+# Disable GC until https://github.com/theforeman/ruby-newt/issues/2 is fixed,
+# see also: http://projects.theforeman.org/issues/11623
+GC.disable
+
+main_loop

@@ -1,0 +1,88 @@
+#!/bin/bash
+
+source /usr/share/fdi/commonfunc.sh
+exportKCL
+bootif="$(normalizeHwAddr "${BOOTMAC}")"
+mac=${2:-$bootif}
+uuid=$(/usr/bin/uuid)
+
+correct_owner_perms() {
+  chown root:root $1
+  chmod 600 $1
+}
+
+usage() {
+  echo "Usage: "
+  echo " $0 primary [MAC_ADDRESS]"
+  echo " $0 primary-static MAC_ADDRESS IP4_ADDR/CIDR IP4_GW IP4_DNS"
+  echo " $0 secondary MAC_ADDRESS AUTOCONNECT (true/false)"
+}
+
+[[ -z "$mac" ]] && echo "MAC address was not provided or detected, leaving unconfigured" && exit 0
+
+if [[ "$1" == "primary-static" ]]; then
+  ip=$3
+  gw=$4
+  dns=$5
+  script=/etc/NetworkManager/system-connections/primary
+  cat > $script <<EONS
+[connection]
+id=primary
+uuid=$uuid
+type=802-3-ethernet
+autoconnect=true
+autoconnect-priority=1
+[802-3-ethernet]
+mac-address=$mac
+[ipv4]
+method=manual
+address1=$ip
+gateway=$gw
+dns=$dns;
+[ipv6]
+method=ignore
+EONS
+  correct_owner_perms $script
+elif [[ "$1" == "primary" ]]; then
+  script=/etc/NetworkManager/system-connections/primary
+  cat > $script <<EONS
+[connection]
+id=primary
+uuid=$uuid
+type=802-3-ethernet
+autoconnect=true
+autoconnect-priority=1
+[802-3-ethernet]
+mac-address=$mac
+[ipv4]
+method=auto
+[ipv6]
+method=ignore
+EONS
+  correct_owner_perms $script
+elif [[ "$1" == "secondary" ]]; then
+  autoconnect=$3
+  id=secondary-$mac
+  script=/etc/NetworkManager/system-connections/$id
+  cat > $script <<EONS
+[connection]
+id=$id
+uuid=$uuid
+type=802-3-ethernet
+autoconnect=$autoconnect
+[802-3-ethernet]
+mac-address=$mac
+[ipv4]
+method=auto
+ignore-auto-dns=true
+ignore-auto-routes=true
+never-default=true
+[ipv6]
+method=ignore
+EONS
+  correct_owner_perms $script
+else
+  usage
+fi
+
+exit 0

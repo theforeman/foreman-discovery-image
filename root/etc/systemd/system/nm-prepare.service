@@ -6,7 +6,7 @@ Before=NetworkManager.service
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/usr/bin/nm-prepare primary
+ExecStart=/usr/bin/nm-configure primary
 
 [Install]
 WantedBy=multi-user.target

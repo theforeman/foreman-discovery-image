@@ -1,32 +1,35 @@
 #!/bin/bash
 
-echo "* PROCESSES *"
-ps axww
+source /etc/default/discovery
 
-echo "* JOURNAL (last 500 lines) *"
-journalctl | tail -n500
+if [ "$1" != "--tui" ]; then
+  echo "* LOOPBACK ISO IMAGE CHECK"
+  checkisomd5 /dev/loop0
 
-if [ -f /var/log/foreman-proxy/proxy.log]; then
-  echo "* PROXY (LEGACY) LOG *"
-  tail -n 200 /var/log/foreman-proxy/proxy.log
+  echo "* KERNEL COMMAND LINE *"
+  cat /proc/cmdline
+
+  echo "* PROCESSES *"
+  ps axww
+
+  echo "* JOURNAL (last 500 lines) *"
+  journalctl | tail -n500
 fi
-
-echo "* KERNEL COMMAND LINE *"
-cat /proc/cmdline
 
 echo "* NETWORK CONFIGURATION *"
 nmcli con
-for C in /etc/NetworkManager/system-connections/*; do cat $C; echo; done
-
-echo "* FACTER *"
-FACTERLIB=/usr/share/fdi/facts/ facter
-FACTERLIB=/usr/share/fdi/facts/ facter --json
+for C in /etc/NetworkManager/system-connections/*; do
+  echo $C; cat $C; echo
+done
 
 echo "* IP ADDRESSES *"
 ip addr show
 
 echo "* ROUTES *"
 ip route
+
+echo "* NEIGHBOURS *"
+ip neigh
 
 echo "* DHCP LEASES *"
 cat /var/lib/NetworkManager/dhclient-*.lease
@@ -36,3 +39,9 @@ cat /etc/resolv.conf
 
 echo "* IMAGE VERSION"
 cat /usr/share/fdi/VERSION /usr/share/fdi/RELEASE
+
+echo "* FACTER *"
+facter
+if [ "$1" != "--tui" ]; then
+  facter --json
+fi
