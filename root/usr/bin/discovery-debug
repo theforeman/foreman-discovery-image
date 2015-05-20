@@ -33,3 +33,6 @@ cat /var/lib/NetworkManager/dhclient-*.lease
 
 echo "* DNS *"
 cat /etc/resolv.conf
+
+echo "* IMAGE VERSION"
+cat /usr/share/fdi/VERSION /usr/share/fdi/RELEASE
