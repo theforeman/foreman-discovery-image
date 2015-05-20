@@ -5,6 +5,7 @@ Before=NetworkManager.target network-online.target
 
 [Service]
 Type=oneshot
+RemainAfterExit=yes
 ExecStart=/usr/bin/nm-prepare
 
 [Install]
