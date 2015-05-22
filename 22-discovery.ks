@@ -30,6 +30,11 @@ sed -i "s/.*:log_level:.*/:log_level: debug/" /etc/foreman-proxy/settings.yml
 sed -i 's/.*:enabled:.*/:enabled: true/' /etc/foreman-proxy/settings.d/bmc.yml
 sed -i 's/.*:bmc_default_provider:.*/:bmc_default_provider: shell/' /etc/foreman-proxy/settings.d/bmc.yml
 
+echo " * setting up systemd"
+echo "DefaultTimeoutStartSec=30s" >> /etc/systemd/system.conf
+echo "DefaultTimeoutStopSec=5s" >> /etc/systemd/system.conf
+echo "DumpCore=no" >> /etc/systemd/system.conf
+
 echo " * setting up journald and tty1"
 rm -f /etc/systemd/system/getty.target.wants/getty@tty1.service
 echo "SystemMaxUse=15M" >> /etc/systemd/journald.conf
