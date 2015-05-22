@@ -1,4 +1,4 @@
-
+```
   _____
  |  ___|__  _ __ ___ _ __ ___   __ _ _ __
  | |_ / _ \| '__/ _ \ '_ ` _ \ / _` | '_ \
@@ -9,7 +9,7 @@
    | |_| | \__ \ (_| (_) \ V /  __/ |  | |_| |
    |____/|_|___/\___\___/ \_/ \___|_|   \__, |
                                         |___/
-
+```
 
 Foreman Discovery Image
 =======================
@@ -24,8 +24,10 @@ The image has foreman-proxy installed with BMC API configured to "shell"
 provider. Upon request of Foreman, it reboots the node via /usr/bin/reboot
 command. To initiate the restart, use the following command:
 
-  curl -3 -H "Accept:application/json" -H "Content-Length:0" -k -X PUT \
-    http://192.168.100.100:8443/bmc/ignored/chassis/power/cycle
+```
+curl -3 -H "Accept:application/json" -H "Content-Length:0" -k -X PUT \
+  http://192.168.100.100:8443/bmc/ignored/chassis/power/cycle
+```
 
 Usage
 -----
@@ -35,17 +37,21 @@ plugin site: https://github.com/theforeman/foreman_discovery
 
 To extract the tarball into the correct directory you can use this command:
 
+```
 wget http://downloads.theforeman.org/discovery/releases/X.X/fdi-image-X.X.X.tar \
   -O - | tar x --overwrite -C /var/lib/tftpboot/boot
+```
 
 Integrate it via the PXELinux templates in the Foreman application.
 
+```
 LABEL discovery
 MENU LABEL Foreman Discovery Image
 MENU DEFAULT
 KERNEL boot/fdi-image/vmlinuz0
 APPEND initrd=boot/fdi-image/initrd0.img rootflags=loop root=live:/fdi.iso rootfstype=auto ro rd.live.image acpi=force rd.luks=0 rd.md=0 rd.dm=0 rd.lvm=0 rd.bootif=0 rd.neednet=0 nomodeset proxy.url=http://YOURPROXY proxy.type=proxy
 IPAPPEND 2
+```
 
 Make sure the APPEND statement is on *single line*.
 
@@ -110,21 +116,35 @@ Planned features
 Building
 --------
 
+Install the required packages:
+
+```
+$ sudo yum install livecd-tools pykickstart
+```
+
 To prepare CentOS 7 kickstart do:
 
-  $ ./build-livecd fdi-centos7.ks
+```
+$ ./build-livecd fdi-centos7.ks
+```
 
 To prepare Fedora 19 kickstart do:
 
-  $ ./build-livecd fdi-fedora19.ks
+```
+$ ./build-livecd fdi-fedora19.ks
+```
 
 To build the image (make sure you have at least 1 GB free space in /tmp):
 
-  $ sudo ./build-livecd-root
+```
+$ sudo ./build-livecd-root
+```
 
 Copy the resulting tarball to the TFTP boot directory:
 
-  $ tar xvf fdi-image-*.tar -C /var/tftproot/boot
+```
+$ tar xvf fdi-image-*.tar -C /var/lib/tftpboot/boot
+```
 
 And visit https://github.com/theforeman/foreman_discovery for more
 information about how to configure Foreman and how to use the plugin.
@@ -140,9 +160,11 @@ Additional facts
 Some extra facts are reported in addition to the standard ones reported by
 Facter:
 
-  FACTERLIB=/usr/share/fdi/facts/ facter | grep discovery
-  discovery_bootif => 52:54:00:94:9e:52
-  discovery_bootip => 192.168.122.51
+```
+FACTERLIB=/usr/share/fdi/facts/ facter | grep discovery
+discovery_bootif => 52:54:00:94:9e:52
+discovery_bootip => 192.168.122.51
+```
 
 discovery_bootif - MAC of the interface it was booted from
 discovery_bootip - IP of the interface it was booted from
@@ -165,7 +187,9 @@ shown there. Particulary useful system logs are tagged with:
 The root account and ssh access are disabled by default, but you can enable
 ssh and set root password using the following kernel command line options:
 
-  fdi.ssh=1 fdi.rootpw=redhat
+```
+fdi.ssh=1 fdi.rootpw=redhat
+```
 
 You can use tty2 console (or higher) to login as well.
 
@@ -177,23 +201,28 @@ fdi-image.ks kickstart file is self-containing. First of all, run the
 initial script and provide empty base kickstart without any repositories
 (they will be added via koji:
 
-  $ ./build-livecd fdi-empty.ks
-
+```
+$ ./build-livecd fdi-empty.ks
+```
 Then simply build the image from kickstart called fdi-image.ks:
 
-  koji spin-livecd \
-    fdi-image-rhel_7_0 \
-    $(cat root/usr/share/fdi/VERSION) \
-    --release $(cat root/usr/share/fdi/RELEASE) \
-    --repo=http://my.repo/1 \
-    --scratch \
-    my-tag-image
-    x86_64 \
-    fdi-image.ks
+```
+koji spin-livecd \
+  fdi-image-rhel_7_0 \
+  $(cat root/usr/share/fdi/VERSION) \
+  --release $(cat root/usr/share/fdi/RELEASE) \
+  --repo=http://my.repo/1 \
+  --scratch \
+  my-tag-image
+  x86_64 \
+  fdi-image.ks
+```
 
 Then extract the kernel and initial RAM disk:
 
-  mv fdi-image-rhel_7_0-1.9.90-20141022.1.iso fdi.iso
-  livecd-iso-to-pxeboot fdi.iso
+```
+mv fdi-image-rhel_7_0-1.9.90-20141022.1.iso fdi.iso
+livecd-iso-to-pxeboot fdi.iso
+```
 
 vim:tw=75
