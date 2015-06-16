@@ -106,6 +106,10 @@ paths are relative to the TFTP root. So if you have two zips at
 $TFTP/zip1.zip and $TFTP/boot/zip2.zip, you would use
 `fdi.zips=zip1.zip,boot/zip2.zip`.
 
+You can force the server to download the zip files by appending
+`fdi.zipserver=<tftp-address>`, where `<tftp-address>` is the IP address of
+your TFTP server hosting the extensions.
+
 Planned features
 ----------------
 
