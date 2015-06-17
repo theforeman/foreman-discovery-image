@@ -57,10 +57,10 @@ unless zips.nil?
       else
         log_msg "TFTP error downloading #{zip}: #{tftp_result}"
       end
-
     rescue
       # We always want to write /etc/default/discovery so don't bomb out here
       log_err "Problem downloading zipfile #{zip}"
+      exit 1
     ensure
       # Cleanup
       File.unlink('/tmp/ext.zip') if File.exists?('/tmp/ext.zip')
@@ -76,3 +76,5 @@ File.open('/etc/default/discovery','w') do |f|
   f.write(env_append('LD_LIBRARY_PATH','/opt/extension/lib'))
   f.write(env_append('RUBYLIB','/opt/extension/lib/ruby'))
 end
+
+exit 0
