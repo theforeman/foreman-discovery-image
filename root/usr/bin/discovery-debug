@@ -15,8 +15,8 @@ echo "* KERNEL COMMAND LINE *"
 cat /proc/cmdline
 
 echo "* NETWORK CONFIGURATION *"
-ls /etc/sysconfig/network-scripts/ifcfg*
-for C in /etc/sysconfig/network-scripts/ifcfg-*; do cat $C; echo; done
+nmcli con
+for C in /etc/NetworkManager/system-connections/*; do cat $C; echo; done
 
 echo "* FACTER *"
 FACTERLIB=/usr/share/fdi/facts/ facter

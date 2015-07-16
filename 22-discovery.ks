@@ -7,6 +7,18 @@ yum -y install fedora-release centos-release redhat-release-server || \
 echo " * disabling legacy network services (needed for RHEL 7.0)"
 systemctl disable network.service
 
+echo " * configuring NetworkManager and udev/nm-prepare"
+cat > /etc/NetworkManager/NetworkManager.conf <<'NM'
+[main]
+monitor-connection-files=yes
+no-auto-default=*
+#[logging]
+#level=DEBUG
+NM
+cat > /etc/udev/rules.d/81-nm-prepare.rules <<'UDEV'
+ACTION=="add", SUBSYSTEM=="net", NAME!="lo", RUN+="/usr/bin/systemd-cat -t nm-prepare /usr/bin/nm-prepare %k"
+UDEV
+
 echo " * enabling NetworkManager system services (needed for RHEL 7.0)"
 systemctl enable NetworkManager.service
 systemctl enable NetworkManager-dispatcher.service

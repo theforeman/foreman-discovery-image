@@ -59,6 +59,18 @@ You can also use the image standalone (without TFTP under Foreman's
 control). In this case, edit your pxelinux.cfg/default file directly and
 make sure the foreman.url points correctly.
 
+Networking
+----------
+
+By default the instance only initializes default interface (the one it was
+booted from) via DHCP. If you want to initialize all network interfaces,
+provide fdi.initnet=all option on the kernel command line. Peer DNS and
+routes are always acquired only from the primary interface and ignored for
+secondary (PEERDNS, PEERROUTES, DEFROUTE). Network cards connected to same
+networks can cause troubles due to ARP filtering.
+
+Only IPv4 is supported at the moment, IPv6 is not initialized.
+
 Extending the image at runtime with a ZIPfile
 ---------------------------------------------
 
@@ -172,6 +184,17 @@ discovery_bootip => 192.168.122.51
 
 discovery_bootif - MAC of the interface it was booted from
 discovery_bootip - IP of the interface it was booted from
+
+Kernel command line options
+---------------------------
+
+* proxy.url - URL to proxy (if omitted DNS SRV lookup is made)
+* proxy.type=proxy/foreman - direct or via smart-proxy connection
+* fdi.zips - extensions to download (see above)
+* fdi.zipserver - override TFTP server reported by DHCP (see above)
+* fdi.initnet=all/bootif - initialize all or pxe NICs (default) during startup
+* fdi.ssh=1/0 - configure ssh daemon (see below)
+* fdi.rootpw=string - configure ssh daemon password (see below)
 
 Troubleshooting
 ---------------
