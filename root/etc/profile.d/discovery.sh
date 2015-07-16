@@ -4,25 +4,31 @@
 # in normal shells
 
 filename="/etc/default/discovery"
-while read -r line
-do
+if test -f $filename
+then
+  while read -r line
+  do
     if [[ $line =~ ^# ]] ; then
-        continue
+      continue
     elif [[ $line =~ .*=.* ]] ; then
-	export $line
+      export $line
     else
-        continue
+      continue
     fi
-done < "$filename"
+  done < "$filename"
+fi
 
 filename="/etc/default/discovery-zip-server"
-while read -r line
-do
+if test -f $filename
+then
+  while read -r line
+  do
     if [[ $line =~ ^# ]] ; then
-        continue
+      continue
     elif [[ $line =~ .*=.* ]] ; then
-	export $line
+      export $line
     else
-        continue
+      continue
     fi
-done < "$filename"
+  done < "$filename"
+fi

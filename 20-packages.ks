@@ -11,6 +11,7 @@ yum
 vim-minimal
 acpid
 tftp
+lldpad
 
 # Facter
 facter
@@ -26,6 +27,7 @@ OpenIPMI-tools
 foreman-proxy
 
 # Debugging support
+less
 file
 
 # Only needed because livecd-tools runs /usr/bin/firewall-offline-cmd
@@ -39,6 +41,7 @@ openssh-server
 
 # Starts all interfaces automatically for us
 NetworkManager
+uuid
 
 # Used to update code at runtime
 unzip
