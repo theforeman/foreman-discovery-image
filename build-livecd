@@ -1,9 +1,11 @@
 #!/bin/bash
 
-[[ -z "$1" ]] && echo "Usage: $0 fdi-name.ks [RELEASE_NUMBER]" && exit 1
+[[ -z "$1" ]] && echo "Usage: $0 fdi-name.ks [VERSION] [RELEASE]" && exit 1
 
-VERSION=$(git describe --abbrev=0 --tags)
-RELEASE=$(date +%Y%m%d).${2:-1}
+DEFAULT_VERSION=$(git describe --abbrev=0 --tags)
+DEFAULT_RELEASE=$(date +%Y%m%d).1
+VERSION=${2:-$DEFAULT_VERSION}
+RELEASE=${3:-$DEFAULT_RELEASE}
 KS_INSTALL=fdi-install.ks
 KS_TARGET=fdi-image.ks
 OVERLAY="/etc/dhcp/dhclient.d/get-zip-server.sh
