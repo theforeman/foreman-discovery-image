@@ -6,23 +6,25 @@ VERSION=$(git describe --abbrev=0 --tags)
 RELEASE=$(date +%Y%m%d).${2:-1}
 KS_INSTALL=fdi-install.ks
 KS_TARGET=fdi-image.ks
-OVERLAY="/etc/dhcp/dhclient.d/get-zip-server.sh
+OVERLAY="
+  /etc/default/discovery
+  /etc/NetworkManager/dispatcher.d/15-get-zip-server
   /etc/profile.d/discovery.sh
   /etc/rc.d/rc.local
-  /etc/systemd/system/discovery-autostart.service
+  /etc/systemd/system/discovery-fetch-extensions.path
+  /etc/systemd/system/discovery-fetch-extensions.service
   /etc/systemd/system/discovery-register.service
-  /etc/systemd/system/discovery-setup.path
-  /etc/systemd/system/discovery-setup.service
+  /etc/systemd/system/discovery-start-extensions.service
   /etc/systemd/system/nm-prepare.service
-  /usr/bin/discovery-autostart
   /usr/bin/discovery-debug
+  /usr/bin/discovery-fetch-extensions
   /usr/bin/discovery-register
-  /usr/bin/discovery-setup
+  /usr/bin/discovery-start-extensions
   /usr/bin/find-largest-rpms
   /usr/bin/find-missing-libs
-  /usr/bin/get-zip-server_config
   /usr/bin/nm-prepare
   /usr/lib64/ruby/vendor_ruby/discovery.rb
+  /usr/share/fdi/commonfunc.sh
   /usr/share/fdi/facts/discovery-facts.rb
   /usr/share/fdi/RELEASE
   /usr/share/fdi/VERSION"
@@ -46,15 +48,14 @@ done
 cat >> $KS_INSTALL <<KS
 %post
 chmod +x \
-  /etc/dhcp/dhclient.d/get-zip-server.sh \
+  /etc/NetworkManager/dispatcher.d/15-get-zip-server \
   /etc/rc.d/rc.local \
-  /usr/bin/discovery-autostart \
   /usr/bin/discovery-debug \
+  /usr/bin/discovery-fetch-extensions \
   /usr/bin/discovery-register \
-  /usr/bin/discovery-setup \
+  /usr/bin/discovery-start-extensions \
   /usr/bin/find-largest-rpms \
   /usr/bin/find-missing-libs \
-  /usr/bin/get-zip-server_config \
   /usr/bin/nm-prepare
 %end
 KS

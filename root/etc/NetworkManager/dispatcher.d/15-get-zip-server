@@ -1,0 +1,50 @@
+#!/bin/bash
+
+# Script to extract the NEXT_SERVER value from the incoming DHCP lease
+# and write it to a place where systemd/profile.d can source it
+
+# This is only run when the interface is going "up" so we don't interfere
+# with the next-server settings on "down"
+
+zipserver=""
+
+# create/replace file using a tempfile.
+# This allows us to trigger on PathExists inside systemd.path units.
+function tmpwriter {
+  tmpfile="$(TMPDIR="${1%/*}" mktemp)"
+  cat > "${tmpfile}"
+  mv "${tmpfile}" "${1}"
+}
+
+if [ $# -ne 2 ]
+then
+  echo "usage: $0 <iface> <action>" >&2
+  echo '  Only action "up" is used by this script.' >&2
+  exit 1
+fi
+
+if [ "${2}" != "up" ]
+then
+  exit
+fi
+
+iface="${1}"
+
+read hwaddr < "/sys/class/net/${iface}/address"
+
+source /usr/share/fdi/commonfunc.sh
+exportKCL
+
+zipserver="${KCL_FDI_ZIPSERVER}"
+bootif="$(normalizeHwAddr "${BOOTMAC}")"
+
+# we process the interface we have booted PXELINUX from
+if [ "${hwaddr}" == "${bootif}" ]
+then
+  # kernel cmdline takes precedence over DHCP supplied next-server
+  if [ -z "${zipserver}" -a -n "${DHCP4_NEXT_SERVER}" ]
+  then
+    zipserver="${DHCP4_NEXT_SERVER}"
+  fi
+  echo "ZIP_SERVER=${zipserver}" | tmpwriter /etc/default/discovery-zip-server
+fi

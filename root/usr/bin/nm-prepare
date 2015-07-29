@@ -6,15 +6,19 @@
 # configured. The script is executed via udev for all secondary network devices and
 # via systemd (nm-prepare) for primary interface.
 
-bootif=$(cat /proc/cmdline | grep -io 'BOOTIF=\S*' | tail -n1 | tr A-F- a-f: | cut -d: -f2-7)
-initnet=$(cat /proc/cmdline | grep -io 'fdi.initnet=\S*' | tail -n1 | cut -d= -f2)
+source /usr/share/fdi/commonfunc.sh
+
+exportKCL
+bootif="$(normalizeHwAddr "${BOOTMAC}")"
+initnet="${KCL_FDI_INITNET}"
 
 configure_secondary_device() {
     # device name can still change after configuration is deployed - we don't use it
     dev=$(basename $1)
     [[ "$dev" == "lo" ]] && return
     [[ -f /sys/class/net/$dev/address ]] || return
-    mac=$(cat /sys/class/net/$dev/address | tr A-F- a-f:)
+    read mac < "/sys/class/net/$dev/address"
+    mac="$(normalizeHwAddr "$mac")"
     [[ "$mac" == "$bootif" ]] && return
     if [[ "${initnet,,}" == "all" ]]; then
         autoconnect=true
@@ -52,7 +56,7 @@ if [[ -z "$1" ]]; then
 elif [[ "$1" == "primary" ]]; then
     script=/etc/NetworkManager/system-connections/primary
     uuid=$(/usr/bin/uuid)
-    echo "Dropping nm config $script ($mac)"
+    echo "Dropping nm config $script ($bootif)"
     cat > $script <<EONS
 [connection]
 id=primary

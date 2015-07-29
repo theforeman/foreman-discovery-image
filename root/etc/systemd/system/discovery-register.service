@@ -1,14 +1,10 @@
 [Unit]
 Description=Register this host in Foreman
-Wants=basic.target
-After=basic.target network.target network-online.target nss-lookup.target discovery-autostart.service foreman-proxy.service
+After=foreman-proxy.service
 
 [Service]
 Type=idle
-EnvironmentFile=-/etc/default/discovery
+EnvironmentFile=/etc/default/discovery
 ExecStart=/usr/bin/discovery-register
 KillMode=process
 Restart=always
-
-[Install]
-WantedBy=multi-user.target
