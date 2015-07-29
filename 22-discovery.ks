@@ -30,10 +30,7 @@ systemctl enable nm-prepare.service
 echo " * enabling required system services"
 systemctl enable ipmi.service
 systemctl enable foreman-proxy.service
-systemctl enable discovery-setup.path
-systemctl enable discovery-setup.service
-systemctl enable discovery-autostart.service
-systemctl enable discovery-register.service
+systemctl enable discovery-fetch-extensions.path
 
 echo " * setting up foreman proxy"
 sed -i "s/.*:http_port:.*/:http_port: 8443/" /etc/foreman-proxy/settings.yml

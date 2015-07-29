@@ -1,0 +1,10 @@
+[Unit]
+Description=Download zip extensions to this image
+Wants=discovery-start-extensions.service
+Before=discovery-start-extensions.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/etc/default/discovery-zip-server
+RemainAfterExit=yes
+ExecStart=/usr/bin/discovery-fetch-extensions

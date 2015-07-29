@@ -1,0 +1,10 @@
+[Unit]
+Description=Start downloaded extension scripts
+Wants=discovery-register.service
+Before=discovery-register.service foreman-proxy.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/default/discovery
+RemainAfterExit=yes
+ExecStart=/usr/bin/discovery-start-extensions
