@@ -22,7 +22,7 @@ fi
 trap cleanup EXIT
 
 resultdir=$PWD
-srcdir=$(realpath $(dirname $0))
+srcdir=$(readlink -f $(dirname $0))
 tmpdir=$(mktemp -d /tmp/build-fdi-XXXXXX)
 
 cd $srcdir
@@ -33,10 +33,22 @@ cd $tmpdir
 echo Working in directory $tmpdir
 
 echo "* Running livecd-creator"
-livecd-creator -v --cache /var/cache/build-fdi --config $srcdir/fdi-image.ks -f fdi -t /tmp || KEEP_TMPDIR=yes
+livecd-creator -v --cache /var/cache/build-fdi --config $srcdir/fdi-image.ks -f fdi -t /tmp
+
+if [ $? -ne 0 ]; then
+    KEEP_TMPDIR=yes
+    echo "Error creating livecd"
+    exit 1
+fi
 
 echo "* Converting to initrd"
-livecd-iso-to-pxeboot $tmpdir/fdi.iso || KEEP_TMPDIR=yes
+livecd-iso-to-pxeboot $tmpdir/fdi.iso
+
+if [ $? -ne 0 ]; then
+    KEEP_TMPDIR=yes
+    echo "Error converting to initrd"
+    exit 1
+fi
 
 ## Work around dracut not configuring udev correctly for the loopback kernel module
 ## See: http://git.kernel.org/cgit/boot/dracut/dracut.git/commit/?id=ba9368fa4fedda0f72d84f910d01d7da201405a3
