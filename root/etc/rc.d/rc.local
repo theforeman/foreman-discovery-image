@@ -1,12 +1,14 @@
 #!/bin/bash
 
+source /usr/share/fdi/commonfunc.sh
+exportKCL
+
 # setup root password
-ROOTPW=$(cat /proc/cmdline | grep -io 'fdi.rootpw=\S*' | sed 's/fdi.rootpw=//')
-if [[ ! -z "$ROOTPW" ]]; then
-  echo "root:$ROOTPW" | chpasswd >/dev/null
+if [[ ! -z "$KCL_FDI_ROOTPW" ]]; then
+  echo "root:$KCL_FDI_ROOTPW" | chpasswd >/dev/null
 fi
 
 # enable ssh
-if [[ "$(cat /proc/cmdline | grep -io 'fdi.ssh=\S*')" == "fdi.ssh=1" ]]; then
+if [ "$KCL_FDI_SSH" == "1" ]; then
   systemctl start sshd
 fi
