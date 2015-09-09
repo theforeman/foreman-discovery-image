@@ -84,9 +84,15 @@ facts = Hash[Facter.to_hash.select {|k,v| k =~ /address|hardware|manufacturer|pr
 facts.keys.sort.each {|k| log_msg " #{k}: #{facts[k]}"}
 
 # loop, but only upload on changes
+i = cmdline("fdi.cachefacts", 10).to_i rescue 10
 while true do
   uninteresting_facts=/kernel|operatingsystem|osfamily|ruby|path|time|swap|free|filesystem|version|selinux/i
   facts = Facter.to_hash.reject! {|k,v| k =~ uninteresting_facts }
+  if i > 0
+    # clear cache because during bootproces facts may change
+    Facter.clear
+    i -= 1
+  end
   unless YAML.load(read_cache) == facts
     log_msg "Fact cache invalid, reloading to foreman"
     write_cache(YAML.dump(facts)) if upload
