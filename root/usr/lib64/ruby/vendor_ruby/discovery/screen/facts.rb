@@ -15,8 +15,8 @@ def screen_facts mac, proxy_url, proxy_type
   (0..8).each_with_index do |ix, _|
     labels[ix] = Newt::Label.new(-1, -1, "Fact \##{ix + 1} name ")
     labels_sep[ix] = Newt::Label.new(-1, -1, " value ")
-    names[ix] = Newt::Entry.new(-1, -1, cmdline("fdi.pxfactname#{ix + 1}").to_s, 15, 0)
-    values[ix] = Newt::Entry.new(-1, -1, cmdline("fdi.pxfactvalue#{ix + 1}").to_s, 15, 0)
+    names[ix] = Newt::Entry.new(-1, -1, cmdline("fdi.pxfactname#{ix + 1}").to_s, 15, Newt::FLAG_SCROLL)
+    values[ix] = Newt::Entry.new(-1, -1, cmdline("fdi.pxfactvalue#{ix + 1}").to_s, 15, Newt::FLAG_SCROLL)
     facts_grid.set_field(0, ix, Newt::GRID_COMPONENT, labels[ix], 0, 0, 0, 0, 0, 0)
     facts_grid.set_field(1, ix, Newt::GRID_COMPONENT, names[ix], 0, 0, 0, 0, 0, 0)
     facts_grid.set_field(2, ix, Newt::GRID_COMPONENT, labels_sep[ix], 0, 0, 0, 0, 0, 0)
