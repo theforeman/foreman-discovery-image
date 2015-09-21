@@ -9,6 +9,7 @@ require 'discovery/screen/primary_iface'
 require 'discovery/screen/ssh'
 require 'discovery/screen/status'
 require 'discovery/screen/welcome'
+require 'discovery/screen/info'
 
 # Disable GC until https://github.com/theforeman/ruby-newt/issues/2 is fixed,
 # see also: http://projects.theforeman.org/issues/11623

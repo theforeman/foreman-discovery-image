@@ -1,7 +1,7 @@
 def screen_primary_iface dhcp = false
   width = 60
   t_desc = Newt::Textbox.new(-1, -1, width, 3, Newt::FLAG_WRAP)
-  t_desc.set_text "Select primary network interface with connection to Foreman server:"
+  t_desc.set_text "Select primary (provisioning) network interface with connection to Foreman server:"
   lb_ifaces = Newt::Listbox.new(-1, -1, 10, Newt::FLAG_SCROLL)
   b_select = Newt::Button.new(-1, -1, "Select")
   b_cancel = Newt::Button.new(-1, -1, "Cancel")
@@ -48,14 +48,13 @@ def screen_primary_iface dhcp = false
   if answer == b_select
     primary_mac = lb_ifaces.get_current_as_string
     if dhcp
-      configure_network false, primary_mac
-      [:screen_foreman, primary_mac, nil, cmdline('proxy.url'), cmdline('proxy.type'), true]
+      action = Proc.new { configure_network false, primary_mac }
+      [:screen_info, action, "Configuring network via DHCP. This operation can take several minutes to complete.", "Unable to bring network via DHCP",
+        [:screen_foreman, primary_mac, nil, cmdline('proxy.url'), cmdline('proxy.type'), true],
+        [:screen_network, primary_mac]]
     else
       detect_ip, detect_gw, detect_dns = detect_ipv4_credentials('primary')
-      [:screen_network, primary_mac,
-       cmdline('fdi.pxip') || detect_ip,
-       cmdline('fdi.pxgw') || detect_gw,
-       cmdline('fdi.pxdns') || detect_dns]
+      [:screen_network, primary_mac, cmdline('fdi.pxip', detect_ip), cmdline('fdi.pxgw', detect_gw), cmdline('fdi.pxdns', detect_dns)]
     end
   elsif answer == b_cancel
     :screen_welcome

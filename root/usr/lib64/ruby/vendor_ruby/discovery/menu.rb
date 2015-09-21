@@ -40,13 +40,17 @@ def error_box(msg, extra_msg = nil)
   exit(1)
 end
 
-def command(cmd)
+def command(cmd, fail_on_error = true)
   log_msg "TUI executing: #{cmd}"
   # do not run real commands in development (non-image) environment
-  return if fdi_version == 'GIT'
+  return true if fdi_version == 'GIT'
   output = `#{cmd} 2>&1`
   if $? != 0
-    error_box("Command failed: #{cmd}", output)
+    if fail_on_error
+      error_box("Command failed: #{cmd}", output)
+    else
+      return false
+    end
   end
   output
 end
@@ -82,9 +86,10 @@ def configure_network static, mac, ip=nil, gw=nil, dns=nil
   end
   command("nmcli connection reload")
   command("nmcli connection down primary")
-  command("nmcli connection up primary")
+  result = command("nmcli connection up primary", false)
   # restarting proxy with regenerated SSL self-signed cert
-  command("systemctl start foreman-proxy")
+  command("systemctl start foreman-proxy") if result
+  result
 end
 
 def perform_upload proxy_url, proxy_type, custom_facts
