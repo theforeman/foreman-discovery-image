@@ -140,16 +140,6 @@ discovery_bootip => 192.168.122.51
 discovery_bootif - MAC of the interface it was booted from
 discovery_bootip - IP of the interface it was booted from
 
-Kernel command line options
----------------------------
-
-* proxy.url - URL to proxy (if omitted DNS SRV lookup is made)
-* proxy.type=proxy/foreman - direct or via smart-proxy connection
-* fdi.zips - extensions to download (see above)
-* fdi.zipserver - override TFTP server reported by DHCP (see above)
-* fdi.initnet=all/bootif - initialize all or pxe NICs (default) during startup
-* fdi.ssh=1/0 - configure ssh daemon (see below)
-* fdi.rootpw=string - configure ssh daemon password (see below)
 
 Troubleshooting
 ---------------
