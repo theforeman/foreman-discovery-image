@@ -93,7 +93,9 @@ def proxy_type
 end
 
 def write_tui result = 'success', code, body
-  File.open("/tmp/discovery-http-#{result}", 'w') do |file|
+  filename = "/tmp/discovery-http-#{result}"
+  log_debug "Wrote result #{code} to #{filename}"
+  File.open(filename, 'w') do |file|
     file.write("#{code}: #{body}")
   end
 end
@@ -101,6 +103,10 @@ end
 def upload(uri = discover_server, type = proxy_type, custom_facts = {})
   unless uri
     log_err "Could not determine Foreman instance, add foreman.url or proxy.url kernel command parameter"
+    return
+  end
+  unless uri.is_a? URI
+    log_err "Upload#uri must be type of URI"
     return
   end
   if uri.host.nil? or uri.port.nil?
