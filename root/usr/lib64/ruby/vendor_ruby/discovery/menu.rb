@@ -118,6 +118,19 @@ def cleanup
   Newt::Screen.finish
 end
 
+def detect_first_nic_with_link
+  log_debug "Traing to guess the first NICs with link, fdi.pxmac was NOT provided"
+  mac = ''
+  Dir.glob('/sys/class/net/*') do |ifn|
+    name = File.basename ifn
+    next if name == "lo"
+    mac = File.read("#{ifn}/address").chomp rescue "??:??:??:??:??:??"
+    link = File.read("#{ifn}/carrier").chomp == "1" rescue false
+    break if link
+  end
+  mac
+end
+
 log_msg "Kernel opts: #{cmdline}"
 
 def main_loop
@@ -130,42 +143,58 @@ def main_loop
   Newt::Screen.new
   Newt::Screen.push_helpline("Foreman Discovery Image v#{fdi_version} (#{fdi_release})")
 
-  if cmdline('fdi.pxauto')
-    # automated pxeless discovery via kernel command line options
-    mac = cmdline('fdi.pxmac')
-    ip = cmdline('fdi.pxip')
-    gw = cmdline('fdi.pxgw')
-    dns = cmdline('fdi.pxdns')
-    configure_network true, mac, ip, gw, dns
-    proxy_url = cmdline('proxy.url')
-    proxy_url = cmdline('proxy.type')
-    facts = new_custom_facts(mac)
-    [1..9].each do |n|
-      if (fact_name = cmdline("fdi.pxfactname#{n}"))
-        fact_value = cmdline("fdi.pxfactvalue#{n}")
-        facts[fact_name] = fact_value
-      end
-    end
-    if perform_upload(proxy_url, proxy_type, custom_facts)
-      [:screen_status, generate_info('AWAITING KEXEC INTO INSTALLER')]
-    else
-      error_box("Unable to send facts", "Automated fact upload failed")
-    end
-  end
-
   if cmdline('BOOTIF')
-    func = :screen_countdown
+    # Booted via PXE
+    active_screen = :screen_countdown
   else
-    # the image was booted from ISO directly
-    func = :screen_welcome
-  end
-  while ! [:quit].include? func
-    if func.is_a?(Array)
-      log_debug "Entering #{func[0]}"
-      func = send(*func)
+    # Booted from ISO
+    if cmdline('fdi.pxauto')
+      # Unattended PXE-less provisioning
+      log_debug "Unattended provisioning started"
+      proxy_url = cmdline('proxy.url') || error_box("Option proxy.url was not provided, cannot continue")
+      proxy_url = URI.parse(proxy_url) rescue error_box("Unable to parse proxy.url URI: #{proxy_url}")
+      proxy_type = cmdline('proxy.type') || error_box("Option proxy.type was not provided, cannot continue")
+      log_debug "proxy.url=#{proxy_url} proxy.type=#{proxy_type}"
+      mac = cmdline('fdi.pxmac', detect_first_nic_with_link)
+      ip = cmdline('fdi.pxip') || error_box("Option fdi.pxip was not provided, cannot continue")
+      gw = cmdline('fdi.pxgw') || error_box("Option fdi.pxgw was not provided, cannot continue")
+      dns = cmdline('fdi.pxdns')
+      log_debug "fdi.px: mac=#{mac} ip=#{ip} gw=#{gw} dns=#{dns}"
+      action = Proc.new do
+        log_debug "Unattended network configuration started"
+        status = configure_network true, mac, ip, gw, dns
+        log_debug "Unattended network configuration finished, result: #{status}"
+        log_debug "Unattended facts collection started"
+        facts = new_custom_facts(mac)
+        [1..9].each do |n|
+          if (fact_name = cmdline("fdi.pxfactname#{n}"))
+            fact_value = cmdline("fdi.pxfactvalue#{n}")
+            facts[fact_name] = fact_value
+          end
+        end
+        log_debug "Unattended facts collection finished"
+        log_debug "Unattended facts upload started"
+        result = perform_upload(proxy_url, proxy_type, facts)
+        log_debug "Unattended facts upload finished, result: #{result}"
+        result
+      end
+      active_screen = [:screen_info, action,
+        "Performing unattended provisioning via NIC #{mac} with IP #{ip} (gw #{gw} DNS #{dns}) sending facts to #{proxy_url} of endpoint type #{proxy_type}...",
+        "Unattended provisioning failed: unable to upload facts",
+        [:screen_status, generate_info('Unattended fact upload OK - awaiting kexec')],
+        [:screen_status, generate_info('Unattended fact upload FAILED')]]
     else
-      log_debug "Entering #{func}"
-      func = send(func)
+      # Attended PXE-less provisioning
+      active_screen = :screen_welcome
+    end
+  end
+  while ! [:quit].include? active_screen
+    if active_screen.is_a?(Array)
+      log_debug "Entering #{active_screen[0]}"
+      active_screen = send(*active_screen)
+    else
+      log_debug "Entering #{active_screen}"
+      active_screen = send(active_screen)
     end
     Newt::Screen.pop_window()
   end

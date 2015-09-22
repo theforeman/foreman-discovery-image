@@ -7,9 +7,12 @@ def generate_info extra_status = ''
   elsif File.exist?(f = '/tmp/discovery-http-failure')
     status = "FAILURE #{extra_status}"
     response = wrap(IO.read(f), 65)
+  elsif extra_status != ''
+    status = extra_status
+    response = ''
   end
-  mac = Facter["macaddress"].value rescue 'N/A'
-  ip = Facter["ipaddress"].value rescue 'N/A'
+  mac = (Facter["macaddress"].value || '') rescue 'N/A'
+  ip = (Facter["ipaddress"].value || '') rescue 'N/A'
   <<EOS
 Status: #{status}
 
