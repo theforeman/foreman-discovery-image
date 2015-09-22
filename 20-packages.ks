@@ -2,6 +2,7 @@
 bash
 kernel
 grub2
+grub2-tools
 e2fsprogs
 passwd
 policycoreutils
@@ -56,6 +57,11 @@ unzip
 # Enable stripping
 binutils
 
+# For UEFI/Secureboot support
+grub2-efi
+efibootmgr
+shim
+
 #
 # Packages to Remove
 #
@@ -79,8 +85,6 @@ binutils
 
 # grub
 -freetype
--grub2
--grub2-tools
 -grubby
 -os-prober
 
@@ -93,7 +97,5 @@ binutils
 
 # Things it would be nice to loose
 -fedora-logos
-# EL
-#generic-logos
 -fedora-release-notes
 %end

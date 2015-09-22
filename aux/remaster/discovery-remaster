@@ -1,0 +1,77 @@
+#!/bin/bash
+
+if [ -z "$2" ]; then
+  echo "Usage: $0 fdi-bootable-x.y.z.iso 'proxy.url=https://192.168.9.1:443 proxy.type=foreman fdi.xyz=abc ...'"
+  exit 2
+fi
+
+if [ $(id -u) != 0 ]; then
+  echo "Please run this script as root"
+  exit 1
+fi
+
+which mount dd xorriso >/dev/null || ( echo "Command(s) missing, install required tools" && exit 3 )
+
+function cleanup() {
+	umount $TMP_ISO
+	[ -f $TMP_MBR ] && rm -f $TMP_MBR
+	[ -d $TMP_ISO ] && rm -rf $TMP_ISO
+	[ -d $TMP_NEW ] && rm -rf $TMP_NEW
+}
+
+TMP_ISO=$(mktemp -d)
+TMP_NEW=$(mktemp -d)
+TMP_MBR=$(mktemp)
+trap cleanup EXIT
+
+dd "if=$1" bs=512 count=1 of=$TMP_MBR
+mount -o loop -t iso9660 "$1" $TMP_ISO
+cp -r $TMP_ISO/* $TMP_NEW
+
+cat >$TMP_NEW/isolinux/isolinux.cfg <<EOIS
+default vesamenu.c32
+timeout 1
+prompt 0
+label fdi
+  menu label Foreman Discovery Image
+  kernel vmlinuz0
+  append initrd=initrd0.img root=live:CDLABEL=fdi rootfstype=auto ro rd.live.image acpi=force rd.luks=0 rd.md=0 rd.dm=0 $2
+  menu default
+EOIS
+
+cat >$TMP_NEW/EFI/BOOT/grub.cfg <<EOGR
+set default="1"
+function load_video {
+  insmod efi_gop
+  insmod efi_uga
+  insmod video_bochs
+  insmod video_cirrus
+  insmod all_video
+}
+load_video
+set gfxpayload=keep
+insmod gzio
+insmod part_gpt
+insmod ext2
+set timeout=1
+search --no-floppy --set=root -l 'fdi'
+menuentry 'Foreman Discovery Image' --class fedora --class gnu-linux --class gnu --class os {
+	linuxefi /isolinux/vmlinuz0 root=live:LABEL=fdi ro rd.live.image acpi=force $2
+	initrdefi /isolinux/initrd0.img
+}
+EOGR
+
+TIMESTAMP=$(date +%y%m%d_%H%M%S)
+xorriso -as mkisofs \
+       -iso-level 3 \
+       -full-iso9660-filenames \
+       -volid "fdi" \
+       -eltorito-boot isolinux/isolinux.bin \
+       -eltorito-catalog isolinux/boot.cat \
+       -no-emul-boot -boot-load-size 4 -boot-info-table \
+       -isohybrid-mbr $TMP_MBR \
+       -eltorito-alt-boot \
+       -e isolinux/efiboot.img \
+       -no-emul-boot -isohybrid-gpt-basdat \
+       -output ${1/.iso/-$TIMESTAMP}.iso \
+       $TMP_NEW
