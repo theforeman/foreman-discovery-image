@@ -1,7 +1,7 @@
 def screen_facts mac, proxy_url, proxy_type
   custom_facts = new_custom_facts(mac)
 
-  b_confirm = Newt::Button.new(-1, -1, "Confim")
+  b_confirm = Newt::Button.new(-1, -1, "Confirm")
   b_cancel = Newt::Button.new(-1, -1, "Cancel")
 
   top_grid = Newt::Grid.new(1, 2)

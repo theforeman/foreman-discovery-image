@@ -12,13 +12,8 @@ def screen_foreman mac = nil, gw = nil, proxy_url = cmdline('proxy.url'), proxy_
   r_proxy = Newt::RadioButton.new(32, 10, "Proxy", 1, r_server)
   b_ok = Newt::Button.new(34, 15, "Next")
   b_cancel = Newt::Button.new(46, 15, "Cancel")
-  if gw.nil?
-    proxy_url ||= ''
-  else
-    proxy_url ||= "https://#{gw}"
-  end
   proxy_type ||= 'foreman'
-  t_url.set(proxy_url, 1)
+  t_url.set(proxy_url, 1) if proxy_url
   r_server.set(proxy_type != 'proxy' ? '*' : ' ')
   r_proxy.set(proxy_type == 'proxy' ? '*' : ' ')
   items = [t_desc, l_type, l_url, t_url, r_server, r_proxy]
