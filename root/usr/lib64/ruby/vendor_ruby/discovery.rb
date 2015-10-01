@@ -31,15 +31,15 @@ require 'yaml'
 require 'json'
 
 def log_msg msg
-  Syslog.open($0, Syslog::LOG_PID | Syslog::LOG_CONS) { |s| s.info msg.to_s }
+  Syslog.open($0, Syslog::LOG_PID | Syslog::LOG_CONS) { |s| s.info msg.to_s.gsub('%', '%%') rescue false }
 end
 
 def log_err msg
-  Syslog.open($0, Syslog::LOG_PID | Syslog::LOG_CONS) { |s| s.err msg.to_s }
+  Syslog.open($0, Syslog::LOG_PID | Syslog::LOG_CONS) { |s| s.err msg.to_s.gsub('%', '%%') rescue false }
 end
 
 def log_debug msg
-  Syslog.open($0, Syslog::LOG_PID | Syslog::LOG_CONS) { |s| s.debug msg.to_s }
+  Syslog.open($0, Syslog::LOG_PID | Syslog::LOG_CONS) { |s| s.debug msg.to_s.gsub('%', '%%') rescue false }
 end
 
 def cmdline option=nil, default=nil
