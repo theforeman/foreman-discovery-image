@@ -5,3 +5,4 @@ root/usr/share/fdi/RELEASE
 *.tar
 *.iso
 .idea/
+build-local

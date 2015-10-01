@@ -98,7 +98,6 @@ echo " * setting multi-user.target as default"
 systemctl set-default multi-user.target
 
 echo " * setting up journald and ttys"
-systemctl stop getty@tty1.service getty@tty2.service
 systemctl disable getty@tty1.service getty@tty2.service
 systemctl mask getty@tty1.service getty@tty2.service
 echo "SystemMaxUse=15M" >> /etc/systemd/journald.conf
