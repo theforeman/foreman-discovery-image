@@ -12,6 +12,9 @@ if [ "$1" != "--tui" ]; then
   echo "* PROCESSES *"
   ps axww
 
+  echo "* PACKAGES"
+  cat /usr/packages_list
+
   echo "* JOURNAL (last 500 lines) *"
   journalctl | tail -n500
 fi

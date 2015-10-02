@@ -65,6 +65,7 @@ echo " * locking root account"
 passwd -l root
 
 echo " * cleaning up yum cache and removing rpm database"
+rpm -qa > /usr/packages_list
 yum clean all
 rm -rf /var/lib/{yum,rpm}/*
 # fix the vim syntax markup */
