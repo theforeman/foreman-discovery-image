@@ -1,0 +1,13 @@
+#!/bin/bash
+
+[[ -z "$1" ]] && echo "Usage: $0 interface" && exit 1
+[[ "$1" == "lo" ]] && exit 0
+
+echo -n "Setting LLDP parameter on interface $1: "
+/usr/sbin/lldptool -L -i $1 adminstatus=rxtx
+for var in portDesc sysName sysDesc sysCap; do
+	echo -n "Setting LLDP TLV $var on interface $1: "
+	/usr/sbin/lldptool -i $1 -T -V $var enableTx=yes
+done
+
+exit 0

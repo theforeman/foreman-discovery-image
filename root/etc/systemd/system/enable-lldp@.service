@@ -1,0 +1,13 @@
+[Unit]
+Description=Configures LLDP for %i
+After=lldpad.service
+Requires=lldpad.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/enable-lldp %i
+SyslogIdentifier=enable-lldp
+
+[Install]
+WantedBy=multi-user.target
