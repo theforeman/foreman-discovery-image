@@ -10,21 +10,18 @@ if [ $(id -u) != 0 ]; then
   exit 1
 fi
 
-which mount dd xorriso >/dev/null || ( echo "Command(s) missing, install required tools" && exit 3 )
+which mount dd mkisofs isohybrid implantisomd5 >/dev/null || ( echo "Command(s) missing, install required tools" && exit 3 )
 
 function cleanup() {
-	umount $TMP_ISO
-	[ -f $TMP_MBR ] && rm -f $TMP_MBR
-	[ -d $TMP_ISO ] && rm -rf $TMP_ISO
-	[ -d $TMP_NEW ] && rm -rf $TMP_NEW
+  umount $TMP_ISO
+  [ -d $TMP_ISO ] && rm -rf $TMP_ISO
+  [ -d $TMP_NEW ] && rm -rf $TMP_NEW
 }
 
 TMP_ISO=$(mktemp -d)
 TMP_NEW=$(mktemp -d)
-TMP_MBR=$(mktemp)
 trap cleanup EXIT
 
-dd "if=$1" bs=512 count=1 of=$TMP_MBR
 mount -o loop -t iso9660 "$1" $TMP_ISO
 cp -r $TMP_ISO/* $TMP_NEW
 
@@ -56,22 +53,16 @@ insmod ext2
 set timeout=1
 search --no-floppy --set=root -l 'fdi'
 menuentry 'Foreman Discovery Image' --class fedora --class gnu-linux --class gnu --class os {
-	linuxefi /isolinux/vmlinuz0 root=live:LABEL=fdi ro rd.live.image acpi=force $2
-	initrdefi /isolinux/initrd0.img
+  linuxefi /isolinux/vmlinuz0 root=live:LABEL=fdi ro rd.live.image acpi=force $2
+  initrdefi /isolinux/initrd0.img
 }
 EOGR
 
 TIMESTAMP=$(date +%y%m%d_%H%M%S)
-xorriso -as mkisofs \
-       -iso-level 3 \
-       -full-iso9660-filenames \
-       -volid "fdi" \
-       -eltorito-boot isolinux/isolinux.bin \
-       -eltorito-catalog isolinux/boot.cat \
-       -no-emul-boot -boot-load-size 4 -boot-info-table \
-       -isohybrid-mbr $TMP_MBR \
-       -eltorito-alt-boot \
-       -e isolinux/efiboot.img \
-       -no-emul-boot -isohybrid-gpt-basdat \
-       -output ${1/.iso/-$TIMESTAMP}.iso \
-       $TMP_NEW
+OUT_ISO=${1/.iso/-$TIMESTAMP}.iso
+mkisofs -quiet -U -A "fdi" -V "fdi" -volset "fdi" -J -joliet-long -r -v -T \
+  -o $OUT_ISO -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 \
+  -boot-info-table -eltorito-alt-boot -e isolinux/efiboot.img -no-emul-boot $TMP_NEW
+isohybrid --partok --uefi $OUT_ISO
+implantisomd5 $OUT_ISO
+echo "Created: $OUT_ISO"

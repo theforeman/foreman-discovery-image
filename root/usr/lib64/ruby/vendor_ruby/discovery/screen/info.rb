@@ -10,9 +10,13 @@ def screen_info action_proc, message, error_message, success_screen, failure_scr
   f = Newt::Form.new
   f.add(t)
   f.draw
+
+  # facter sometimes leaves messages on stdout, refresh before/after
+  Newt::Screen.refresh
+  result = action_proc.call
   Newt::Screen.refresh
 
-  if action_proc.call
+  if result
     success_screen
   else
     Newt::Screen.win_message("Operation failed", "OK", error_message)
