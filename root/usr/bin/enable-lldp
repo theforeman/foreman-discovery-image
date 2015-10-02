@@ -1,0 +1,23 @@
+#!/bin/bash
+
+enable_lldp_int() {
+  local int=$1
+  shift
+  local ip=$1
+  shift
+
+  variables="$@"
+
+  lldptool -L -i $int adminstatus=rxtx
+
+  for var in $variables; do
+    lldptool -i $int -T -V $var enableTx=yes
+  done
+
+}
+
+for inter in $(ls /sys/class/net/ | grep -v "lo"); do
+ enable_lldp_int $inter $ipaddress portDesc sysName sysDesc sysCap
+done
+
+exit 0
