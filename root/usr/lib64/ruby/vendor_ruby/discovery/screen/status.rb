@@ -11,13 +11,11 @@ def generate_info extra_status = '', server = discover_server, proxy_type = prox
     status = extra_status
     response = ''
   end
-  mac = (Facter["macaddress"].value || '') rescue 'N/A'
-  ip = (Facter["ipaddress"].value || '') rescue 'N/A'
   <<EOS
 Status: #{status}
 
-MAC address: #{mac.strip}
-IP address: #{ip.strip}
+Primary NIC: #{get_mac}
+Primary IPv4: #{get_ipv4}
 
 Discovery server: #{discover_server || 'N/A'}
 Endpoint type: #{proxy_type}

@@ -157,6 +157,14 @@ def env_append(env,string)
   end
 end
 
+def get_mac(interface = 'primary')
+  `nmcli -t -f 802-3-ethernet.mac-address con show #{interface}`.scan(/\w{2}:\w{2}:\w{2}:\w{2}:\w{2}:\w{2}\n/).first.strip rescue 'N/A'
+end
+
+def get_ipv4(interface = 'primary')
+  `nmcli -t -f IP4.ADDRESS con show #{interface}`.scan(/\d+\.\d+\.\d+\.\d+\/\d+\n/).first.strip rescue 'N/A'
+end
+
 def detect_ipv4_credentials(interface)
   res = {}
   str = `nmcli -t -f IP4.ADDRESS,IP4.GATEWAY,IP4.DNS con show #{interface}`
