@@ -36,7 +36,7 @@ def screen_foreman mac = nil, gw = nil, proxy_url = cmdline('proxy.url'), proxy_
     end
     if dhcp
       if perform_upload(proxy_url, proxy_type, new_custom_facts(mac))
-        [:screen_status, generate_info(' - awaiting kexec into installer')]
+        [:screen_status, generate_info(' - awaiting kexec into installer', proxy_url, proxy_type)]
       else
         :screen_welcome
       end
