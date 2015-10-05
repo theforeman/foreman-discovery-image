@@ -1,4 +1,4 @@
-def generate_info extra_status = ''
+def generate_info extra_status = '', server = discover_server, proxy_type = proxy_type
   status = "N/A (use Status to update)"
   response = "N/A"
   if File.exist?(f = '/tmp/discovery-http-success')
