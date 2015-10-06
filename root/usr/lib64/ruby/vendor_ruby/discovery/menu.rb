@@ -156,13 +156,18 @@ def main_loop
       proxy_type = cmdline('proxy.type') || error_box("Option proxy.type was not provided, cannot continue")
       log_debug "proxy.url=#{proxy_url} proxy.type=#{proxy_type}"
       mac = cmdline('fdi.pxmac', detect_first_nic_with_link)
-      ip = cmdline('fdi.pxip') || error_box("Option fdi.pxip was not provided, cannot continue")
-      gw = cmdline('fdi.pxgw') || error_box("Option fdi.pxgw was not provided, cannot continue")
+      ip = cmdline('fdi.pxip')
+      gw = cmdline('fdi.pxgw')
       dns = cmdline('fdi.pxdns')
-      log_debug "fdi.px: mac=#{mac} ip=#{ip} gw=#{gw} dns=#{dns}"
       action = Proc.new do
         log_debug "Unattended network configuration started"
-        status = configure_network true, mac, ip, gw, dns
+        if ip && gw
+          log_debug "Configuring #{mac} with static info: ip=#{ip} gw=#{gw} dns=#{dns}"
+          status = configure_network true, mac, ip, gw, dns
+        else
+          log_debug "Configuring #{mac} with DHCP (pxip or pxgw were not provided)"
+          status = configure_network false, mac
+        end
         log_debug "Unattended network configuration finished, result: #{status}"
         log_debug "Unattended facts collection started"
         facts = new_custom_facts(mac)
