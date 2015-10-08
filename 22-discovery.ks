@@ -78,11 +78,6 @@ cat >/etc/foreman-proxy/settings.d/discovery_image.yml <<'CFG'
 :enabled: true
 CFG
 
-cat >/etc/foreman-proxy/settings.d/facts.yml <<'CFG'
----
-:enabled: true
-CFG
-
 cat >/etc/foreman-proxy/settings.d/bmc.yml <<'CFG'
 ---
 :enabled: true
