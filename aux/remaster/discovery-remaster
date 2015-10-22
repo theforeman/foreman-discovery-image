@@ -60,9 +60,17 @@ EOGR
 
 TIMESTAMP=$(date +%y%m%d_%H%M%S)
 OUT_ISO=${1/.iso/-$TIMESTAMP}.iso
+find $TMP_ISO
+if [ -f "$TMP_ISO/isolinux/efiboot.img" ]; then
+  EFI_OPTS="-eltorito-alt-boot -e isolinux/efiboot.img -no-emul-boot"
+  EXTRA_MSG="(BIOS/EFI compatible)"
+else
+  EFI_OPTS=""
+  EXTRA_MSG="(BIOS-only compatible)"
+fi
 mkisofs -quiet -U -A "fdi" -V "fdi" -volset "fdi" -J -joliet-long -r -v -T \
   -o $OUT_ISO -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 \
-  -boot-info-table -eltorito-alt-boot -e isolinux/efiboot.img -no-emul-boot $TMP_NEW
+  -boot-info-table $EFI_OPTS $TMP_NEW
 isohybrid --partok --uefi $OUT_ISO
 implantisomd5 $OUT_ISO
-echo "Created: $OUT_ISO"
+echo "Created: $OUT_ISO $EXTRA_MSG"
