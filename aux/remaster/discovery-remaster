@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ -z "$2" ]; then
-  echo "Usage: $0 fdi-bootable-x.y.z.iso 'proxy.url=https://192.168.9.1:443 proxy.type=foreman fdi.xyz=abc ...'"
+  echo "Usage: $0 fdi-bootable-x.y.z.iso 'proxy.url=https://192.168.9.1:443 proxy.type=foreman fdi.xyz=abc...' [output.iso]"
   exit 2
 fi
 
@@ -21,6 +21,10 @@ function cleanup() {
 TMP_ISO=$(mktemp -d)
 TMP_NEW=$(mktemp -d)
 trap cleanup EXIT
+
+TIMESTAMP=$(date +%y%m%d_%H%M%S)
+OUT_ISO=${1/.iso/-$TIMESTAMP}.iso
+[ ! -z "$3" ] && OUT_ISO=$3
 
 mount -o loop -t iso9660 "$1" $TMP_ISO
 cp -r $TMP_ISO/* $TMP_NEW
@@ -58,11 +62,16 @@ menuentry 'Foreman Discovery Image' --class fedora --class gnu-linux --class gnu
 }
 EOGR
 
-TIMESTAMP=$(date +%y%m%d_%H%M%S)
-OUT_ISO=${1/.iso/-$TIMESTAMP}.iso
+if [ -f "$TMP_ISO/isolinux/efiboot.img" ]; then
+  EFI_OPTS="-eltorito-alt-boot -e isolinux/efiboot.img -no-emul-boot"
+  EXTRA_MSG="(BIOS/EFI compatible)"
+else
+  EFI_OPTS=""
+  EXTRA_MSG="(BIOS-only compatible)"
+fi
 mkisofs -quiet -U -A "fdi" -V "fdi" -volset "fdi" -J -joliet-long -r -v -T \
   -o $OUT_ISO -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 \
-  -boot-info-table -eltorito-alt-boot -e isolinux/efiboot.img -no-emul-boot $TMP_NEW
+  -boot-info-table $EFI_OPTS $TMP_NEW
 isohybrid --partok --uefi $OUT_ISO
 implantisomd5 $OUT_ISO
-echo "Created: $OUT_ISO"
+echo "Created: $OUT_ISO $EXTRA_MSG"
