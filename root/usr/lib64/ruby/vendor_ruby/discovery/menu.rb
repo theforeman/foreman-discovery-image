@@ -121,7 +121,7 @@ end
 def detect_first_nic_with_link
   log_debug "Traing to guess the first NICs with link, fdi.pxmac was NOT provided"
   mac = ''
-  Dir.glob('/sys/class/net/*') do |ifn|
+  Dir.glob('/sys/class/net/*').sort do |ifn|
     name = File.basename ifn
     next if name == "lo"
     mac = File.read("#{ifn}/address").chomp rescue "??:??:??:??:??:??"
