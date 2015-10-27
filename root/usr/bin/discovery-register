@@ -63,7 +63,7 @@ facts = Hash[Facter.to_hash.select {|k,v| k =~ /address|hardware|manufacturer|pr
 facts.keys.sort.each {|k| log_msg " #{k}: #{facts[k]}"}
 
 # loop, but only upload on changes
-i = cmdline("fdi.cachefacts", 5).to_i rescue 5
+i = cmdline("fdi.cachefacts", 0).to_i rescue 0
 upload_sleep = cmdline("fdi.uploadsleep", 30).to_i rescue 30
 while true do
   uninteresting_facts=/kernel|operatingsystem|osfamily|ruby|path|time|swap|free|filesystem|version|selinux/i
