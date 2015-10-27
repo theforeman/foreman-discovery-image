@@ -30,7 +30,7 @@ def screen_network mac, ip = cmdline('fdi.pxip', ''), gw = cmdline('fdi.pxgw', '
       return [:screen_network, mac, ip, gw, dns]
     end
     action = Proc.new { configure_network true, mac, ip, gw, dns }
-    [:screen_info, action, "Configuring network via DHCP. This operation can take several minutes to complete.", "Unable to bring network via DHCP",
+    [:screen_info, action, "Configuring network. This operation can take several minutes to complete.", "Unable to bring up network",
       [:screen_foreman, mac, gw],
       [:screen_network, mac, ip, gw, dns]]
   else

@@ -68,8 +68,12 @@ def screen_status status = generate_info, active_button = 0
   elsif answer == b_ssh
     :screen_ssh
   elsif answer == b_resend
-    command("rm -f /tmp/discovery-http*")
-    command("systemctl reload discovery-register")
+    if cmdline('BOOTIF')
+      command("rm -f /tmp/discovery-http*")
+      command("systemctl reload discovery-register")
+    else
+      Newt::Screen.win_message("Not supported", "OK", "Resending not possible in PXE-less, reboot and start over.")
+    end
     :screen_status
   else
     :quit
