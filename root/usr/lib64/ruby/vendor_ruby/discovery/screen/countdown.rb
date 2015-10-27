@@ -22,7 +22,7 @@ EOT
   f.add(t, l_press)
   f.draw
   key_was_pressed = false
-  sec = 10
+  sec = cmdline("fdi.countdown", 15).to_i rescue 15
   while sec > 0
     l_press.set_text("< Press any key (#{sec}s) >")
     sec = sec - 1
