@@ -18,11 +18,8 @@ end
 
 def error_box(msg, extra_msg = nil)
   log_err msg
-  if extra_msg.is_a? Exception
-    backtrace = (extra_msg.to_s + "\n" + extra_msg.backtrace.join("\n")) rescue 'N/A'
-    log_err backtrace
-  end
   log_err extra_msg
+  backtrace = log_exception extra_msg
   Newt::Screen.centered_window(74, 20, "Fatal error")
   f = Newt::Form.new
   t_desc = Newt::Textbox.new(1, 1, 70, 13, Newt::FLAG_SCROLL)
@@ -94,7 +91,6 @@ end
 
 def perform_upload proxy_url, proxy_type, custom_facts
   upload proxy_url, proxy_type, custom_facts
-  true
 rescue => e
   error_box("Unable to upload facts", e)
 end
@@ -112,6 +108,9 @@ def new_custom_facts mac
     'discovery_dns' => dns,
     'discovery_bootif' => mac,
   }
+rescue => e
+  log_exception e
+  {}
 end
 
 def cleanup
@@ -119,14 +118,17 @@ def cleanup
 end
 
 def detect_first_nic_with_link
-  log_debug "Traing to guess the first NICs with link, fdi.pxmac was NOT provided"
-  mac = ''
-  Dir.glob('/sys/class/net/*').sort do |ifn|
+  log_debug "Trying to guess the first NICs with link, fdi.pxmac was NOT provided"
+  mac = nil
+  Dir.glob('/sys/class/net/*').sort.each do |ifn|
     name = File.basename ifn
     next if name == "lo"
     mac = File.read("#{ifn}/address").chomp rescue "??:??:??:??:??:??"
     link = File.read("#{ifn}/carrier").chomp == "1" rescue false
-    break if link
+    if link
+      log_debug "Interface with link found: #{name}=#{mac}"
+      break
+    end
   end
   mac
 end
@@ -155,7 +157,7 @@ def main_loop
       proxy_url = URI.parse(proxy_url) rescue error_box("Unable to parse proxy.url URI: #{proxy_url}")
       proxy_type = cmdline('proxy.type') || error_box("Option proxy.type was not provided, cannot continue")
       log_debug "proxy.url=#{proxy_url} proxy.type=#{proxy_type}"
-      mac = cmdline('fdi.pxmac', detect_first_nic_with_link)
+      mac = cmdline('fdi.pxmac') || detect_first_nic_with_link
       ip = cmdline('fdi.pxip')
       gw = cmdline('fdi.pxgw')
       dns = cmdline('fdi.pxdns')
@@ -179,15 +181,15 @@ def main_loop
         end
         log_debug "Unattended facts collection finished"
         log_debug "Unattended facts upload started"
-        result = perform_upload(proxy_url, proxy_type, facts)
+        result = upload(proxy_url, proxy_type, facts)
         log_debug "Unattended facts upload finished, result: #{result}"
         result
       end
       active_screen = [:screen_info, action,
-        "Performing unattended provisioning via NIC #{mac} with IP #{ip} (gw #{gw} DNS #{dns}) sending facts to #{proxy_url} of endpoint type #{proxy_type}...",
-        "Unattended provisioning failed: unable to upload facts",
+        "Performing unattended provisioning via NIC #{mac} (provided credentials: ip=#{ip} gw=#{gw} dns=#{dns}) and sending facts to #{proxy_url} of endpoint type #{proxy_type}. This can take a while...",
+        "Unattended provisioning failed: unable to upload facts. Check your network credentials.",
         [:screen_status, generate_info('Unattended fact upload OK - awaiting kexec')],
-        [:screen_status, generate_info('Unattended fact upload FAILED')]]
+        [:screen_status, generate_info('Unattended fact upload FAILED - check logs')]]
     else
       # Attended PXE-less provisioning
       active_screen = :screen_welcome

@@ -42,6 +42,22 @@ def log_debug msg
   Syslog.open($0, Syslog::LOG_PID | Syslog::LOG_CONS) { |s| s.debug msg.to_s.gsub('%', '%%') rescue false }
 end
 
+def log_exception ex
+  if ex.is_a? Exception
+    backtrace = (ex.to_s + "\n" + ex.backtrace.join("\n")) rescue 'N/A'
+    log_err "#{ex.class}: #{ex.message}\n#{backtrace}"
+    backtrace
+  end
+end
+
+def capture_stderr
+  previous_stderr, $stderr = $stderr, StringIO.new
+  yield
+  $stderr.string
+ensure
+  $stderr = previous_stderr
+end
+
 def cmdline option=nil, default=nil
   @cmdline ||= File.open("/proc/cmdline", 'r') { |f| f.read }
   if option
@@ -125,7 +141,11 @@ def upload(uri = discover_server, type = proxy_type, custom_facts = {})
                 "#{uri.path}/api/v2/discovered_hosts/facts"
               end
   req = Net::HTTP::Post.new(facts_url, {'Content-Type' => 'application/json'})
-  facts = Facter.to_hash
+  # supress stderr of Facter
+  facts = {}
+  capture_stderr do
+    facts = Facter.to_hash
+  end.each_line { |x| log_err x}
   facts.merge!(custom_facts)
   req.body = {'facts' => facts }.to_json
   response = http.request(req)
@@ -158,16 +178,16 @@ def env_append(env,string)
 end
 
 def get_mac(interface = 'primary')
-  `nmcli -t -f 802-3-ethernet.mac-address con show #{interface}`.scan(/\w{2}:\w{2}:\w{2}:\w{2}:\w{2}:\w{2}\n/).first.strip rescue 'N/A'
+  `nmcli -t -f 802-3-ethernet.mac-address con show #{interface} 2>/dev/null`.scan(/\w{2}:\w{2}:\w{2}:\w{2}:\w{2}:\w{2}\n/).first.strip rescue 'N/A'
 end
 
 def get_ipv4(interface = 'primary')
-  `nmcli -t -f IP4.ADDRESS con show #{interface}`.scan(/\d+\.\d+\.\d+\.\d+\/\d+\n/).first.strip rescue 'N/A'
+  `nmcli -t -f IP4.ADDRESS con show #{interface} 2>/dev/null`.scan(/\d+\.\d+\.\d+\.\d+\/\d+\n/).first.strip rescue 'N/A'
 end
 
 def detect_ipv4_credentials(interface)
   res = {}
-  str = `nmcli -t -f IP4.ADDRESS,IP4.GATEWAY,IP4.DNS con show #{interface}`
+  str = `nmcli -t -f IP4.ADDRESS,IP4.GATEWAY,IP4.DNS con show #{interface} 2>/dev/null`
   return ["", "", ""] if $? != 0
   str.each_line { |x| kv = x.split(':'); res[kv[0]] = kv[1].chomp }
   [res["IP4.ADDRESS[1]"] || '', res["IP4.GATEWAY"] || '', res["IP4.DNS[1]"] || '']
