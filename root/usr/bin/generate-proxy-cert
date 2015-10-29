@@ -1,11 +1,16 @@
 #!/bin/bash
 
+# When booted from ISO, foreman-proxy starts up by default but since
+# network is not yet configured, we cannot continue. This makes
+# the service to fail.
+[ -f /etc/NetworkManager/system-connections/primary ] || exit 1
+
 source /usr/share/fdi/commonfunc.sh
 exportKCL
 
 DIR=/etc/foreman-proxy
 DAYS=${KCL_FDI_PROXY_CERT_DAYS:-999}
-IP=$(nmcli -t -f IP4.ADDRESS con show primary | cut -f2 -d: | cut -f1 -d/)
+IP=$(nmcli -t -f IP4.ADDRESS con show primary 2>/dev/null | cut -f2 -d: | cut -f1 -d/)
 
 openssl req -x509 \
   -newkey rsa:2048 \
