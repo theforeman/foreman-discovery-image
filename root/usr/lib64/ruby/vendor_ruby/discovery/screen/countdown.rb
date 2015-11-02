@@ -1,4 +1,4 @@
-def screen_countdown
+def screen_countdown discovery_only = false
   text_help, tw, th = Newt.reflow_text(<<EOT, 60, 5, 5)
 This system will attempt to configure all interfaces via DHCP and discover itself by \
 sending hardware facts to Foreman instance. To interrupt this behavior, press a key \
@@ -7,7 +7,9 @@ EOT
   t = Newt::Textbox.new(-1, -1, tw, th, Newt::FLAG_WRAP)
   t.set_text(text_help)
 
-  l_press = Newt::Label.new(-1, -1, "< Press any key (10) >")
+  secs = cmdline("fdi.countdown", 10).to_i rescue 10
+
+  l_press = Newt::Label.new(-1, -1, "< Press any key (#{secs}) >")
 
   main_grid = Newt::Grid.new(1, 2)
   but_grid = Newt::Grid.new(1, 1)
@@ -22,16 +24,18 @@ EOT
   f.add(t, l_press)
   f.draw
   key_was_pressed = false
-  sec = cmdline("fdi.countdown", 15).to_i rescue 15
-  while sec > 0
-    l_press.set_text("< Press any key (#{sec}s) >")
-    sec = sec - 1
-    Newt::Screen.refresh
-    if (STDIN.read_nonblock(1) rescue nil)
-      key_was_pressed = true
-      break
+  unless discovery_only
+    sec = secs
+    while sec > 0
+      l_press.set_text("< Press any key (#{sec}s) >")
+      sec = sec - 1
+      Newt::Screen.refresh
+      if (STDIN.read_nonblock(1) rescue nil)
+        key_was_pressed = true
+        break
+      end
+      sleep 1
     end
-    sleep 1
   end
 
   if key_was_pressed
@@ -39,12 +43,15 @@ EOT
   else
     start_discovery_service
     # additional countdown to let discovery-register do its work
-    sec = 10
+    sec = secs
     while sec > 0
       l_press.set_text("< Discovery ... (#{sec}s) >")
       sec = sec - 1
       Newt::Screen.refresh
+      # break countdown on keypress or IPC
       break if (STDIN.read_nonblock(1) rescue nil)
+      break if File.exist?("/tmp/discovery-http-success")
+      break if File.exist?("/tmp/discovery-http-failure")
       sleep 1
     end
     :screen_status

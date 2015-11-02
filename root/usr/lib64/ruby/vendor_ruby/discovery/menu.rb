@@ -70,7 +70,7 @@ end
 
 def start_discovery_service
   if File.exist? "/etc/systemd/system/discovery-register.service"
-    command("systemctl start discovery-register.service")
+    command("systemctl restart discovery-register.service")
   end
 end
 
