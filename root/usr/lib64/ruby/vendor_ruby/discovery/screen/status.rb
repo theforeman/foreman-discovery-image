@@ -70,11 +70,12 @@ def screen_status status = generate_info, active_button = 0
   elsif answer == b_resend
     if cmdline('BOOTIF')
       command("rm -f /tmp/discovery-http*")
-      command("systemctl reload discovery-register")
+      # discovery register will be restarted in countdown screen
+      [:screen_countdown, true]
     else
       Newt::Screen.win_message("Not supported", "OK", "Resending not possible in PXE-less, reboot and start over.")
+      :screen_status
     end
-    :screen_status
   else
     :quit
   end
