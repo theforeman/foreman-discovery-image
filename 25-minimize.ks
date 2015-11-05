@@ -6,11 +6,6 @@
 echo " * purge existing random seed to avoid identical seeds everywhere"
 rm -f /var/lib/random-seed
 
-# I can't tell if this should force a new SSH key, or force a fixed one,
-# but for now we can ensure that we generate new keys when SSHD is finally
-# fined up on the nodes...
-#
-# We also disable SSHd automatic startup in the final image.
 echo " * disable sshd and purge existing SSH host keys"
 rm -f /etc/ssh/ssh_host_*key{,.pub}
 systemctl disable sshd.service
@@ -43,6 +38,12 @@ mv /usr/lib/locale/locale-archive /usr/lib/locale/locale-archive.tmpl
 echo " * purging all other locale data"
 rm -rf /usr/share/locale*
 
+echo " * purging images"
+rm -rf /usr/share/backgrounds/* /usr/share/kde4/* /usr/share/anaconda/pixmaps/rnotes/*
+
+echo " * purging rubygems cache"
+rm -rf /usr/share/gems/cache/*
+
 echo " * truncating various logfiles"
 for log in yum.log dracut.log lastlog yum.log; do
     truncate -c -s 0 /var/log/${log}
@@ -50,9 +51,6 @@ done
 
 echo " * removing /boot, since that lives on the ISO side"
 rm -rf /boot*
-
-echo " * removing python precompiled *.pyc files"
-find /usr/lib64/python*/ -name *pyc -print0 | xargs -0 rm -f
 
 echo " * removing trusted CA certificates"
 truncate -s0 /usr/share/pki/ca-trust-source/ca-bundle.trust.crt
@@ -64,14 +62,20 @@ echo fdi > /etc/hostname
 echo " * locking root account"
 passwd -l root
 
+echo " * store list of packages sorted by size"
+rpm -qa --queryformat '%{SIZE} %{NAME}\n' | sort -n -r > /usr/PACKAGES-LIST
+
 echo " * cleaning up yum cache and removing rpm database"
-rpm -qa > /usr/packages_list
 yum clean all
 rm -rf /var/lib/{yum,rpm}/*
 # fix the vim syntax markup */
+
+# no more python loading after this step
+echo " * removing python precompiled *.pyc files"
+find /usr/lib64/python*/ /usr/lib/python*/ -name *py[co] -print0 | xargs -0 rm -f
 %end
 
 %post --nochroot
-echo " * disquieting the microkernel boot process"
+echo " * disquieting the boot process"
 sed -i -e's/ rhgb//g' -e's/ quiet//g' $LIVE_ROOT/isolinux/isolinux.cfg
 %end
