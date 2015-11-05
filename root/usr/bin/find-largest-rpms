@@ -1,6 +1,0 @@
-#!/bin/bash
-#
-# vim: ts=2:sw=2:et
-#
-
-rpm -qa --queryformat '%{SIZE} %{NAME}\n' | sort -n -r | head -n100
