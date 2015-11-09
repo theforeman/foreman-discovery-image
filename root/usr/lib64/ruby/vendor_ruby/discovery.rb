@@ -68,6 +68,23 @@ def cmdline option=nil, default=nil
   end
 end
 
+def detect_first_nic_with_link
+  log_debug "Detecting the first NICs with link"
+  mac = ''
+  Dir.glob('/sys/class/net/*').sort.each do |ifn|
+    name = File.basename ifn
+    next if name == "lo"
+    mac = File.read("#{ifn}/address").chomp rescue ''
+    link = File.read("#{ifn}/carrier").chomp == "1" rescue false
+    if link
+      log_debug "Interface with link found: #{mac} (#{name})"
+      break
+    end
+  end
+  log_debug "No interfaces with link found, using #{mac}"
+  mac
+end
+
 def normalize_mac mac
   mac.split('-')[1..6].join(':') rescue nil
 end

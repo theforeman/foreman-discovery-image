@@ -32,7 +32,7 @@ end
 
 def discovery_bootif
   # PXELinux dash-separated hexadecimal *without* the leading hardware type
-  cmdline('BOOTIF', Facter.fact("macaddress").value).gsub(/^[a-fA-F0-9]+-/, '').gsub('-', ':') rescue '00:00:00:00:00:00'
+  cmdline('BOOTIF', cmdline('fdi.pxmac', detect_first_nic_with_link)).gsub(/^[a-fA-F0-9]+-/, '').gsub('-', ':') rescue '00:00:00:00:00:00'
 end
 
 Facter.add("discovery_version") do

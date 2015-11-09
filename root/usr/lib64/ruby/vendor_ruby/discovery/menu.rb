@@ -117,22 +117,6 @@ def cleanup
   Newt::Screen.finish
 end
 
-def detect_first_nic_with_link
-  log_debug "Trying to guess the first NICs with link, fdi.pxmac was NOT provided"
-  mac = nil
-  Dir.glob('/sys/class/net/*').sort.each do |ifn|
-    name = File.basename ifn
-    next if name == "lo"
-    mac = File.read("#{ifn}/address").chomp rescue "??:??:??:??:??:??"
-    link = File.read("#{ifn}/carrier").chomp == "1" rescue false
-    if link
-      log_debug "Interface with link found: #{name}=#{mac}"
-      break
-    end
-  end
-  mac
-end
-
 log_msg "Kernel opts: #{cmdline}"
 
 def main_loop
