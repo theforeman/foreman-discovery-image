@@ -117,6 +117,10 @@ sed -i -e 's/^Defaults.*requiretty/Defaults !requiretty/g' /etc/sudoers
 echo "foreman-proxy ALL=NOPASSWD: /sbin/shutdown" >> /etc/sudoers
 echo "foreman-proxy ALL=NOPASSWD: /usr/sbin/kexec" >> /etc/sudoers
 
+# modify startup of foreman-proxy service to wait till network is fully ready
+sed -i 's|network.target|NetworkManager-wait-online.service|' /usr/lib/systemd/system/foreman-proxy.service
+sed -i '/ExecStart=/ cExecStart=/usr/bin/nm-online -s -q --timeout=120' /usr/lib/systemd/system/NetworkManager-wait-online.service
+
 echo " * dropping some friendly aliases"
 echo "alias vim=vi" >> /root/.bashrc
 echo "alias halt=poweroff" >> /root/.bashrc
