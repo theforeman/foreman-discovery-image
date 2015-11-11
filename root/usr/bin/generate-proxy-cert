@@ -3,7 +3,7 @@
 # When booted from ISO, foreman-proxy starts up by default but since
 # network is not yet configured, we cannot continue. This makes
 # the service to fail.
-[ -f /etc/NetworkManager/system-connections/primary ] || exit 1
+[ -f /etc/NetworkManager/system-connections/primary ] || exit 101
 
 source /usr/share/fdi/commonfunc.sh
 exportKCL

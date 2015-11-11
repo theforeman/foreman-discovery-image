@@ -1,6 +1,7 @@
 [Unit]
 Description=Register this host in Foreman
-After=basic.target network.target network-online.target nss-lookup.target foreman-proxy.service discovery-register.service
+Wants=network-online.target
+After=basic.target network-online.target nss-lookup.target foreman-proxy.service
 
 [Service]
 Type=simple
