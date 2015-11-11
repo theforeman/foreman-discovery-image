@@ -2,6 +2,7 @@
 Description=Prepares NetworkManager configuration for primary interface
 Wants=basic.target
 Before=NetworkManager.service
+ConditionKernelCommandLine=BOOTIF
 
 [Service]
 Type=oneshot

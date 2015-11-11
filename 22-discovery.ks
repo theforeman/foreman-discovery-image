@@ -48,7 +48,10 @@ systemctl disable ipmi.service
 echo " * open foreman-proxy port via firewalld"
 firewall-offline-cmd --zone=public --add-port=8443/tcp --add-port=8448/tcp
 
-echo " * setting up foreman proxy"
+echo " * setting up foreman proxy service"
+sed -i 's/After=.*/After=basic.target network-online.target nm-prepare.service/' /usr/lib/systemd/system/foreman-proxy.service
+sed -i 's/Wants=.*/Wants=basic.target network-online.target nm-prepare.service/' /usr/lib/systemd/system/foreman-proxy.service
+sed -i '/\[Unit\]/a ConditionPathExists=/etc/NetworkManager/system-connections/primary' /usr/lib/systemd/system/foreman-proxy.service
 sed -i '/\[Service\]/a EnvironmentFile=-/etc/default/discovery' /usr/lib/systemd/system/foreman-proxy.service
 sed -i '/\[Service\]/a ExecStartPre=/usr/bin/generate-proxy-cert' /usr/lib/systemd/system/foreman-proxy.service
 sed -i '/\[Service\]/a PermissionsStartOnly=true' /usr/lib/systemd/system/foreman-proxy.service

@@ -84,6 +84,7 @@ def configure_network static, mac, ip=nil, gw=nil, dns=nil
   command("nmcli connection reload")
   command("nmcli connection down primary")
   result = command("nmcli connection up primary", false)
+  command("nm-online -s -q --timeout=45") unless static
   # restarting proxy with regenerated SSL self-signed cert
   command("systemctl start foreman-proxy") if result
   result

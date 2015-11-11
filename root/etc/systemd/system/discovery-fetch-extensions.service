@@ -1,7 +1,8 @@
 [Unit]
 Description=Download zip extensions to this image
-Wants=discovery-start-extensions.service
+Wants=network-online.target discovery-start-extensions.service
 Before=discovery-start-extensions.service
+After=network-online.target
 
 [Service]
 Type=oneshot
