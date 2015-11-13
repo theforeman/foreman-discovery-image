@@ -3,7 +3,7 @@
 set -x
 export repoowner=${1:-theforeman}
 export branch=${2:-master}
-export proxy_repo=${3:-http://yum.theforeman.org/nightly/el7/x86_64/}
+export proxy_repo=${3:-nightly}
 NAME=foreman-discovery-image
 
 # give the VM some time to finish booting and network configuration
