@@ -20,7 +20,7 @@ setenforce 1
 pushd $NAME
 git pull
 
-./build-livecd fdi-centos7.ks && sudo ./build-livecd-root
+./build-livecd fdi-centos7.ks $proxy_repo && sudo ./build-livecd-root
 ls fdi-image*tar -lah
 
 popd
