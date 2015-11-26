@@ -19,6 +19,7 @@
 # also available at http://www.gnu.org/copyleft/gpl.html.
 
 require 'facter/util/ip'
+require 'discovery'
 
 def cmdline option=nil, default=nil
   line = File.open("/proc/cmdline", 'r') { |f| f.read }
