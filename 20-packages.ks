@@ -1,4 +1,4 @@
-%packages --excludedocs --nobase
+%packages --excludedocs
 bash
 kernel
 grub2
