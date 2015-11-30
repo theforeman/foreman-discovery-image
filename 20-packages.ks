@@ -15,12 +15,9 @@ tftp
 lldpad
 isomd5sum
 
-# Dracut (https://bugzilla.redhat.com/show_bug.cgi?id=1285810)
-dracut
+# Dracut missing deps (https://bugzilla.redhat.com/show_bug.cgi?id=1285810)
 tar
 gzip
-coreutils
-bash
 
 # Facter
 facter
@@ -75,7 +72,6 @@ shim
 -prelink
 -setserial
 -ed
--tar
 -authconfig
 -wireless-tools
 
