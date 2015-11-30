@@ -19,7 +19,7 @@ isomd5sum
 dracut
 tar
 gzip
-dd
+coreutils
 bash
 
 # Facter
