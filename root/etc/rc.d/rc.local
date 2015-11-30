@@ -8,6 +8,11 @@ if [[ ! -z "$KCL_FDI_ROOTPW" ]]; then
   echo "root:$KCL_FDI_ROOTPW" | chpasswd >/dev/null
 fi
 
+# set encrypted root password - overrides non-encrypted password
+if [[ ! -z "$KCL_FDI_ENCR_ROOTPW" ]]; then
+  echo "root:$KCL_FDI_ENCR_ROOTPW" | chpasswd -e >/dev/null
+fi
+
 # enable ssh
 if [ "$KCL_FDI_SSH" == "1" ]; then
   systemctl start sshd
