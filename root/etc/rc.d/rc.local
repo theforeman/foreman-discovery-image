@@ -9,8 +9,8 @@ if [[ ! -z "$KCL_FDI_ROOTPW" ]]; then
 fi
 
 # set encrypted root password - overrides non-encrypted password
-if [[ ! -z "$KCL_FDI_ENCR_ROOTPW" ]]; then
-  echo "root:$KCL_FDI_ENCR_ROOTPW" | chpasswd -e >/dev/null
+if [[ ! -z "$KCL_FDI_ENCRYPTED_ROOTPW" ]]; then
+  echo "root:$KCL_FDI_ENCRYPTED_ROOTPW" | sed -e 's/"//g' -e "s/'//g" | chpasswd -e >/dev/null
 fi
 
 # enable ssh
