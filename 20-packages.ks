@@ -15,6 +15,13 @@ tftp
 lldpad
 isomd5sum
 
+# Dracut (https://bugzilla.redhat.com/show_bug.cgi?id=1285810)
+dracut
+tar
+gzip
+dd
+bash
+
 # Facter
 facter
 ethtool
