@@ -31,15 +31,33 @@ require 'yaml'
 require 'json'
 
 def log_msg msg
-  Syslog.open($0, Syslog::LOG_PID | Syslog::LOG_CONS) { |s| s.info msg.to_s.gsub('%', '%%') rescue false }
+  if defined? ::Proxy::Log
+    ::Proxy::Log.logger.info msg
+  else
+    Syslog.open($0, Syslog::LOG_PID | Syslog::LOG_CONS) { |s| s.info msg.to_s.gsub('%', '%%') rescue false }
+  end
+rescue Exception => e
+  puts msg
 end
 
 def log_err msg
-  Syslog.open($0, Syslog::LOG_PID | Syslog::LOG_CONS) { |s| s.err msg.to_s.gsub('%', '%%') rescue false }
+  if defined? ::Proxy::Log
+    ::Proxy::Log.logger.error msg
+  else
+    Syslog.open($0, Syslog::LOG_PID | Syslog::LOG_CONS) { |s| s.err msg.to_s.gsub('%', '%%') rescue false }
+  end
+rescue Exception => e
+  puts msg
 end
 
 def log_debug msg
-  Syslog.open($0, Syslog::LOG_PID | Syslog::LOG_CONS) { |s| s.debug msg.to_s.gsub('%', '%%') rescue false }
+  if defined? ::Proxy::Log
+    ::Proxy::Log.logger.debug msg
+  else
+    Syslog.open($0, Syslog::LOG_PID | Syslog::LOG_CONS) { |s| s.debug msg.to_s.gsub('%', '%%') rescue false }
+  end
+rescue Exception => e
+  puts msg
 end
 
 def log_exception ex
@@ -69,20 +87,22 @@ def cmdline option=nil, default=nil
 end
 
 def detect_first_nic_with_link
-  log_debug "Detecting the first NICs with link"
-  mac = ''
-  Dir.glob('/sys/class/net/*').sort.each do |ifn|
-    name = File.basename ifn
-    next if name == "lo"
-    mac = File.read("#{ifn}/address").chomp rescue ''
-    link = File.read("#{ifn}/carrier").chomp == "1" rescue false
-    if link
-      log_debug "Interface with link found: #{mac} (#{name})"
-      break
+  detection_func = lambda do
+    mac = ''
+    log_debug "Detecting the first NICs with link"
+    Dir.glob('/sys/class/net/*').sort.each do |ifn|
+      name = File.basename ifn
+      next if name == "lo"
+      mac = File.read("#{ifn}/address").chomp rescue ''
+      if (File.read("#{ifn}/carrier").chomp == "1" rescue false)
+        log_debug "Interface with link found: #{mac} (#{name})"
+        return mac
+      end
     end
+    log_debug "No interfaces with link found, using #{mac}"
+    mac
   end
-  log_debug "No interfaces with link found, using #{mac}"
-  mac
+  @detected_mac ||= detection_func.call
 end
 
 def normalize_mac mac

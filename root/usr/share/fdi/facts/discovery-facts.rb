@@ -19,7 +19,7 @@
 # also available at http://www.gnu.org/copyleft/gpl.html.
 
 require 'facter/util/ip'
-require 'discovery'
+require '/usr/lib64/ruby/vendor_ruby/discovery.rb'
 
 def cmdline option=nil, default=nil
   line = File.open("/proc/cmdline", 'r') { |f| f.read }
@@ -48,13 +48,13 @@ Facter.add("discovery_release") do
   end
 end
 
-Facter.add("discovery_bootif") do
+Facter.add("discovery_bootif", :timeout => 10) do
   setcode do
     discovery_bootif
   end
 end
 
-Facter.add("discovery_bootip") do
+Facter.add("discovery_bootip", :timeout => 10) do
   setcode do
     result = Facter.fact("ipaddress").value
     required = discovery_bootif
@@ -95,7 +95,7 @@ Facter::Util::IP.get_interfaces.each do |interface|
       Facter.debug("Running ethtool on #{interface} didn't give any information")
     end
     attributes.each do |fact, value|
-      Facter.add("#{fact}_#{Facter::Util::IP.alphafy(interface)}") do
+      Facter.add("#{fact}_#{Facter::Util::IP.alphafy(interface)}", :timeout => 10) do
         confine :kernel => "Linux"
         setcode do
           value
