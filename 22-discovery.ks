@@ -49,7 +49,7 @@ echo " * open foreman-proxy port via firewalld"
 firewall-offline-cmd --zone=public --add-port=8443/tcp --add-port=8448/tcp
 
 echo " * setting up foreman proxy"
-sed -i '/\[Service\]/a EnvironmentFile=-/etc/default/discovery' /usr/lib/systemd/system/foreman-proxy.service
+sed -i '/\[Service\]/a EnvironmentFile=/etc/default/discovery' /usr/lib/systemd/system/foreman-proxy.service
 sed -i '/\[Service\]/a ExecStartPre=/usr/bin/generate-proxy-cert' /usr/lib/systemd/system/foreman-proxy.service
 sed -i '/\[Service\]/a PermissionsStartOnly=true' /usr/lib/systemd/system/foreman-proxy.service
 /sbin/usermod -a -G tty foreman-proxy
@@ -101,7 +101,7 @@ echo "ForwardToConsole=no" >> /etc/systemd/journald.conf
 systemctl enable journalctl.service
 
 echo " * configuring foreman-proxy"
-sed -i 's|.*:log_file:.*|:log_file: SYSLOG|' /etc/foreman-proxy/settings.yml
+##sed -i 's|.*:log_file:.*|:log_file: SYSLOG|' /etc/foreman-proxy/settings.yml
 # facts API is disabled by default
 echo -e "---\n:enabled: true" > /etc/foreman-proxy/settings.d/facts.yml
 /sbin/usermod -a -G tty foreman-proxy
