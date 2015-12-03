@@ -1,4 +1,4 @@
-def screen_foreman mac = nil, gw = nil, proxy_url = cmdline('proxy.url'), proxy_type = cmdline('proxy.type'), dhcp = false
+def screen_foreman mac = nil, gw = nil, proxy_url = cmdline('proxy.url'), proxy_type = cmdline('proxy.type')
   Newt::Screen.centered_window(59, 20, "Foreman credentials")
   f = Newt::Form.new
   t_desc = Newt::Textbox.new(2, 2, 54, 6, Newt::FLAG_WRAP)
@@ -34,15 +34,7 @@ def screen_foreman mac = nil, gw = nil, proxy_url = cmdline('proxy.url'), proxy_
       Newt::Screen.win_message("Invalid URL", "OK", "Not a valid Foreman URL: #{url} (#{e})")
       return [:screen_foreman, mac, gw, url, proxy_type]
     end
-    if dhcp
-      if perform_upload(proxy_url, proxy_type, new_custom_facts(mac))
-        [:screen_status, generate_info(' - awaiting kexec into installer', proxy_url, proxy_type)]
-      else
-        :screen_welcome
-      end
-    else
-      [:screen_facts, mac, proxy_url, proxy_type]
-    end
+    [:screen_facts, mac, proxy_url, proxy_type]
   else
     :screen_welcome
   end

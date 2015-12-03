@@ -50,7 +50,7 @@ def screen_primary_iface dhcp = false
     if dhcp
       action = Proc.new { configure_network false, primary_mac }
       [:screen_info, action, "Configuring network via DHCP. This operation can take several minutes to complete.", "Unable to bring network via DHCP",
-        [:screen_foreman, primary_mac, nil, cmdline('proxy.url'), cmdline('proxy.type'), true],
+        [:screen_foreman, primary_mac, nil, cmdline('proxy.url'), cmdline('proxy.type')],
         [:screen_network, primary_mac]]
     else
       detect_ip, detect_gw, detect_dns = detect_ipv4_credentials('primary')
