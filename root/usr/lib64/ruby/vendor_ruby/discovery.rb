@@ -127,7 +127,7 @@ def discover_by_dns_srv
   type = Resolv::DNS::Resource::IN::SRV
   result = resolver.getresources("_x-foreman._tcp", type).first
   hostname = result.target.to_s
-  if result.port == 443
+  if [443, 8443, 9090].include?(result.port)
     scheme = 'https'
   else
     scheme = 'http'
