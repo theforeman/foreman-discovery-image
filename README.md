@@ -164,13 +164,12 @@ fdi.ssh=1 fdi.rootpw=redhat
 ```
 
 Root password can also be specified in encrypted form (using 'redhat' as
-an example below). Setting this option will override plain-text password
-set by fdi.rootpw. Single and/or double quotes around password are 
+an example below). Single and/or double quotes around password are 
 recommended to be used to prevent possible special characters
 interpretation.
 
 ```
-fdi.encrypted.rootpw='$1$_redhat_$i3.3Eg7ko/Peu/7Q/1.wJ/'
+fdi.rootpw='$1$_redhat_$i3.3Eg7ko/Peu/7Q/1.wJ/'
 ```
 
 You can use tty2 console (or higher) to login as well.
