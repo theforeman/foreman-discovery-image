@@ -8,8 +8,7 @@ if [[ ! -z "$KCL_FDI_ROOTPW" ]]; then
   # remove possible double and/or single quotes surrounding password string
   KCL_FDI_ROOTPW=`echo $KCL_FDI_ROOTPW | sed "s/\('\|\"\)//g"`
   # if password starts with dollar sign, set an encrypted flag
-  echo $KCL_FDI_ROOTPW | grep '^\$.*$' > /dev/null
-  if [ $? -eq 0 ]; then
+  if [[ $KCL_FDI_ROOTPW =~ ^\$.* ]]; then
     FLAG="-e"
   fi
   echo "root:$KCL_FDI_ROOTPW" | chpasswd $FLAG >/dev/null
