@@ -1,0 +1,9 @@
+[Unit]
+Description=Device writer service for /dev/%I
+ConditionPathExists=/dev/%I
+ConditionPathExists=/etc/devicewriter/%I.conf
+
+[Service]
+EnvironmentFile=-/etc/devicewriter/%I.conf
+ExecStart=/usr/bin/bash -c "nc -l ${DWPORT} | lzop -d | cat > /dev/%I"
+Restart=always

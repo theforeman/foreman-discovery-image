@@ -5,10 +5,21 @@ exportKCL
 
 # setup root password
 if [[ ! -z "$KCL_FDI_ROOTPW" ]]; then
-  echo "root:$KCL_FDI_ROOTPW" | chpasswd >/dev/null
+	echo "root:$KCL_FDI_ROOTPW" | chpasswd >/dev/null
 fi
 
 # enable ssh
 if [ "$KCL_FDI_SSH" == "1" ]; then
-  systemctl start sshd
+	systemctl start sshd
+fi
+
+if [ "$KCL_FDI_EXPOSEBDEV" == "1" ]; then
+	firewall-cmd --zone=public \
+		--add-port=13000-13025/tcp \
+		--add-port=13100-13125/tcp \
+		--add-port=13200-13225/tcp
+fi
+
+if [[ ! -z "$KCL_FDI_UDPCAST" ]]; then
+	systemctl start udp-receiver@${KCL_FDI_UDPCAST}.service
 fi

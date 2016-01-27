@@ -66,6 +66,11 @@ grub2-efi
 efibootmgr
 shim
 
+# Device writing
+nmap-ncat
+lzop
+udpcast
+
 #
 # Packages to Remove
 #

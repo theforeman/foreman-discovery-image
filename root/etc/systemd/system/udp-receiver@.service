@@ -1,0 +1,8 @@
+[Unit]
+Description=UDPcast device writer service for /dev/%I
+ConditionPathExists=/dev/%I
+
+[Service]
+ExecStartPre=/usr/bin/firewall-cmd --zone=public --add-port=9000-9100/udp
+ExecStart=/usr/sbin/udp-receiver --file /dev/%I --nokbd
+Restart=always

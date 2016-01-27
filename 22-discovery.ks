@@ -126,4 +126,18 @@ echo "alias 'yum=echo DO NOT USE YUM; yum'" >> /root/.bashrc
 # Base env for extracting zip extensions
 mkdir -p /opt/extension/{bin,lib,lib/ruby,facts}
 
+# Device writer for image-based deployment
+mkdir -p /etc/devicewriter/
+PORT=13000
+for pre in sd hd vd; do
+	for x in {a..z}; do
+		echo "DWPORT=$PORT" > /etc/devicewriter/$pre$x.conf
+		((PORT+=1))
+	done
+	((PORT+=74))
+done
+cat > /etc/udev/rules.d/99-devicewriter.rules <<'UDEV'
+ACTION=="add", SUBSYSTEM=="block", NAME!="loop[0-9]*", TAG+="systemd", ENV{SYSTEMD_WANTS}+="devicewriter@$name.service"
+UDEV
+
 %end
