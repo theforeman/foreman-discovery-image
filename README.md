@@ -163,6 +163,15 @@ ssh and set root password using the following kernel command line options:
 fdi.ssh=1 fdi.rootpw=redhat
 ```
 
+Root password can also be specified in encrypted form (using 'redhat' as
+an example below). Single and/or double quotes around password are 
+recommended to be used to prevent possible special characters
+interpretation.
+
+```
+fdi.rootpw='$1$_redhat_$i3.3Eg7ko/Peu/7Q/1.wJ/'
+```
+
 You can use tty2 console (or higher) to login as well.
 
 To debug booting issues when the system is terminated in early stage of

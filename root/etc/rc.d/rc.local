@@ -5,7 +5,13 @@ exportKCL
 
 # setup root password
 if [[ ! -z "$KCL_FDI_ROOTPW" ]]; then
-  echo "root:$KCL_FDI_ROOTPW" | chpasswd >/dev/null
+  # remove possible double and/or single quotes surrounding password string
+  KCL_FDI_ROOTPW=`echo $KCL_FDI_ROOTPW | sed -e "s/^'\(.*\)'$/\1/" -e 's/^"\(.*\)"$/\1/'`
+  # if password starts with dollar sign, set an encrypted flag
+  if [[ "$KCL_FDI_ROOTPW" =~ ^\$.* ]]; then
+    FLAG="-e"
+  fi
+  echo "root:$KCL_FDI_ROOTPW" | chpasswd $FLAG >/dev/null
 fi
 
 # enable ssh
