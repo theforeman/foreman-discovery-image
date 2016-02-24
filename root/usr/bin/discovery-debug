@@ -2,22 +2,17 @@
 
 source /etc/default/discovery
 
-if [ "$1" != "--tui" ]; then
-  echo "* LOOPBACK ISO IMAGE CHECK"
-  checkisomd5 /dev/loop0
+echo "* LOOPBACK ISO IMAGE CHECK"
+checkisomd5 /dev/loop0
 
-  echo "* KERNEL COMMAND LINE *"
-  cat /proc/cmdline
+echo "* KERNEL COMMAND LINE *"
+cat /proc/cmdline
 
-  echo "* PROCESSES *"
-  ps axww
+echo "* PROCESSES *"
+ps axww
 
-  echo "* PACKAGES"
-  cat /usr/packages_list
-
-  echo "* JOURNAL (last 500 lines) *"
-  journalctl | tail -n500
-fi
+echo "* PACKAGES"
+cat /usr/PACKAGES-LIST
 
 echo "* NETWORK CONFIGURATION *"
 nmcli con
@@ -45,6 +40,6 @@ cat /usr/share/fdi/VERSION /usr/share/fdi/RELEASE
 
 echo "* FACTER *"
 facter
-if [ "$1" != "--tui" ]; then
-  facter --json
-fi
+
+echo "* JOURNAL (last 500 lines) *"
+journalctl -n300 -ocat

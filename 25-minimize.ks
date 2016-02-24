@@ -63,7 +63,7 @@ echo " * locking root account"
 passwd -l root
 
 echo " * store list of packages sorted by size"
-rpm -qa --queryformat '%{SIZE} %{NAME}\n' | sort -n -r > /usr/PACKAGES-LIST
+rpm -qa --queryformat '%{SIZE} %{NAME}%{VERSION}%{RELEASE}\n' | sort -n -r > /usr/PACKAGES-LIST
 
 echo " * cleaning up yum cache and removing rpm database"
 yum clean all
