@@ -57,6 +57,7 @@ autoconnect-priority=1
 mac-address=$mac
 [ipv4]
 method=auto
+dhcp-send-hostname=false
 dhcp-timeout=$timeout
 [ipv6]
 method=ignore
@@ -80,6 +81,7 @@ dhcp-timeout=$timeout
 ignore-auto-dns=true
 ignore-auto-routes=true
 never-default=true
+dhcp-send-hostname=false
 [ipv6]
 method=ignore
 EONS
