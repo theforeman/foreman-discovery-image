@@ -122,4 +122,10 @@ echo "alias halt=poweroff" >> /root/.bashrc
 # Base env for extracting zip extensions
 mkdir -p /opt/extension/{bin,lib,lib/ruby,facts}
 
+echo " * setting up lldp service"
+systemctl enable lldpad.service
+cat > /etc/udev/rules.d/82-enable-lldp.rules <<'UDEV'
+ACTION=="add", SUBSYSTEM=="net", NAME!="lo", RUN+="/usr/bin/enable-lldp"
+UDEV
+
 %end
