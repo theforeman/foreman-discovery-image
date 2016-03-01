@@ -19,7 +19,7 @@ if [ $(id -u) != 0 ]; then
   exit 1
 fi
 
-which livecd-creator isohybrid livecd-iso-to-pxeboot >/dev/null || ( echo "Command(s) missing, install required tools" && exit 2 )
+which livecd-creator isohybrid >/dev/null || ( echo "Command(s) missing, install required tools" && exit 2 )
 
 trap cleanup EXIT
 
@@ -49,7 +49,7 @@ isohybrid --partok --uefi fdi-bootable.iso
 mv fdi-bootable.iso $srcdir/fdi-bootable-${last_tag#release-}.iso
 
 echo "* Converting to initrd"
-livecd-iso-to-pxeboot $tmpdir/fdi.iso
+$srcdir/aux/livecd-iso-to-pxeboot $tmpdir/fdi.iso
 
 if [ $? -ne 0 ]; then
     KEEP_TMPDIR=yes
