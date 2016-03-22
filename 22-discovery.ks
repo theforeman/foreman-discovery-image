@@ -69,6 +69,8 @@ cat >/etc/foreman-proxy/settings.yml <<'CFG'
 :https_port: 8443
 :log_file: SYSLOG
 :log_level: DEBUG
+:log_buffer: 1000
+:log_buffer_errors: 500
 CFG
 
 cat >/etc/foreman-proxy/settings.d/discovery_image.yml <<'CFG'
@@ -83,6 +85,11 @@ cat >/etc/foreman-proxy/settings.d/bmc.yml <<'CFG'
 CFG
 
 cat >/etc/foreman-proxy/settings.d/facts.yml <<'CFG'
+---
+:enabled: true
+CFG
+
+cat >/etc/foreman-proxy/settings.d/logs.yml <<'CFG'
 ---
 :enabled: true
 CFG

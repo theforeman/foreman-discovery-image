@@ -31,8 +31,9 @@ require 'yaml'
 require 'json'
 
 def log_msg msg
-  if defined? ::Proxy::Log
-    ::Proxy::Log.logger.info msg
+  if defined? ::Proxy::LoggerFactory
+    # helper methods are also used from proxy context (refresh facts -> facter API -> custom facts)
+    ::Proxy::LoggerFactory.logger.info msg
   else
     Syslog.open($0, Syslog::LOG_PID | Syslog::LOG_CONS) { |s| s.info msg.to_s.gsub('%', '%%') rescue false }
   end
@@ -41,8 +42,9 @@ rescue Exception => e
 end
 
 def log_err msg
-  if defined? ::Proxy::Log
-    ::Proxy::Log.logger.error msg
+  if defined? ::Proxy::LoggerFactory
+    # helper methods are also used from proxy context (refresh facts -> facter API -> custom facts)
+    ::Proxy::LoggerFactory.logger.error msg
   else
     Syslog.open($0, Syslog::LOG_PID | Syslog::LOG_CONS) { |s| s.err msg.to_s.gsub('%', '%%') rescue false }
   end
@@ -51,8 +53,9 @@ rescue Exception => e
 end
 
 def log_debug msg
-  if defined? ::Proxy::Log
-    ::Proxy::Log.logger.debug msg
+  if defined? ::Proxy::LoggerFactory
+    # helper methods are also used from proxy context (refresh facts -> facter API -> custom facts)
+    ::Proxy::LoggerFactory.logger.debug msg
   else
     Syslog.open($0, Syslog::LOG_PID | Syslog::LOG_CONS) { |s| s.debug msg.to_s.gsub('%', '%%') rescue false }
   end
