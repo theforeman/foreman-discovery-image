@@ -158,7 +158,7 @@ end
 
 def upload(uri = discover_server, type = proxy_type, custom_facts = {})
   unless uri
-    log_err "Could not determine Foreman instance, add foreman.url or proxy.url kernel command parameter"
+    log_err "Could not determine instance type, add foreman.url or proxy.url kernel command parameter"
     return
   end
   unless uri.is_a? URI
@@ -166,10 +166,10 @@ def upload(uri = discover_server, type = proxy_type, custom_facts = {})
     return
   end
   if uri.host.nil? or uri.port.nil?
-    log_err "Foreman URI host or port was not specified, cannot continue"
+    log_err "Server or proxy URI host or port was not specified, cannot continue"
     return
   end
-  log_msg "Registering host with Foreman (#{uri})"
+  log_msg "Registering host at (#{uri})"
   http = Net::HTTP.new(uri.host, uri.port)
   if uri.scheme == 'https' then
     http.use_ssl = true
@@ -190,18 +190,18 @@ def upload(uri = discover_server, type = proxy_type, custom_facts = {})
   req.body = {'facts' => facts }.to_json
   response = http.request(req)
   if ['200','201'].include? response.code
-    log_msg "Response from Foreman #{response.code}: #{response.body}"
+    log_msg "Response from server #{response.code}: #{response.body}"
     body = response.nil? ? 'N/A' : response.body
     write_tui 'success', response.code, body
     return true
   else
-    log_err "Response from Foreman #{response.code}: #{response.body}"
+    log_err "Response from server #{response.code}: #{response.body}"
     body = response.nil? ? 'N/A' : response.body
     write_tui 'failure', response.code, body
     return false
   end
 rescue => e
-  log_err "Could not send facts to Foreman: #{e}"
+  log_err "Could not send facts to server: #{e}"
   log_debug e.backtrace.join("\n")
   body = response.nil? ? 'N/A' : response.body
   write_tui 'failure', 1001, "#{e}, body: #{body}"

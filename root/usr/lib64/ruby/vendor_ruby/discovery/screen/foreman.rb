@@ -1,11 +1,11 @@
 def screen_foreman mac = nil, gw = nil, proxy_url = cmdline('proxy.url'), proxy_type = cmdline('proxy.type')
-  Newt::Screen.centered_window(59, 20, "Foreman credentials")
+  Newt::Screen.centered_window(59, 20, "Credentials")
   f = Newt::Form.new
   t_desc = Newt::Textbox.new(2, 2, 54, 6, Newt::FLAG_WRAP)
   t_desc.set_text "Provide full URL (http(s)://host:PORT) to the Server or Proxy " +
   "according to the type selected. Ports are usually 443, 8443, 8448 or 9090 according " +
   "to configuration."
-  l_url = Newt::Label.new(2, 8, "Foreman URL:")
+  l_url = Newt::Label.new(2, 8, "Server URL:")
   l_type = Newt::Label.new(2, 10, "Connection type:")
   t_url = Newt::Entry.new(20, 8, "", 36, Newt::FLAG_SCROLL)
   r_server = Newt::RadioButton.new(20, 10, "Server", 0, nil)
@@ -31,7 +31,7 @@ def screen_foreman mac = nil, gw = nil, proxy_url = cmdline('proxy.url'), proxy_
       proxy_url = URI.parse(url)
       raise "Port must be explicitly provided" if proxy_url.port.nil?
     rescue Exception => e
-      Newt::Screen.win_message("Invalid URL", "OK", "Not a valid Foreman URL: #{url} (#{e})")
+      Newt::Screen.win_message("Invalid URL", "OK", "Not a valid URL: #{url} (#{e})")
       return [:screen_foreman, mac, gw, url, proxy_type]
     end
     [:screen_facts, mac, proxy_url, proxy_type]

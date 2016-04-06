@@ -1,7 +1,7 @@
 def screen_welcome
   text_help, tw, th = Newt.reflow_text(<<EOT, 60, 5, 5)
 Select Manual network setup to select primary interface, configure network (no DHCP required), \
-setup Foreman server credentials, add custom facts and trigger auto-provisioning \
+setup server credentials, add custom facts and trigger auto-provisioning \
 via Discovery rules. This will lead to kernel reload (kexec) into installer. \
 Select Discover with DHCP to select primary interface and proceed with DHCP configuration \
 and standard discovery without any custom facts. This will reboot the host once the system \

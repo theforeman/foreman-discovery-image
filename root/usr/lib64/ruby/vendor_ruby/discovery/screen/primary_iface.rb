@@ -1,7 +1,7 @@
 def screen_primary_iface dhcp = false
   width = 60
   t_desc = Newt::Textbox.new(-1, -1, width, 3, Newt::FLAG_WRAP)
-  t_desc.set_text "Select primary (provisioning) network interface with connection to Foreman server:"
+  t_desc.set_text "Select primary (provisioning) network interface with connection to server or proxy:"
   lb_ifaces = Newt::Listbox.new(-1, -1, 10, Newt::FLAG_SCROLL)
   b_select = Newt::Button.new(-1, -1, "Select")
   b_cancel = Newt::Button.new(-1, -1, "Cancel")
