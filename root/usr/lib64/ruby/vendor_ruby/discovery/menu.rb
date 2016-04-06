@@ -2,6 +2,7 @@ require "newt"
 require "discovery"
 require "facter"
 require "ipaddr"
+require "fast_gettext"
 
 def fdi_version file = 'VERSION'
   return 'GIT' unless File.exist?("/usr/share/fdi/#{file}")
@@ -120,6 +121,21 @@ end
 
 log_msg "Kernel opts: #{cmdline}"
 
+# fast_gettext initialization
+begin
+  FastGettext.add_text_domain('foreman-discovery-image',
+    :path => File.exists?('/usr/share/locale/fdi') ? '/usr/share/locale/fdi' : 'root/usr/share/locale/fdi',
+    :type => :po,
+    :ignore_fuzzy => true,
+    :report_warning => false)
+  FastGettext.text_domain = 'foreman-discovery-image'
+  selected_locale = cmdline('locale')
+  FastGettext.locale = selected_locale if selected_locale
+rescue Exception => e
+  log_err "Unable to initialize gettext: #{e}"
+end
+include FastGettext::Translation
+
 def main_loop
   Signal.trap("TERM") { cleanup }
   Signal.trap("INT") { cleanup }
@@ -128,7 +144,7 @@ def main_loop
   end
 
   Newt::Screen.new
-  Newt::Screen.push_helpline("Foreman Discovery Image v#{fdi_version} (#{fdi_release})")
+  Newt::Screen.push_helpline(_("Foreman Discovery Image") + " v#{fdi_version} (#{fdi_release})")
 
   if cmdline('BOOTIF')
     # Booted via PXE
@@ -138,9 +154,9 @@ def main_loop
     if cmdline('fdi.pxauto')
       # Unattended PXE-less provisioning
       log_debug "Unattended provisioning started"
-      proxy_url = cmdline('proxy.url') || error_box("Option proxy.url was not provided, cannot continue")
-      proxy_url = URI.parse(proxy_url) rescue error_box("Unable to parse proxy.url URI: #{proxy_url}")
-      proxy_type = cmdline('proxy.type') || error_box("Option proxy.type was not provided, cannot continue")
+      proxy_url = cmdline('proxy.url') || error_box(_("Option proxy.url was not provided, cannot continue"))
+      proxy_url = URI.parse(proxy_url) rescue error_box(_("Unable to parse proxy.url URI: %s") % proxy_url)
+      proxy_type = cmdline('proxy.type') || error_box(_("Option proxy.type was not provided, cannot continue"))
       log_debug "proxy.url=#{proxy_url} proxy.type=#{proxy_type}"
       mac = cmdline('fdi.pxmac') || detect_first_nic_with_link
       ip = cmdline('fdi.pxip')
@@ -173,10 +189,10 @@ def main_loop
         result
       end
       active_screen = [:screen_info, action,
-        "Performing unattended provisioning via NIC #{mac} (provided credentials: ip=#{ip} gw=#{gw} dns=#{dns}) and sending facts to #{proxy_url} of endpoint type #{proxy_type}. This can take a while...",
-        "Unattended provisioning failed: unable to upload facts. Check your network credentials.",
-        [:screen_status, generate_info('Unattended fact upload OK - awaiting kexec')],
-        [:screen_status, generate_info('Unattended fact upload FAILED - check logs')]]
+        (_("Performing unattended provisioning via NIC %s, please wait.") % mac) + " (ip=#{ip} gw=#{gw} dns=#{dns}, url=#{proxy_url} [#{proxy_type}])",
+        _("Unattended provisioning failed: unable to upload facts. Check your network credentials."),
+        [:screen_status, generate_info(_('Unattended fact upload OK - awaiting kexec'))],
+        [:screen_status, generate_info(_('Unattended fact upload FAILED - check logs'))]]
     else
       # Attended PXE-less provisioning
       active_screen = :screen_welcome
@@ -193,7 +209,7 @@ def main_loop
     Newt::Screen.pop_window()
   end
 rescue Exception => e
-  error_box("Fatal error - investigate journal", e) unless e.is_a? SystemExit
+  error_box(_("Fatal error - investigate journal"), e) unless e.is_a? SystemExit
 ensure
   cleanup
 end

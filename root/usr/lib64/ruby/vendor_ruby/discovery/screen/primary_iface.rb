@@ -1,10 +1,10 @@
 def screen_primary_iface dhcp = false
   width = 60
   t_desc = Newt::Textbox.new(-1, -1, width, 3, Newt::FLAG_WRAP)
-  t_desc.set_text "Select primary (provisioning) network interface with connection to server or proxy:"
+  t_desc.set_text _("Select primary (provisioning) network interface with connection to server or proxy:")
   lb_ifaces = Newt::Listbox.new(-1, -1, 10, Newt::FLAG_SCROLL)
-  b_select = Newt::Button.new(-1, -1, "Select")
-  b_cancel = Newt::Button.new(-1, -1, "Cancel")
+  b_select = Newt::Button.new(-1, -1, _("Select"))
+  b_cancel = Newt::Button.new(-1, -1, _("Cancel"))
   lb_ifaces.set_width(width)
 
   bootif = normalize_mac(cmdline('BOOTIF'))
@@ -36,7 +36,7 @@ def screen_primary_iface dhcp = false
   main_grid.set_field(0, 0, Newt::GRID_COMPONENT, t_desc, 0, 0, 0, 0, 0, Newt::GRID_FLAG_GROWX)
   main_grid.set_field(0, 1, Newt::GRID_COMPONENT, lb_ifaces, 0, 0, 0, 0, 0, Newt::GRID_FLAG_GROWX)
   main_grid.set_field(0, 2, Newt::GRID_SUBGRID, but_grid, 0, 1, 0, 0, 0, Newt::GRID_FLAG_GROWX)
-  main_grid.wrapped_window("Primary interface")
+  main_grid.wrapped_window(_("Primary interface"))
 
   f = Newt::Form.new
   if preselectedif
@@ -49,7 +49,7 @@ def screen_primary_iface dhcp = false
     primary_mac = lb_ifaces.get_current_as_string
     if dhcp
       action = Proc.new { configure_network false, primary_mac }
-      [:screen_info, action, "Configuring network via DHCP. This operation can take several minutes to complete.", "Unable to bring network via DHCP",
+      [:screen_info, action, _("Configuring network via DHCP. This operation can take several minutes to complete."), _("Unable to bring network via DHCP"),
         [:screen_foreman, primary_mac, nil, cmdline('proxy.url'), cmdline('proxy.type')],
         [:screen_network, primary_mac]]
     else

@@ -1,17 +1,10 @@
 def screen_welcome
-  text_help, tw, th = Newt.reflow_text(<<EOT, 60, 5, 5)
-Select Manual network setup to select primary interface, configure network (no DHCP required), \
-setup server credentials, add custom facts and trigger auto-provisioning \
-via Discovery rules. This will lead to kernel reload (kexec) into installer. \
-Select Discover with DHCP to select primary interface and proceed with DHCP configuration \
-and standard discovery without any custom facts. This will reboot the host once the system \
-is provisioned either manually or via Discovery rules.
-EOT
+  text_help, tw, th = Newt.reflow_text(_('Select Manual network setup to select primary interface, configure network (no DHCP required), setup server credentials, add custom facts and trigger auto-provisioning via Discovery rules. This will lead to kernel reload (kexec) into installer. Select Discover with DHCP to select primary interface and proceed with DHCP configuration and standard discovery without any custom facts. This will reboot the host once the system is provisioned either manually or via Discovery rules.'), 60, 5, 5)
   t_welcome = Newt::Textbox.new(-1, -1, tw, th, Newt::FLAG_WRAP)
   t_welcome.set_text(text_help)
 
-  b_proceed = Newt::Button.new(-1, -1, "Manual network setup")
-  b_discover = Newt::Button.new(-1, -1, "Discover with DHCP")
+  b_proceed = Newt::Button.new(-1, -1, _("Manual network setup"))
+  b_discover = Newt::Button.new(-1, -1, _("Discover with DHCP"))
 
   main_grid = Newt::Grid.new(1, 2)
   but_grid = Newt::Grid.new(2, 1)
@@ -21,7 +14,7 @@ EOT
 
   main_grid.set_field(0, 0, Newt::GRID_COMPONENT, t_welcome, 0, 0, 0, 1, 0, 0)
   main_grid.set_field(0, 1, Newt::GRID_SUBGRID, but_grid, 0, 0, 0, 0, 0, Newt::GRID_FLAG_GROWX)
-  main_grid.wrapped_window("Manual/PXE-less provisioning workflow")
+  main_grid.wrapped_window(_("Manual/PXE-less provisioning workflow"))
 
   f = Newt::Form.new
   f.add(t_welcome, b_proceed, b_discover)

@@ -1,10 +1,10 @@
 def screen_ssh
   t_desc = Newt::Textbox.new(-1, -1, 39, 3, Newt::FLAG_WRAP)
-  t_desc.set_text "Enter root password to unlock the account and enable SSH service:"
+  t_desc.set_text _("Enter root password to unlock the account and enable SSH service:")
   e_password = Newt::Entry.new(-1, -1, "", 39, Newt::FLAG_PASSWORD)
-  b_enable = Newt::Button.new(-1, -1, "Set and Enable")
-  b_disable = Newt::Button.new(-1, -1, "Disable")
-  b_cancel = Newt::Button.new(-1, -1, "Cancel")
+  b_enable = Newt::Button.new(-1, -1, _("Set and Enable"))
+  b_disable = Newt::Button.new(-1, -1, _("Disable"))
+  b_cancel = Newt::Button.new(-1, -1, _("Cancel"))
 
   main_grid = Newt::Grid.new(1, 3)
   but_grid = Newt::Grid.new(3, 1)
@@ -16,7 +16,7 @@ def screen_ssh
   main_grid.set_field(0, 0, Newt::GRID_COMPONENT, t_desc, 0, 0, 0, 0, 0, 0)
   main_grid.set_field(0, 1, Newt::GRID_COMPONENT, e_password, 0, 0, 0, 0, 0, 0)
   main_grid.set_field(0, 2, Newt::GRID_SUBGRID, but_grid, 0, 1, 0, 0, 0, Newt::GRID_FLAG_GROWX)
-  main_grid.wrapped_window("Secure Shell access")
+  main_grid.wrapped_window(_("Secure Shell access"))
 
   f = Newt::Form.new
   f.add(t_desc, e_password, b_enable, b_disable, b_cancel)
