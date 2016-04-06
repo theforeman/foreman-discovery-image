@@ -1,0 +1,8 @@
+[main]
+host = https://www.transifex.com
+
+[foreman.discovery-image]
+file_filter = root/usr/share/locale/fdi/<lang>/fdi.edit.po
+source_file = root/usr/share/locale/fdi/fdi.pot
+source_lang = en
+type = PO

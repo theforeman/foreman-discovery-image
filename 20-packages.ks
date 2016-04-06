@@ -33,6 +33,7 @@ OpenIPMI-tools
 openssl
 foreman-proxy
 rubygem-smart_proxy_discovery_image
+rubygem-fast_gettext
 
 # Interactive discovery
 kexec-tools

@@ -1,0 +1,217 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2016 Foreman developers
+# This file is distributed under the same license as the foreman-discovery-image package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2016.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: foreman-discovery-image 3.1.1\n"
+"Report-Msgid-Bugs-To: foreman-dev@googlegroups.com\n"
+"POT-Creation-Date: 2016-04-06 13:47+0200\n"
+"PO-Revision-Date: 2016-04-06 13:47+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Configuring network via DHCP. This operation can take several minutes to complete."
+msgstr ""
+
+msgid "Configuring network. This operation can take several minutes to complete."
+msgstr ""
+
+msgid "Confirm"
+msgstr ""
+
+msgid "Connection type:"
+msgstr ""
+
+msgid "Credentials"
+msgstr ""
+
+msgid "Custom facts"
+msgstr ""
+
+msgid "Disable"
+msgstr ""
+
+msgid "Discover with DHCP"
+msgstr ""
+
+msgid "Discovery"
+msgstr ""
+
+msgid "Discovery status"
+msgstr ""
+
+msgid "Enter root password to unlock the account and enable SSH service:"
+msgstr ""
+
+msgid "Fact %s name"
+msgstr ""
+
+msgid "Facts"
+msgstr ""
+
+msgid "Fatal error - investigate journal"
+msgstr ""
+
+msgid "Foreman Discovery Image"
+msgstr ""
+
+msgid "IPv4 Address:"
+msgstr ""
+
+msgid "IPv4 DNS:"
+msgstr ""
+
+msgid "IPv4 Gateway:"
+msgstr ""
+
+msgid "Invalid IP"
+msgstr ""
+
+msgid "Invalid URL"
+msgstr ""
+
+msgid "Logs"
+msgstr ""
+
+msgid "Manual network setup"
+msgstr ""
+
+msgid "Manual/PXE-less provisioning workflow"
+msgstr ""
+
+msgid "N/A"
+msgstr ""
+
+msgid "Network configuration"
+msgstr ""
+
+msgid "Next"
+msgstr ""
+
+msgid "No URL was provided"
+msgstr ""
+
+msgid "Not a valid URL"
+msgstr ""
+
+msgid "Not supported"
+msgstr ""
+
+msgid "OK"
+msgstr ""
+
+msgid "Operation failed"
+msgstr ""
+
+msgid "Option proxy.type was not provided, cannot continue"
+msgstr ""
+
+msgid "Option proxy.url was not provided, cannot continue"
+msgstr ""
+
+msgid "Performing unattended provisioning via NIC %s, please wait."
+msgstr ""
+
+msgid "Port must be explicitly provided"
+msgstr ""
+
+msgid "Press any key"
+msgstr ""
+
+msgid "Primary interface"
+msgstr ""
+
+msgid "Provide full URL (http(s)://host:PORT) to the Server or Proxy according to the type selected. Ports are usually 443, 8443, 8448 or 9090 according to configuration."
+msgstr ""
+
+msgid "Provide network configuration for the selected primary interface. Use CIDR netmask notation (e.g. 192.168.1.1/24) for the IP address."
+msgstr ""
+
+msgid "Provide valid CIDR ipaddress with a netmask, gateway and one DNS server"
+msgstr ""
+
+msgid "Proxy"
+msgstr ""
+
+msgid "Reboot"
+msgstr ""
+
+msgid "Resend"
+msgstr ""
+
+msgid "Resending not possible in PXE-less, reboot and start over."
+msgstr ""
+
+msgid "SSH"
+msgstr ""
+
+msgid "Secure Shell access"
+msgstr ""
+
+msgid "Select"
+msgstr ""
+
+msgid "Select Manual network setup to select primary interface, configure network (no DHCP required), setup server credentials, add custom facts and trigger auto-provisioning via Discovery rules. This will lead to kernel reload (kexec) into installer. Select Discover with DHCP to select primary interface and proceed with DHCP configuration and standard discovery without any custom facts. This will reboot the host once the system is provisioned either manually or via Discovery rules."
+msgstr ""
+
+msgid "Select primary (provisioning) network interface with connection to server or proxy:"
+msgstr ""
+
+msgid "Server"
+msgstr ""
+
+msgid "Server URL:"
+msgstr ""
+
+msgid "Set and Enable"
+msgstr ""
+
+msgid "Status"
+msgstr ""
+
+msgid "This system will attempt to configure all interfaces via DHCP and discover itself by sending hardware facts to Foreman instance. To interrupt this behavior, press a key to be able to do manual network configuration and additional provisioning settings."
+msgstr ""
+
+msgid "Unable to bring network via DHCP"
+msgstr ""
+
+msgid "Unable to bring up network"
+msgstr ""
+
+msgid "Unable to parse proxy.url URI: %s"
+msgstr ""
+
+msgid "Unattended fact upload FAILED - check logs"
+msgstr ""
+
+msgid "Unattended fact upload OK - awaiting kexec"
+msgstr ""
+
+msgid "Unattended provisioning failed: unable to upload facts. Check your network credentials."
+msgstr ""
+
+msgid "Waiting for operation to complete"
+msgstr ""
+
+msgid "Welcome to Foreman Discovery"
+msgstr ""
+
+msgid "awaiting kexec into installer"
+msgstr ""
+
+msgid "use Status to update"
+msgstr ""
+
+msgid "value"
+msgstr ""

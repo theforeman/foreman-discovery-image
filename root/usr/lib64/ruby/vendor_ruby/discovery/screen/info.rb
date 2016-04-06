@@ -5,7 +5,7 @@ def screen_info action_proc, message, error_message, success_screen, failure_scr
 
   main_grid = Newt::Grid.new(1, 1)
   main_grid.set_field(0, 0, Newt::GRID_COMPONENT, t, 0, 0, 0, 1, 0, 0)
-  main_grid.wrapped_window("Waiting for operation to complete")
+  main_grid.wrapped_window(_("Waiting for operation to complete"))
 
   f = Newt::Form.new
   f.add(t)
@@ -19,7 +19,7 @@ def screen_info action_proc, message, error_message, success_screen, failure_scr
   if result
     success_screen
   else
-    Newt::Screen.win_message("Operation failed", "OK", error_message)
+    Newt::Screen.win_message(_("Operation failed"), _("OK"), error_message)
     failure_screen
   end
 end
