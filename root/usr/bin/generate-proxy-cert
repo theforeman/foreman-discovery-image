@@ -10,14 +10,18 @@ exportKCL
 
 DIR=/etc/foreman-proxy
 DAYS=${KCL_FDI_PROXY_CERT_DAYS:-999}
-IP=$(nmcli -t -f IP4.ADDRESS con show primary 2>/dev/null | cut -f2 -d: | cut -f1 -d/)
+
+COMMON_NAME=$(nmcli -t -f IP4.ADDRESS con show primary 2>/dev/null | cut -f2 -d: | cut -f1 -d/)
+
+# Don't fail when IP address was not provided (HTTP can be still used).
+[ -z "$COMMON_NAME" ] && COMMON_NAME=discovered
 
 openssl req -x509 \
   -newkey rsa:2048 \
   -keyout $DIR/key.pem \
   -out $DIR/cert.pem \
   -nodes \
-  -subj "/CN=$IP" \
+  -subj "/CN=$COMMON_NAME" \
   -rand /dev/urandom \
   -batch \
   -days $DAYS
