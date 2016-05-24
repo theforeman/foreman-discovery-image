@@ -21,6 +21,13 @@ blacklist mei
 install mei /bin/true
 EOMEI
 
+# See https://bugzilla.redhat.com/show_bug.cgi?id=1335830
+echo " * remove KMS DRM video drivers to prevent kexec isues"
+rm -rf /lib/modules/*/kernel/drivers/gpu/drm /lib/firmware/{amdgpu,radeon}
+
+echo " * remove unused drivers"
+rm -rf /lib/modules/*/kernel/{sound,drivers/media,fs/nls}
+
 echo " * compressing cracklib dictionary"
 gzip -9 /usr/share/cracklib/pw_dict.pwd
 
