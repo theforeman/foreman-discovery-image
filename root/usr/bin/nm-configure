@@ -5,6 +5,7 @@ exportKCL
 bootif="$(normalizeHwAddr "${BOOTMAC}")"
 mac=${2:-$bootif}
 uuid=$(/usr/bin/uuid)
+timeout=${KCL_FDI_DHCP_TIMEOUT:-300}
 
 correct_owner_perms() {
   chown root:root $1
@@ -56,6 +57,7 @@ autoconnect-priority=1
 mac-address=$mac
 [ipv4]
 method=auto
+dhcp-timeout=$timeout
 [ipv6]
 method=ignore
 EONS
@@ -74,6 +76,7 @@ autoconnect=$autoconnect
 mac-address=$mac
 [ipv4]
 method=auto
+dhcp-timeout=$timeout
 ignore-auto-dns=true
 ignore-auto-routes=true
 never-default=true
