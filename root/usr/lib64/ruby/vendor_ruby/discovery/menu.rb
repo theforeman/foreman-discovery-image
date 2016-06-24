@@ -13,7 +13,7 @@ def fdi_release file = 'RELEASE'
 end
 
 def enable_root_account(pass)
-  command("echo 'root:#{pass}' | chpasswd && systemctl restart sshd.service")
+  command("echo 'root:#{pass}' | chpasswd && systemctl restart sshd.service", false, false)
 end
 
 def error_box(msg, extra_msg = nil)
@@ -37,8 +37,8 @@ def error_box(msg, extra_msg = nil)
   exit(1)
 end
 
-def command(cmd, fail_on_error = true)
-  log_msg "TUI executing: #{cmd}"
+def command(cmd, fail_on_error = true, send_to_syslog = true)
+  log_msg("TUI executing: #{cmd}") if send_to_syslog
   # do not run real commands in development (non-image) environment
   return true if fdi_version == 'GIT'
   output = `#{cmd} 2>&1`
