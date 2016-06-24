@@ -1,4 +1,4 @@
-def screen_network mac, ip = cmdline('fdi.pxip', ''), gw = cmdline('fdi.pxgw', ''), dns = cmdline('fdi.pxdns', '')
+def screen_network mac, vlan_id, ip = cmdline('fdi.pxip', ''), gw = cmdline('fdi.pxgw', ''), dns = cmdline('fdi.pxdns', '')
   Newt::Screen.centered_window(49, 20, _("Network configuration"))
   f = Newt::Form.new
   t_desc = Newt::Textbox.new(2, 2, 44, 6, Newt::FLAG_WRAP)
@@ -26,12 +26,12 @@ def screen_network mac, ip = cmdline('fdi.pxip', ''), gw = cmdline('fdi.pxgw', '
       IPAddr.new(ip); IPAddr.new(gw); IPAddr.new(dns)
     rescue Exception => e
       Newt::Screen.win_message(_("Invalid IP"), _("OK"), _("Provide valid CIDR ipaddress with a netmask, gateway and one DNS server"))
-      return [:screen_network, mac, ip, gw, dns]
+      return [:screen_network, mac, vlan_id, ip, gw, dns]
     end
-    action = Proc.new { configure_network true, mac, ip, gw, dns }
+    action = Proc.new { configure_network true, mac, ip, gw, dns, vlan_id }
     [:screen_info, action, _("Configuring network. This operation can take several minutes to complete."), _("Unable to bring up network"),
       [:screen_foreman, mac, gw],
-      [:screen_network, mac, ip, gw, dns]]
+      [:screen_network, mac, vlan_id, ip, gw, dns]]
   else
     :screen_welcome
   end

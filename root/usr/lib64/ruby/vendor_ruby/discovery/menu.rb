@@ -75,15 +75,15 @@ def start_discovery_service
   end
 end
 
-def configure_network static, mac, ip=nil, gw=nil, dns=nil
+def configure_network static, mac, ip=nil, gw=nil, dns=nil, vlan=nil
   command("systemctl stop foreman-proxy")
   if static
-    command("nm-configure primary-static '#{mac}' '#{ip}' '#{gw}' '#{dns}'")
+    command("nm-configure primary-static '#{mac}' '#{ip}' '#{gw}' '#{dns}' '#{vlan}'")
   else
-    command("nm-configure primary '#{mac}'")
+    command("nm-configure primary '#{mac}' '#{vlan}'")
   end
   command("nmcli connection reload")
-  command("nmcli connection down primary")
+  command("nmcli connection down primary", false)
   result = command("nmcli connection up primary", false)
   command("nm-online -s -q --timeout=45") unless static
   # restarting proxy with regenerated SSL self-signed cert
