@@ -181,12 +181,14 @@ def upload(uri = discover_server, type = proxy_type, custom_facts = {})
                 "#{uri.path}/api/v2/discovered_hosts/facts"
               end
   req = Net::HTTP::Post.new(facts_url, {'Content-Type' => 'application/json'})
+  # create facts based on user input
+  user_input_facts = {"discovery_proxy_uri"=>uri, "discovery_proxy_type"=>type}
   # supress stderr of Facter
   facts = {}
   capture_stderr do
     facts = Facter.to_hash
   end.each_line { |x| log_err x}
-  facts.merge!(custom_facts)
+  facts.merge!(custom_facts).merge!(user_input_facts)
   req.body = {'facts' => facts }.to_json
   response = http.request(req)
   if ['200','201'].include? response.code
