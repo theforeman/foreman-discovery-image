@@ -132,7 +132,7 @@ begin
   selected_locale = cmdline('locale')
   FastGettext.locale = selected_locale if selected_locale
 rescue Exception => e
-  log_err "Unable to initialize gettext: #{e}"
+  error_box("Unable to initialize gettext: #{e}", e) unless e.is_a? SystemExit
 end
 include FastGettext::Translation
 
