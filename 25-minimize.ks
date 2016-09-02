@@ -38,12 +38,12 @@ rpm -e syslinux mtools acl
 # 100MB of locale archive is kind unnecessary; we only do en_US.utf8
 # this will clear out everything we don't need; 100MB => 2.1MB.
 echo " * minimizing locale-archive binary / memory size"
-localedef --list-archive | grep -iv 'en_US' | xargs localedef -v --delete-from-archive
+localedef --list-archive | grep -Eiv '(en_US|fdi)' | xargs localedef -v --delete-from-archive
 mv /usr/lib/locale/locale-archive /usr/lib/locale/locale-archive.tmpl
 /usr/sbin/build-locale-archive
 
 echo " * purging all other locale data"
-rm -rf /usr/share/locale*
+ls -d /usr/share/locale/* | grep -v fdi | xargs rm -rf
 
 echo " * purging images"
 rm -rf /usr/share/backgrounds/* /usr/share/kde4/* /usr/share/anaconda/pixmaps/rnotes/*

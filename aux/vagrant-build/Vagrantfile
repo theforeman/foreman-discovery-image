@@ -6,8 +6,8 @@ boxes = [
   {:name => 'wheezy',   :libvirt => 'fm-debian7',    :image_name => /Debian.*7/,      :os_user => 'debian'},
   {:name => 'f19',      :libvirt => 'fm-fedora19',   :image_name => /Fedora.*19/, :pty => true},
   {:name => 'f20',      :libvirt => 'fm-fedora20',   :image_name => /Fedora.*20.*PVHVM/, :pty => true},
-  {:name => 'f21',      :libvirt => 'fm-fedora21',   :image_name => /Fedora.*21.*PVHVM/, :pty => true},
-  {:name => 'f22',      :libvirt => 'fm-fedora22',   :image_name => /Fedora.*22.*PVHVM/, :pty => true},
+  {:name => 'f23',      :libvirt => 'fm-fedora23',   :image_name => /Fedora.*23.*PVHVM/, :pty => true},
+  {:name => 'f24',      :libvirt => 'fm-fedora24',   :image_name => /Fedora.*24.*PVHVM/, :pty => true},
   {:name => 'el6',      :libvirt => 'fm-centos64',   :image_name => /CentOS 6\.5 SELinux/, :default => true, :pty => true},
   # There is no livecd-tools available in EPEL7 therefore we build on F20
   {:name => 'el7',      :libvirt => 'fm-centos70',   :image_name => /CentOS 7/, :default => true, :pty => true},

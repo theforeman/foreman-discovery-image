@@ -13,7 +13,7 @@ def screen_facts mac, proxy_url, proxy_type
 
   names = []; values = []; labels = []; labels_sep = []
   (0..8).each_with_index do |ix, _|
-    labels[ix] = Newt::Label.new(-1, -1, (_("Fact %s name") % ('#' + ix + 1)) + ' ')
+    labels[ix] = Newt::Label.new(-1, -1, (_("Fact %s name") % ('#' + (ix + 1).to_s)) + ' ')
     labels_sep[ix] = Newt::Label.new(-1, -1, ' ' + _('value') + ' ')
     names[ix] = Newt::Entry.new(-1, -1, cmdline("fdi.pxfactname#{ix + 1}").to_s, 15, Newt::FLAG_SCROLL)
     values[ix] = Newt::Entry.new(-1, -1, cmdline("fdi.pxfactvalue#{ix + 1}").to_s, 15, Newt::FLAG_SCROLL)
