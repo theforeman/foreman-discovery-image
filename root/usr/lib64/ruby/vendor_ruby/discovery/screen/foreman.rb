@@ -27,7 +27,9 @@ def screen_foreman mac = nil, gw = nil, proxy_url = cmdline('proxy.url'), proxy_
       url = t_url.get
       raise _("No URL was provided") if url.size < 1
       proxy_url = URI.parse(url)
-      raise _("Port must be explicitly provided") if proxy_url.port.nil?
+      unless [443, 8443, 8448, 9090].include? proxy_url.port
+        Newt::Screen.win_message(_("Warning"), _("OK"), _("Port %s is likely not correct, expected ports are 443, 8443 or 9090") % proxy_url.port)
+      end
     rescue Exception => e
       Newt::Screen.win_message(_("Invalid URL"), _("OK"), _("Not a valid URL") + ": #{url} (#{e})")
       return [:screen_foreman, mac, gw, url, proxy_type]
