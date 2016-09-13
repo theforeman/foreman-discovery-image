@@ -1,6 +1,7 @@
 %packages --excludedocs
 bash
 kernel
+biosdevname
 grub2
 grub2-tools
 e2fsprogs
