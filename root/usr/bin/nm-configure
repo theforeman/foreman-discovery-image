@@ -6,6 +6,7 @@ bootif="$(normalizeHwAddr "${BOOTMAC}")"
 mac=${2:-$bootif}
 uuid=$(/usr/bin/uuid)
 timeout=${KCL_FDI_DHCP_TIMEOUT:-300}
+ctype="802-3-ethernet"
 
 correct_owner_perms() {
   chown root:root $1
@@ -14,8 +15,8 @@ correct_owner_perms() {
 
 usage() {
   echo "Usage: "
-  echo " $0 primary [MAC_ADDRESS]"
-  echo " $0 primary-static MAC_ADDRESS IP4_ADDR/CIDR IP4_GW IP4_DNS"
+  echo " $0 primary MAC_ADDRESS [VPN_ID]"
+  echo " $0 primary-static MAC_ADDRESS IP4_ADDR/CIDR IP4_GW IP4_DNS [VPN_ID]"
   echo " $0 secondary MAC_ADDRESS AUTOCONNECT (true/false)"
 }
 
@@ -25,12 +26,14 @@ if [[ "$1" == "primary-static" ]]; then
   ip=$3
   gw=$4
   dns=$5
+  vlanid=${6:-$KCL_FDI_VLAN_PRIMARY}
+  [[ "$vlanid" != "" ]] && ctype="vlan"
   script=/etc/NetworkManager/system-connections/primary
   cat > $script <<EONS
 [connection]
 id=primary
 uuid=$uuid
-type=802-3-ethernet
+type=$ctype
 autoconnect=true
 autoconnect-priority=1
 [802-3-ethernet]
@@ -42,15 +45,19 @@ gateway=$gw
 dns=$dns;
 [ipv6]
 method=ignore
+[vlan]
+id=$vlanid
 EONS
   correct_owner_perms $script
 elif [[ "$1" == "primary" ]]; then
+  vlanid=${3:-$KCL_FDI_VLAN_PRIMARY}
+  [[ "$vlanid" != "" ]] && ctype="vlan"
   script=/etc/NetworkManager/system-connections/primary
   cat > $script <<EONS
 [connection]
 id=primary
 uuid=$uuid
-type=802-3-ethernet
+type=$ctype
 autoconnect=true
 autoconnect-priority=1
 [802-3-ethernet]
@@ -61,6 +68,8 @@ dhcp-send-hostname=false
 dhcp-timeout=$timeout
 [ipv6]
 method=ignore
+[vlan]
+id=$vlanid
 EONS
   correct_owner_perms $script
 elif [[ "$1" == "secondary" ]]; then
