@@ -95,8 +95,6 @@ cat >/etc/foreman-proxy/settings.d/logs.yml <<'CFG'
 CFG
 
 echo " * setting up systemd"
-echo "DefaultTimeoutStartSec=30s" >> /etc/systemd/system.conf
-echo "DefaultTimeoutStopSec=5s" >> /etc/systemd/system.conf
 echo "DumpCore=no" >> /etc/systemd/system.conf
 
 echo " * setting multi-user.target as default"
