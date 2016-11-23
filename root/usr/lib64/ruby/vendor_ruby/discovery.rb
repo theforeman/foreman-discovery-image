@@ -124,21 +124,27 @@ rescue
   return nil
 end
 
-# SRV discovery will work only if DHCP returns valid search domain
 def discover_by_dns_srv
   resolver = Resolv::DNS.new
   type = Resolv::DNS::Resource::IN::SRV
-  result = resolver.getresources("_x-foreman._tcp", type).first
+  srv = "_x-foreman._tcp"
+  # Search domains is ignored in Ruby 2.x (https://bugs.ruby-lang.org/issues/11152)
+  domains = detect_dhcp_domains('primary') + ['']
+  results = domains.map{ |d| resolver.getresources([srv, d].join('.'), type) }
+  result = results.flatten.compact.first
+  return false unless result
   hostname = result.target.to_s
-  if [443, 8443, 9090].include?(result.port)
-    scheme = 'https'
+  default_scheme = if [443, 8443, 9090].include?(result.port)
+    'https'
   else
-    scheme = 'http'
+    'http'
   end
+  scheme = cmdline('fdi.srv.scheme', default_scheme)
   uri = "#{scheme}://#{hostname}:#{result.port}"
   log_msg "Discovered by SRV: #{uri}"
   URI.parse(uri)
-rescue
+rescue Exception => e
+  log_err "Error during DNS SRV discovery: #{e}"
   return nil
 end
 
@@ -225,6 +231,17 @@ end
 
 def get_ipv4(interface = 'primary')
   `nmcli -t -f IP4.ADDRESS con show #{interface} 2>/dev/null`.scan(/\d+\.\d+\.\d+\.\d+\/\d+\n/).first.strip rescue 'N/A'
+end
+
+def detect_dhcp_domains(interface)
+  domains = []
+  str = `nmcli -t -f IP4.DOMAIN con show #{interface} 2>/dev/null`
+  return [] if $? != 0
+  str.each_line { |x| domains << x.split(':').last.chomp }
+  domains
+rescue => e
+  log_err e.message
+  []
 end
 
 def detect_ipv4_credentials(interface)
