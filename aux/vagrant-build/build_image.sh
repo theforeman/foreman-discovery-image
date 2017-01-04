@@ -9,7 +9,7 @@ NAME=foreman-discovery-image
 # give the VM some time to finish booting and network configuration
 ping -c1 8.8.8.8 2>&1 >/dev/null && echo OK || echo FAIL
 yum -y install livecd-tools appliance-tools-minimizer \
-  hardlink git wget pykickstart
+  hardlink git wget pykickstart isomd5sum
 
 # build plugin
 pushd /root

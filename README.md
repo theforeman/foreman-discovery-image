@@ -84,7 +84,7 @@ Building
 Install the required packages:
 
 ```
-$ sudo yum install livecd-tools pykickstart
+$ sudo yum install livecd-tools pykickstart isomd5sum
 ```
 
 To prepare CentOS 7 kickstart do:

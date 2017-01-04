@@ -19,7 +19,7 @@ if [ $(id -u) != 0 ]; then
   exit 1
 fi
 
-which livecd-creator isohybrid >/dev/null || ( echo "Command(s) missing, install required tools" && exit 2 )
+which livecd-creator isohybrid implantisomd5 >/dev/null || ( echo "Command(s) missing, install required tools" && exit 2 )
 
 trap cleanup EXIT
 
@@ -46,10 +46,13 @@ fi
 echo "* Filtering ISO with isohybrid"
 cp fdi.iso fdi-bootable.iso
 isohybrid --partok --uefi fdi-bootable.iso
+
+echo "* Implanting MD5 sum"
+implantisomd5 --force fdi-bootable.iso
 mv fdi-bootable.iso $srcdir/fdi-bootable-${last_tag#release-}.iso
 
 echo "* Converting to initrd"
-$srcdir/aux/livecd-iso-to-pxeboot $tmpdir/fdi.iso
+bash -x $srcdir/aux/livecd-iso-to-pxeboot $tmpdir/fdi.iso
 
 if [ $? -ne 0 ]; then
     KEEP_TMPDIR=yes
