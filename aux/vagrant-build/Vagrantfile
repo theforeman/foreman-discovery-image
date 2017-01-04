@@ -8,6 +8,7 @@ boxes = [
   {:name => 'f20',      :libvirt => 'fm-fedora20',   :image_name => /Fedora.*20.*PVHVM/, :pty => true},
   {:name => 'f23',      :libvirt => 'fm-fedora23',   :image_name => /Fedora.*23.*PVHVM/, :pty => true},
   {:name => 'f24',      :libvirt => 'fm-fedora24',   :image_name => /Fedora.*24.*PVHVM/, :pty => true},
+  {:name => 'f25',      :libvirt => 'fm-fedora25',   :image_name => /Fedora.*25.*PVHVM/, :pty => true},
   {:name => 'el6',      :libvirt => 'fm-centos64',   :image_name => /CentOS 6\.5 SELinux/, :default => true, :pty => true},
   # There is no livecd-tools available in EPEL7 therefore we build on F20
   {:name => 'el7',      :libvirt => 'fm-centos70',   :image_name => /CentOS 7/, :default => true, :pty => true},
@@ -42,6 +43,7 @@ Vagrant.configure("2") do |config|
         p.image = box[:image_name]
         p.rackspace_region = :iad
         override.ssh.pty = true if box[:pty]
+        override.nfs.functional = false
       end
 
       # ~/.vagrant.d/Vagrantfile will need

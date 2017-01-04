@@ -125,6 +125,52 @@ file. This workarounds missing input options for additional kernel command
 line elements and can be used for testing the ISO with special kernel
 command line options multiple times.
 
+Building a release
+------------------
+
+This chapter is for The Foreman team members, skip to the next section if
+this is not for you.
+
+To build new release, use Jenkins CI job:
+
+http://ci.theforeman.org/view/Packaging/job/packaging_discovery_image
+
+To initiate the build in Rackspace locally, you need to install Vagrant,
+then install vagrant rackspace plugin via `vagrant plugin install
+vagrant-rackspace" and then configure it:
+
+		$ cat ~/.vagrant.d/Vagrantfile
+		# vim: sw=2:ts=2:et
+
+		Vagrant.configure("2") do |config|
+		  config.vm.box = "dummy"
+		  config.ssh.private_key_path = "~/.ssh/id_rsa"
+
+		  config.vm.provider :rackspace do |rs|
+			rs.username = "username"
+			rs.api_key = "abcdef1234567890..."
+			rs.public_key_path = "~/.ssh/id_rsa.pub"
+		  end
+		end
+
+Starting the job is easy:
+
+		cd aux/vagrant-build
+		distro=f24
+		LC_ALL=C repoowner=theforeman branch=master proxy_repo=1.14 vagrant up $distro
+
+Wait until the box starts up in Rackspace and builds the image, then connect to
+the box and download the image:
+
+		vagrant ssh-config $distro | tee vagrant-ssh-config.tmp
+		mkdir tmp
+		scp -F vagrant-ssh-config.tmp $distro:foreman-discovery-image/fdi*tar tmp/
+		scp -F vagrant-ssh-config.tmp $distro:foreman-discovery-image/fdi-bootable*iso tmp/
+
+And finally (do not forget):
+
+		LC_ALL=C repoowner=theforeman branch=master proxy_repo=1.14 vagrant destroy $distro
+
 Additional facts
 ----------------
 
