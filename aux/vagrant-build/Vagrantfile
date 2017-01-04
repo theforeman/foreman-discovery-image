@@ -43,7 +43,7 @@ Vagrant.configure("2") do |config|
         p.image = box[:image_name]
         p.rackspace_region = :iad
         override.ssh.pty = true if box[:pty]
-        override.nfs.functional = false
+        #override.nfs.functional = false
       end
 
       # ~/.vagrant.d/Vagrantfile will need
