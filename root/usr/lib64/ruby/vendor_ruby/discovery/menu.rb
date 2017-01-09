@@ -173,16 +173,6 @@ def main_loop
         end
         log_debug "Unattended network configuration finished, result: #{status}"
         facts = new_custom_facts(mac)
-        (1..99).each do |n|
-          if (fact_name = cmdline("fdi.pxfactname#{n}"))
-            fact_value = cmdline("fdi.pxfactvalue#{n}")
-            log_debug "Adding custom fact #{fact_name}=#{fact_value}"
-            facts[fact_name] = fact_value
-          else
-            log_debug "Fact named fdi.pxfactname#{n} not present, so this was the last one"
-            break
-          end
-        end
         log_debug "Unattended facts upload started"
         result = upload(proxy_url, proxy_type, facts)
         log_debug "Unattended facts upload finished, result: #{result}"

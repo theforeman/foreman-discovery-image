@@ -29,14 +29,9 @@ def screen_facts mac, proxy_url, proxy_type
   top_grid.wrapped_window(_("Custom facts"))
 
   f = Newt::Form.new
-  if cmdline("fdi.pxfactname1")
-    f.add(b_confirm, b_cancel)
-  end
+  f.add(b_confirm, b_cancel)
   (0..8).each_with_index do |ix, _|
     f.add(labels[ix], names[ix], labels_sep[ix], values[ix])
-  end
-  unless cmdline("fdi.pxfactname1")
-    f.add(b_confirm, b_cancel)
   end
   answer = f.run
   if answer == b_confirm
@@ -46,7 +41,7 @@ def screen_facts mac, proxy_url, proxy_type
     if perform_upload(proxy_url, proxy_type, custom_facts)
       [:screen_status, generate_info(' - ' + _('awaiting kexec into installer'))]
     else
-      :screen_welcome
+      [:screen_status, generate_info(' - ' + _('fact upload failed'))]
     end
   else
     :screen_welcome
