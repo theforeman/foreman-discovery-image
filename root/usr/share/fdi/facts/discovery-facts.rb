@@ -21,16 +21,6 @@
 require 'facter/util/ip'
 require '/usr/lib64/ruby/vendor_ruby/discovery.rb'
 
-def cmdline option=nil, default=nil
-  line = File.open("/proc/cmdline", 'r') { |f| f.read }
-  if option
-    result = line.split.map { |x| $1 if x.match(/^#{option}=(.*)/)}.compact
-    result.size == 1 ? result.first : default
-  else
-    line
-  end
-end
-
 def discovery_bootif
   # PXELinux dash-separated hexadecimal *without* the leading hardware type
   cmdline('BOOTIF', cmdline('fdi.pxmac', detect_first_nic_with_link)).gsub(/^[a-fA-F0-9]+-/, '').gsub('-', ':') rescue '00:00:00:00:00:00'
@@ -63,6 +53,21 @@ Facter.add("discovery_bootip", :timeout => 10) do
       result = Facter::Util::IP.get_interface_value(iface, "ipaddress") if mac == required
     end
     result
+  end
+end
+
+(1..99).each do |n|
+  if (fact_name = cmdline("fdi.pxfactname#{n}"))
+    fact_value = cmdline("fdi.pxfactvalue#{n}")
+    Facter.add(fact_name) do
+      setcode do
+        fact_value
+      end
+    end
+    Facter.debug "Adding kernel command line custom fact #{fact_name}=#{fact_value}"
+  else
+    Facter.debug "Processed #{n} kernel command line custom facts, we are done here"
+    break
   end
 end
 

@@ -4,8 +4,7 @@ def screen_countdown discovery_only = false
   t.set_text(text_help)
 
   secs = cmdline("fdi.countdown", 10).to_i rescue 10
-  press_key_text = "< " + _('Press any key') + " (#{secs}) >"
-  l_press = Newt::Label.new(-1, -1, press_key_text)
+  l_press = Newt::Label.new(-1, -1, "< " + _('Press any key') + " (#{secs}s) >")
 
   main_grid = Newt::Grid.new(1, 2)
   but_grid = Newt::Grid.new(1, 1)
@@ -23,7 +22,7 @@ def screen_countdown discovery_only = false
   unless discovery_only
     sec = secs
     while sec > 0
-      l_press.set_text(press_key_text)
+      l_press.set_text("< " + _('Press any key') + " ... (#{sec}s) >")
       sec = sec - 1
       Newt::Screen.refresh
       if (STDIN.read_nonblock(1) rescue nil)

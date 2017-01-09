@@ -79,14 +79,13 @@ ensure
   $stderr = previous_stderr
 end
 
+def cmdline_hash
+  $cmdline_hash ||= Hash[cmdline.split.map { |x| x.split('=', 2)}]
+end
+
 def cmdline option=nil, default=nil
-  @cmdline ||= File.open("/proc/cmdline", 'r') { |f| f.read }
-  if option
-    result = @cmdline.split.map { |x| $1 if x.match(/^#{option}=(.*)/)}.compact
-    result.size == 1 ? result.first : default
-  else
-    @cmdline
-  end
+  return File.open("/proc/cmdline", 'r') { |f| f.read } unless option
+  cmdline_hash[option] || default
 end
 
 def detect_first_nic_with_link
