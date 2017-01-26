@@ -1,5 +1,5 @@
-def screen_info action_proc, message, error_message, success_screen, failure_screen
-  text_help, tw, th = Newt.reflow_text(message, 60, 5, 5)
+def screen_info pipeline
+  text_help, tw, th = Newt.reflow_text(pipeline.data.message, 60, 5, 5)
   t = Newt::Textbox.new(-1, -1, tw, th, Newt::FLAG_WRAP)
   t.set_text(text_help)
 
@@ -13,13 +13,13 @@ def screen_info action_proc, message, error_message, success_screen, failure_scr
 
   # facter sometimes leaves messages on stdout, refresh before/after
   Newt::Screen.refresh
-  result = action_proc.call
+  result = pipeline.data.action_proc.call
   Newt::Screen.refresh
 
   if result
-    success_screen
+    0
   else
-    Newt::Screen.win_message(_("Operation failed"), _("OK"), error_message)
-    failure_screen
+    Newt::Screen.win_message(_("Operation failed"), _("OK"), pipeline.data.error_message)
+    1
   end
 end

@@ -35,7 +35,7 @@ cd $tmpdir
 echo Working in directory $tmpdir
 
 echo "* Running livecd-creator"
-livecd-creator -v --title="Discovery Image" --compression-type=xz --cache /var/cache/build-fdi --config $srcdir/fdi-image.ks -f fdi -t /tmp
+livecd-creator -v --product="Discovery Image" --title="Foreman" --compression-type=xz --cache /var/cache/build-fdi --config $srcdir/fdi-image.ks -f fdi -t /tmp
 
 if [ $? -ne 0 ]; then
     KEEP_TMPDIR=yes

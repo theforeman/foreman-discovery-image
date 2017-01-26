@@ -13,9 +13,17 @@ require 'discovery/screen/ssh'
 require 'discovery/screen/status'
 require 'discovery/screen/welcome'
 require 'discovery/screen/info'
+require 'discovery/screen/image_mode'
+require 'discovery/screen/image_compress'
+require 'discovery/screen/image_udpcast'
+require 'discovery/screen/image_http'
 
 # Disable GC until https://github.com/theforeman/ruby-newt/issues/2 is fixed,
 # see also: http://projects.theforeman.org/issues/11623
 GC.disable
 
-main_loop
+if cmdline('fdi.noregister')
+  main_loop :screen_status
+else
+  main_loop ARGV
+end

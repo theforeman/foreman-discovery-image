@@ -1,4 +1,7 @@
-def screen_network mac, vlan_id, ip = cmdline('fdi.pxip', ''), gw = cmdline('fdi.pxgw', ''), dns = cmdline('fdi.pxdns', '')
+def screen_network pipeline
+  ip = cmdline('fdi.pxip', pipeline.data.primary_ip || '')
+  gw = cmdline('fdi.pxgw', pipeline.data.primary_gw || '')
+  dns = cmdline('fdi.pxdns', pipeline.data.primary_dns || '')
   Newt::Screen.centered_window(49, 20, _("Network configuration"))
   f = Newt::Form.new
   t_desc = Newt::Textbox.new(2, 2, 44, 6, Newt::FLAG_WRAP)
@@ -19,19 +22,22 @@ def screen_network mac, vlan_id, ip = cmdline('fdi.pxip', ''), gw = cmdline('fdi
   end
   answer = f.run
   if answer == b_ok
-    ip = t_ip.get
-    gw = t_gw.get
-    dns = t_dns.get
+    pipeline.data.primary_ip = t_ip.get
+    pipeline.data.primary_gw = t_gw.get
+    pipeline.data.primary_dns = t_dns.get
     begin
-      IPAddr.new(ip); IPAddr.new(gw); IPAddr.new(dns)
-    rescue Exception => e
+      IPAddr.new(pipeline.data.primary_ip); IPAddr.new(pipeline.data.primary_gw); IPAddr.new(pipeline.data.primary_dns)
+    rescue Exception
       Newt::Screen.win_message(_("Invalid IP"), _("OK"), _("Provide valid CIDR ipaddress with a netmask, gateway and one DNS server"))
-      return [:screen_network, mac, vlan_id, ip, gw, dns]
+      pipeline.prepend :screen_network
+      return
     end
-    action = Proc.new { configure_network true, mac, ip, gw, dns, vlan_id }
-    [:screen_info, action, _("Configuring network. This operation can take several minutes to complete."), _("Unable to bring up network"),
-      [:screen_foreman, mac, gw],
-      [:screen_network, mac, vlan_id, ip, gw, dns]]
+    pipeline.append :screen_info
+    # the screen after will be picked depedning on the return value of the next screen (0 or 1)
+    pipeline.append [:screen_foreman, :screen_network]
+    pipeline.data.action_proc = Proc.new { configure_network false, pipeline.data.primary_mac, nil, nil, nil, pipeline.data.vlan_id }
+    pipeline.data.message = _("Configuring network. This operation can take several minutes to complete.")
+    pipeline.data.error_message = _("Unable to bring network")
   else
     :screen_welcome
   end

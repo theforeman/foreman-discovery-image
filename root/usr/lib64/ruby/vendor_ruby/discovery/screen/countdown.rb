@@ -1,4 +1,4 @@
-def screen_countdown discovery_only = false
+def screen_countdown pipeline
   text_help, tw, th = Newt.reflow_text(_('This system will attempt to configure all interfaces via DHCP and discover itself by sending hardware facts to Foreman instance. To interrupt this behavior, press a key to be able to do manual network configuration and additional provisioning settings.'), 60, 5, 5)
   t = Newt::Textbox.new(-1, -1, tw, th, Newt::FLAG_WRAP)
   t.set_text(text_help)
@@ -19,7 +19,7 @@ def screen_countdown discovery_only = false
   f.add(t, l_press)
   f.draw
   key_was_pressed = false
-  unless discovery_only
+  unless pipeline.data.discovery_only
     sec = secs
     while sec > 0
       l_press.set_text("< " + _('Press any key') + " ... (#{sec}s) >")
@@ -34,7 +34,7 @@ def screen_countdown discovery_only = false
   end
 
   if key_was_pressed
-    :screen_welcome
+    Pipeline.instance << :screen_welcome
   else
     start_discovery_service
     # additional countdown to let discovery-register do its work
@@ -49,6 +49,6 @@ def screen_countdown discovery_only = false
       break if File.exist?("/tmp/discovery-http-failure")
       sleep 1
     end
-    :screen_status
+    Pipeline.instance << :screen_status
   end
 end

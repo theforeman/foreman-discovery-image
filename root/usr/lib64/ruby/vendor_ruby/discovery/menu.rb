@@ -3,6 +3,7 @@ require "discovery"
 require "facter"
 require "ipaddr"
 require "fast_gettext"
+require "discovery/pipeline"
 
 def fdi_version file = 'VERSION'
   return 'GIT' unless File.exist?("/usr/share/fdi/#{file}")
@@ -20,17 +21,19 @@ end
 def error_box(msg, extra_msg = nil)
   log_err msg
   log_err extra_msg
-  backtrace = log_exception extra_msg
+  backtrace = log_exception(extra_msg)
+  backtrace.gsub!(/^\/.*vendor_ruby\//, '') if backtrace
   Newt::Screen.centered_window(74, 20, "Fatal error")
   f = Newt::Form.new
   t_desc = Newt::Textbox.new(1, 1, 70, 13, Newt::FLAG_SCROLL)
   random_pass = (1...10).map { (65 + rand(26)).chr }.join
-  t_desc.set_text "#{msg}:\n#{extra_msg}\n\n#{backtrace}\n\n" +
+  t_desc.set_text "#{msg}:\n#{extra_msg}\n\n" +
   "Once OK button is pressed, and root account will be unlocked\n" +
   "with the following random password:\n\n" +
   "   #{random_pass}\n\n" +
   "It is possible to use third console to login and investigate\n" +
-  "via journalctl and discovery-debug commands. "
+  "via journalctl and discovery-debug commands.\n\n" +
+  "PIPELINE:\n#{Pipeline.instance}\n\nBACKTRACE:\n#{backtrace}"
   b_ok = Newt::Button.new(66, 15, "OK")
   f.add(b_ok, t_desc)
   f.run
@@ -38,14 +41,22 @@ def error_box(msg, extra_msg = nil)
   exit(1)
 end
 
-def command(cmd, fail_on_error = true, send_to_syslog = true)
-  log_msg("TUI executing: #{cmd}") if send_to_syslog
-  # do not run real commands in development (non-image) environment
-  return true if fdi_version == 'GIT'
-  output = `#{cmd} 2>&1`
+def command(cmd, fail_on_error = true, cmd_syslog = true, output_syslog = false, redirect_stdout = true)
+  cmd = "systemd-cat #{cmd}" if output_syslog
+  cmd = "#{cmd} 2>&1" if redirect_stdout
+  if ENV['FDI_DEVEL']
+    # do not run real commands in development (non-image) environment
+    log_msg("*FAKE*: #{cmd}")
+    output = "Fake output (commands disabled)"
+    sleep 0.1
+    return true
+  else
+    log_msg("*EXEC*: #{cmd}") if cmd_syslog
+  end
+  output = `#{cmd}`
   if $? != 0
     if fail_on_error
-      error_box("Command failed: #{cmd}", output)
+      error_box("Command failed (#{$?}): #{cmd}", output)
     else
       return false
     end
@@ -136,12 +147,16 @@ rescue Exception => e
 end
 include FastGettext::Translation
 
-def main_loop
+def main_loop(args)
   Signal.trap("TERM") { cleanup }
   Signal.trap("INT") { cleanup }
   Signal.trap("HUP") do
     Newt::Screen.refresh
   end
+
+  pipeline = Pipeline.instance
+  pipeline.data.proxy_url = cmdline('proxy.url')
+  pipeline.data.proxy_type = cmdline('proxy.type')
 
   Newt::Screen.new
   mode = if File.exists?("/sys/firmware/efi/")
@@ -153,7 +168,11 @@ def main_loop
   driver = "NO-FB" if driver.empty?
   Newt::Screen.push_helpline(_("Foreman Discovery Image") + " v#{fdi_version} (#{fdi_release}) #{RUBY_PLATFORM} #{mode} #{driver}")
 
-  if cmdline('BOOTIF')
+  if args.size > 0
+    # Booted in development mode
+    active_screen = args.first
+    pipeline.gdata.command_line = args.dup
+  elsif cmdline('BOOTIF')
     # Booted via PXE
     active_screen = :screen_countdown
   else
@@ -198,15 +217,22 @@ def main_loop
       active_screen = :screen_welcome
     end
   end
+
+  # the pipeline loop
   while ! [:quit].include? active_screen
-    if active_screen.is_a?(Array)
-      log_debug "Entering #{active_screen[0]}"
-      active_screen = send(*active_screen)
-    else
-      log_debug "Entering #{active_screen}"
-      active_screen = send(active_screen)
-    end
+    log_debug "Entering #{active_screen}"
+    next_screen = send(active_screen, pipeline)
     Newt::Screen.pop_window()
+    active_screen = pipeline.next
+    unless active_screen
+      log_debug "No screens in pipeline, fallback to welcome"
+      active_screen = :screen_welcome
+    end
+    if active_screen.is_a? Array
+      result = next_screen.to_i
+      log_debug "Result is #{result}, picking out of #{active_screen.inspect}"
+      active_screen = active_screen[result]
+    end
   end
 rescue Exception => e
   error_box(_("Fatal error - investigate journal"), e) unless e.is_a? SystemExit

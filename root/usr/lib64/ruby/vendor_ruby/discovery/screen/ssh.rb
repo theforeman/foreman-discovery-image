@@ -1,4 +1,4 @@
-def screen_ssh
+def screen_ssh pipeline
   t_desc = Newt::Textbox.new(-1, -1, 39, 3, Newt::FLAG_WRAP)
   t_desc.set_text _("Enter root password to unlock the account and enable SSH service:")
   e_password = Newt::Entry.new(-1, -1, "", 39, Newt::FLAG_PASSWORD)
@@ -26,7 +26,8 @@ def screen_ssh
   elsif answer == b_disable
     command("systemctl stop sshd.service")
   elsif answer == b_cancel
-    :screen_welcome
+    pipeline.cancel pipeline.data.on_cancel
   end
-  :screen_status
+  # TODO this screen could require next enqued one
+  pipeline.append :screen_status
 end
