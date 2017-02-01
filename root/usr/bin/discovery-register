@@ -67,6 +67,7 @@ i = cmdline("fdi.cachefacts", 0).to_i rescue 0
 upload_sleep = cmdline("fdi.uploadsleep", 30).to_i rescue 30
 while true do
   uninteresting_facts=/kernel|operatingsystem|osfamily|ruby|path|time|swap|free|filesystem|version|selinux/i
+  Facter.clear
   facts = Facter.to_hash.reject! {|k,v| k =~ uninteresting_facts }
   unless YAML.load(read_cache) == facts
     log_msg "Fact cache invalid, reloading to foreman"
