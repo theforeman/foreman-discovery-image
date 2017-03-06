@@ -171,6 +171,21 @@ And finally (do not forget):
 
 		LC_ALL=C repoowner=theforeman branch=master proxy_repo=1.14 vagrant destroy $distro
 
+Extensions
+----------
+
+Discovery Image supports runtime extensions published via TFTP or HTTP.
+Those are distributed as ZIP files with shell scripts. It is also possible
+to build an image with extensions built-in which is helpful for PXE-less
+environments.
+
+To do that, [follow the
+documentation](https://theforeman.org/plugins/foreman_discovery/8.0/index.html#5.Extendingtheimage)
+to create directory structure in root/opt/extension folder. Do not put ZIP
+files into this folder, but keep the directory structure extracted (this is
+the directory where ZIP files get downloaded and extracted). Then rebuild
+the image, the extensions will be started during boot.
+
 Additional facts
 ----------------
 
@@ -210,7 +225,7 @@ fdi.ssh=1 fdi.rootpw=redhat
 ```
 
 Root password can also be specified in encrypted form (using 'redhat' as
-an example below). Single and/or double quotes around password are 
+an example below). Single and/or double quotes around password are
 recommended to be used to prevent possible special characters
 interpretation.
 

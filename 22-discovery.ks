@@ -37,6 +37,7 @@ echo " * enabling required system services"
 systemctl enable ipmi.service
 systemctl enable foreman-proxy.service
 systemctl enable discovery-fetch-extensions.path
+systemctl enable discovery-start-extensions.service
 systemctl enable discovery-menu.service
 
 # register service is started manually from discovery-menu

@@ -6,3 +6,8 @@ root/usr/share/fdi/RELEASE
 *.iso
 .idea/
 build-local
+root/opt/extension/autostart.d/*
+root/opt/extension/facts/*
+root/opt/extension/lib/ruby/*
+root/opt/extension/lib/*
+root/opt/extension/bin/*
