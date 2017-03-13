@@ -18,6 +18,7 @@
 # MA  02110-1301, USA.  A copy of the GNU General Public License is
 # also available at http://www.gnu.org/copyleft/gpl.html.
 
+require 'resolv'
 require 'facter/util/ip'
 require '/usr/lib64/ruby/vendor_ruby/discovery.rb'
 
@@ -158,6 +159,49 @@ if has_ipmi
     end
     attributes.each do |fact, value|
       add_ipmi_facts fact, value, n
+    end
+  end
+end
+
+# NetworkManager details (e.g. nmprimary_dhcp4_option_domain_name)
+nmout = Facter::Util::Resolution.exec("nmcli -t con show primary 2>/dev/null")
+nmout.each_line do |x|
+  elements = x.split(":", 2)
+  name = elements.first.downcase.sub(/\[\d+\]$/,"")
+  if name =~ /dhcp.\.option/
+    dhcp_elems = elements.last.split(/\s*=\s*/, 2)
+    name += '_' + dhcp_elems.first
+    value = dhcp_elems.last
+  else
+    value = elements.last
+  end
+  name = "nmprimary_" + name.tr('.', '_')
+  Facter.add(name) do
+    setcode do
+      value.chomp
+    end
+  end
+end
+
+# Create DHCP FQDN helper facts
+Facter.add("nmprimary_dhcp4_option_fqdn") do
+  setcode do
+    if Facter.value("nmprimary_dhcp4_option_host_name") && Facter.value("nmprimary_dhcp4_option_domain_name")
+      Facter.value("nmprimary_dhcp4_option_host_name") + '.' + Facter.value("nmprimary_dhcp4_option_domain_name")
+    else
+      nil
+    end
+  end
+end
+
+# Primary interface IP PTR DNS record
+Facter.add("nmprimary_ptr") do
+  setcode do
+    ip = Facter.value("nmprimary_ip4_address").scan(/\d+\.\d+\.\d+\.\d+/).first.strip rescue nil
+    if ip.nil?
+      nil
+    else
+      Resolv.new.getname(ip) rescue nil
     end
   end
 end
