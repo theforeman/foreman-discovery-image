@@ -1,5 +1,5 @@
 [Unit]
-Description=Display interactive TUI on tty1
+Description=Discovery TUI
 Wants=basic.target
 After=basic.target network.target nss-lookup.target
 ConditionPathExists=/dev/tty1
@@ -10,8 +10,9 @@ EnvironmentFile=/etc/default/discovery
 ExecStart=/usr/bin/discovery-menu
 ExecReload=/bin/kill -HUP $MAINPID
 Restart=always
-RestartSec=3
+RestartSec=5
 KillMode=process
+TimeoutStopSec=5
 StandardInput=tty
 StandardError=tty
 StandardOutput=tty
