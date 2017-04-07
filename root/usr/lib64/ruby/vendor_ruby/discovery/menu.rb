@@ -117,6 +117,7 @@ end
 
 def cleanup
   Newt::Screen.finish
+  exit 0
 end
 
 log_msg "Kernel opts: #{cmdline}"
