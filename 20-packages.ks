@@ -68,6 +68,14 @@ grub2-efi
 efibootmgr
 shim
 
+# tools that enable the image installer plugin
+parted
+mdadm
+xfsprogs
+e2fsprogs
+bzip2
+system-storage-manager
+
 #
 # Packages to Remove
 #
@@ -83,10 +91,7 @@ shim
 
 # file system stuff
 -dmraid
--mdadm
 -lvm2
--e2fsprogs
--e2fsprogs-libs
 
 # grub
 -freetype
