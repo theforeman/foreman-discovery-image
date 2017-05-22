@@ -125,7 +125,13 @@ end
 
 # SRV discovery will work only if DHCP returns valid search domain
 def discover_by_dns_srv
-  resolver = Resolv::DNS.new
+  default = Resolv::DNS::Config.default_config_hash
+  conf = {
+    :nameserver => cmdline("fdi.dns_nameserver", default[:nameserver]),
+    :search => cmdline("fdi.dns_search", default[:search]),
+    :ndots => cmdline("fdi.dns_ndots", default[:ndots]).to_i,
+  }
+  resolver = Resolv::DNS.new(conf)
   type = Resolv::DNS::Resource::IN::SRV
   result = resolver.getresources("_x-foreman._tcp", type).first
   hostname = result.target.to_s
