@@ -124,6 +124,7 @@ rescue
 end
 
 # SRV discovery will work only if DHCP returns valid search domain
+# and ndots > 1 for search domain to be used
 def discover_by_dns_srv
   resolv_conf = Resolv::DNS::Config.default_config_hash
   resolv_conf[:ndots] = 5 unless resolv_conf[:ndots] > 1
