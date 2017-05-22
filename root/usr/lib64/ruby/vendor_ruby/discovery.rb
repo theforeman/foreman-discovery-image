@@ -125,7 +125,9 @@ end
 
 # SRV discovery will work only if DHCP returns valid search domain
 def discover_by_dns_srv
-  resolver = Resolv::DNS.new
+  resolv_conf = Resolv::DNS::Config.default_config_hash
+  resolv_conf[:ndots] = 5 unless resolv_conf[:ndots] > 1
+  resolver = Resolv::DNS.new(resolv_conf)
   type = Resolv::DNS::Resource::IN::SRV
   result = resolver.getresources("_x-foreman._tcp", type).first
   hostname = result.target.to_s
