@@ -146,6 +146,7 @@ if has_ipmi
         attributes[:ipaddress_source] = $1
       when /^IP Address\s+: (.*)/
         attributes[:ipaddress] = $1
+        attributes[:ptr] = (Resolv.new.getname($1) rescue nil)
       when /^Subnet Mask\s+: (.*)/
         attributes[:subnet_mask] = $1
       when /^MAC Address\s+: (.*)/
