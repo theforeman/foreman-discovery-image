@@ -3,7 +3,7 @@ def screen_countdown discovery_only = false
   t = Newt::Textbox.new(-1, -1, tw, th, Newt::FLAG_WRAP)
   t.set_text(text_help)
 
-  secs = cmdline("fdi.countdown", 10).to_i rescue 10
+  secs = cmdline("fdi.countdown", 45).to_i rescue 45
   l_press = Newt::Label.new(-1, -1, "< " + _('Press any key') + " (#{secs}s) >")
 
   main_grid = Newt::Grid.new(1, 2)
