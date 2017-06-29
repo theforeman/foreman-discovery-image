@@ -15,8 +15,8 @@ cat > /etc/NetworkManager/NetworkManager.conf <<'NM'
 [main]
 monitor-connection-files=yes
 no-auto-default=*
-#[logging]
-#level=DEBUG
+[logging]
+level=DEBUG
 NM
 cat > /etc/udev/rules.d/81-nm-prepare.rules <<'UDEV'
 ACTION=="add", SUBSYSTEM=="net", NAME!="lo", RUN+="/usr/bin/systemd-cat -t nm-prepare /usr/bin/nm-prepare %k"

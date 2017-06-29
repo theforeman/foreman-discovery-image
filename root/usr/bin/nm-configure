@@ -43,7 +43,6 @@ uuid=$uuid
 type=$ctype
 autoconnect=true
 autoconnect-priority=1
-may-fail=false
 [802-3-ethernet]
 mac-address=$mac
 [ipv4]
@@ -68,7 +67,6 @@ uuid=$uuid
 type=$ctype
 autoconnect=true
 autoconnect-priority=1
-may-fail=false
 [802-3-ethernet]
 mac-address=$mac
 [ipv4]
@@ -91,7 +89,6 @@ id=$id
 uuid=$uuid
 type=802-3-ethernet
 autoconnect=$autoconnect
-may-fail=true
 [802-3-ethernet]
 mac-address=$mac
 [ipv4]

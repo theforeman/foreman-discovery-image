@@ -170,7 +170,8 @@ if has_ipmi
 end
 
 # NetworkManager details (e.g. nmprimary_dhcp4_option_domain_name)
-nmout = Facter::Util::Resolution.exec("nmcli -t con show primary 2>/dev/null")
+wait = cmdline('fdi.nmwait', 120)
+nmout = Facter::Util::Resolution.exec("nmcli -w #{wait} -t con show primary 2>/dev/null")
 nmout.each_line do |x|
   elements = x.split(":", 2)
   name = elements.first.downcase.sub(/\[\d+\]$/,"")
