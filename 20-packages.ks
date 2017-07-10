@@ -77,9 +77,14 @@ e2fsprogs
 bzip2
 system-storage-manager
 
-#
-# Packages to Remove
-#
+######################
+# Packages to Remove #
+######################
+
+# Red Hat Enteprise Linux subscription tool
+-subscription-manager
+
+# Generic and wireless tools
 -prelink
 -setserial
 -ed
@@ -94,17 +99,10 @@ system-storage-manager
 -dmraid
 -lvm2
 
-# grub
--freetype
--grubby
--os-prober
-
-# selinux toolchain of policycoreutils, libsemanage, ustr
+# selinux toolchain of policycoreutils, libsemanage (libselinux is needed tho)
 -policycoreutils
 -checkpolicy
 -selinux-policy*
--libselinux-python
--libselinux
 
 # Things it would be nice to loose
 -fedora-logos

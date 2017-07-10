@@ -23,8 +23,8 @@ which livecd-creator isohybrid implantisomd5 >/dev/null || ( echo "Command(s) mi
 
 trap cleanup EXIT
 
-resultdir=$PWD
 srcdir=$(readlink -f $(dirname $0))
+destdir=${2:-$srcdir}
 tmpdir=$(mktemp -d /tmp/build-fdi-XXXXXX)
 
 cd $srcdir
@@ -44,12 +44,12 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "* Filtering ISO with isohybrid"
-cp fdi.iso fdi-bootable.iso
+cp -l fdi.iso fdi-bootable.iso
 isohybrid --partok --uefi fdi-bootable.iso
 
 echo "* Implanting MD5 sum"
 implantisomd5 --force fdi-bootable.iso
-mv fdi-bootable.iso $srcdir/fdi-bootable-${last_tag#release-}.iso
+mv fdi-bootable.iso $destdir/fdi-bootable-${last_tag#release-}.iso
 
 echo "* Converting to initrd"
 bash -x $srcdir/aux/livecd-iso-to-pxeboot $tmpdir/fdi.iso
@@ -81,7 +81,7 @@ EOF
 sha256sum initrd0.img vmlinuz0 > SHA256SUM
 
 cd ..
-tarball=$srcdir/fdi-image-${last_tag#release-}.tar
+tarball=$destdir/fdi-image-${last_tag#release-}.tar
 tar cf $tarball fdi-image/
 ls -lh $tarball
 chown --reference $srcdir/build-livecd $tarball

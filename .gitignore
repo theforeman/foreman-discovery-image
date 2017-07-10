@@ -11,3 +11,5 @@ root/opt/extension/facts/*
 root/opt/extension/lib/ruby/*
 root/opt/extension/lib/*
 root/opt/extension/bin/*
+fdi-rhel7.ks
+00-repos-rhel7.ks
