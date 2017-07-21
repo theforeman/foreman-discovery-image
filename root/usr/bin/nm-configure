@@ -8,9 +8,10 @@ uuid=$(/usr/bin/uuid)
 timeout=${KCL_FDI_DHCP_TIMEOUT:-300}
 ctype="802-3-ethernet"
 
-correct_owner_perms() {
+deploy_config() {
   chown root:root $1
   chmod 600 $1
+  mv $1 $2
 }
 
 usage() {
@@ -22,6 +23,12 @@ usage() {
 
 [[ -z "$mac" ]] && echo "MAC address was not provided or detected, leaving unconfigured" && exit 0
 
+function cleanup() {
+  [ -f $TMP_CFG ] && rm -f $TMP_CFG
+}
+TMP_CFG=$(mktemp)
+trap cleanup EXIT SIGINT SIGTERM
+
 if [[ "$1" == "primary-static" ]]; then
   ip=$3
   gw=$4
@@ -29,7 +36,7 @@ if [[ "$1" == "primary-static" ]]; then
   vlanid=${6:-$KCL_FDI_VLAN_PRIMARY}
   [[ "$vlanid" != "" ]] && ctype="vlan"
   script=/etc/NetworkManager/system-connections/primary
-  cat > $script <<EONS
+  cat > $TMP_CFG <<EONS
 [connection]
 id=primary
 uuid=$uuid
@@ -48,12 +55,12 @@ method=ignore
 [vlan]
 id=$vlanid
 EONS
-  correct_owner_perms $script
+  deploy_config $TMP_CFG $script
 elif [[ "$1" == "primary" ]]; then
   vlanid=${3:-$KCL_FDI_VLAN_PRIMARY}
   [[ "$vlanid" != "" ]] && ctype="vlan"
   script=/etc/NetworkManager/system-connections/primary
-  cat > $script <<EONS
+  cat > $TMP_CFG <<EONS
 [connection]
 id=primary
 uuid=$uuid
@@ -71,12 +78,12 @@ method=ignore
 [vlan]
 id=$vlanid
 EONS
-  correct_owner_perms $script
+  deploy_config $TMP_CFG $script
 elif [[ "$1" == "secondary" ]]; then
   autoconnect=$3
   id=secondary-$mac
   script=/etc/NetworkManager/system-connections/$id
-  cat > $script <<EONS
+  cat > $TMP_CFG <<EONS
 [connection]
 id=$id
 uuid=$uuid
@@ -94,7 +101,7 @@ dhcp-send-hostname=false
 [ipv6]
 method=ignore
 EONS
-  correct_owner_perms $script
+  deploy_config $TMP_CFG $script
 else
   usage
 fi
