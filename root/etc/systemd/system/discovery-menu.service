@@ -8,6 +8,7 @@ ConditionPathExists=/dev/tty1
 Type=idle
 EnvironmentFile=/etc/default/discovery
 ExecStart=/usr/bin/discovery-menu
+ExecStartPre=/usr/sbin/sysctl -w kernel.printk=0
 ExecReload=/bin/kill -HUP $MAINPID
 Restart=always
 RestartSec=5

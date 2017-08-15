@@ -39,7 +39,7 @@ echo "* IMAGE VERSION"
 cat /usr/share/fdi/VERSION /usr/share/fdi/RELEASE
 
 echo "* FACTER *"
-facter
+FACTERLIB=/usr/share/fdi/facts/ facter --json
 
 echo "* JOURNAL (last 500 lines) *"
 journalctl -n300 -ocat
