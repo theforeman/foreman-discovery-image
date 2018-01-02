@@ -13,7 +13,7 @@ systemctl disable kdump.service
 echo " * configuring NetworkManager and udev/nm-prepare"
 cat > /etc/NetworkManager/NetworkManager.conf <<'NM'
 [main]
-monitor-connection-files=yes
+monitor-connection-files=no
 no-auto-default=*
 [logging]
 level=DEBUG
@@ -56,6 +56,7 @@ sed -i '/\[Unit\]/a ConditionPathExists=/etc/NetworkManager/system-connections/p
 sed -i '/\[Service\]/a EnvironmentFile=-/etc/default/discovery' /usr/lib/systemd/system/foreman-proxy.service
 sed -i '/\[Service\]/a ExecStartPre=/usr/bin/generate-proxy-cert' /usr/lib/systemd/system/foreman-proxy.service
 sed -i '/\[Service\]/a PermissionsStartOnly=true' /usr/lib/systemd/system/foreman-proxy.service
+sed -i '/\[Service\]/a TimeoutStartSec=9999' /usr/lib/systemd/system/foreman-proxy.service
 /sbin/usermod -a -G tty foreman-proxy
 
 cat >/etc/foreman-proxy/settings.yml <<'CFG'
