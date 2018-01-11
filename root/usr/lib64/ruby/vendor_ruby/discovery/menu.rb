@@ -82,12 +82,12 @@ def configure_network static, mac, ip=nil, gw=nil, dns=nil, vlan=nil
   else
     command("nm-configure primary '#{mac}' '#{vlan}'")
   end
-  # NetworkManager monitors config files and auto connects immediately
   wait = cmdline('fdi.nmwait', 120)
-  result = command("nm-online -s -q --timeout=#{wait}")
-  # restarting proxy with regenerated SSL self-signed cert
-  command("systemctl start foreman-proxy")
-  result
+  command("nmcli -w #{wait} connection reload", false)
+  up_result = command("nmcli -w #{wait} connection up primary", false)
+  command("nm-online -s -q --timeout=#{wait}")
+  # wait for IPv4, generate SSL self-signed cert and start proxy
+  command("systemctl start foreman-proxy") && up_result
 end
 
 def perform_upload proxy_url, proxy_type, custom_facts
