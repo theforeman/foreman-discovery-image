@@ -81,11 +81,21 @@ http://theforeman.org/plugins/foreman_discovery/
 Building
 --------
 
+A host with either Fedora or CentOS 7 is required. RHEL 7 cannot be used as
+it is missing core dependency (livecd-tools), but this can be workarounded
+by installing it from CentOS 7 repositories (and two dependencies). Grub2
+EFI and Shim packages are only required if the resulting ISO must boot on
+UEFI systems.
+
 Install the required packages:
 
 ```
-$ sudo yum install livecd-tools pykickstart isomd5sum
+$ sudo yum install livecd-tools pykickstart isomd5sum syslinux \
+  grub2-efi shim grub2-efi-x64 grub2-efi-x64-cdboot shim-x64
 ```
+
+On older versions of Fedora or RHEL 7.0-7.3 shim and grub packages has no
+x64 suffix, the command above will install one of the two.
 
 To prepare CentOS 7 kickstart do:
 
@@ -99,7 +109,7 @@ To prepare Fedora 19 kickstart do:
 $ ./build-livecd fdi-fedora19.ks
 ```
 
-To build the image (make sure you have at least 1 GB free space in /tmp):
+To build the image (make sure you have at least 3 GB free space in /tmp):
 
 ```
 $ sudo ./build-livecd-root
