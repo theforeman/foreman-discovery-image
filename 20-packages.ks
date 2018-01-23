@@ -66,9 +66,13 @@ unzip
 binutils
 
 # For UEFI/Secureboot support
-grub2-efi
 efibootmgr
+grub2-efi
 shim
+# These were renamed and split in EL 7.4+
+grub2-efi-x64
+grub2-efi-x64-cdboot
+shim-x64
 
 # tools that enable the image installer plugin
 parted
