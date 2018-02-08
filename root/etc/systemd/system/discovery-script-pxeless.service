@@ -1,0 +1,15 @@
+[Unit]
+Description=Script PXE-less
+Wants=basic.target
+Before=foreman-proxy.service NetworkManager.service
+After=nm-prepare.service systemd-journald.service
+ConditionKernelCommandLine=!BOOTIF
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/default/discovery
+RemainAfterExit=yes
+ExecStart=/usr/bin/discovery-script
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,10 @@
+#!/bin/bash
+SCRIPT="fdi.script=$(cat - | gzip -9 | base64 -w0)"
+LENGTH=${#SCRIPT}
+MAX=310
+echo $SCRIPT
+echo "Maximum length: $MAX (512 limit - current options)"
+echo "Actual length: $LENGTH"
+if [[ $LENGTH -gt $MAX ]]; then
+  echo "Consider shell minifier or stage2 script downloaded from network."
+fi

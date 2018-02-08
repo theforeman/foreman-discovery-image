@@ -25,6 +25,7 @@ facter
 ethtool
 net-tools
 dmidecode
+bind-utils
 virt-what
 
 # Foreman proxy

@@ -1,5 +1,8 @@
 #!/usr/bin/ruby
 
+exit(0) if File.exist?('/tmp/disable-menu')
+
+
 require 'discovery/menu'
 require 'discovery/screen/countdown'
 require 'discovery/screen/facts'

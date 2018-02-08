@@ -39,6 +39,8 @@ systemctl enable foreman-proxy.service
 systemctl enable discovery-fetch-extensions.path
 systemctl enable discovery-start-extensions.service
 systemctl enable discovery-menu.service
+systemctl enable discovery-script-pxe.service
+systemctl enable discovery-script-pxeless.service
 
 # register service is started manually from discovery-menu
 systemctl disable discovery-register.service
@@ -106,7 +108,7 @@ echo " * setting up journald and ttys"
 systemctl disable getty@tty1.service getty@tty2.service
 systemctl mask getty@tty1.service getty@tty2.service
 echo "Storage=volatile" >> /etc/systemd/journald.conf
-echo "RuntimeMaxUse=15M" >> /etc/systemd/journald.conf
+echo "RuntimeMaxUse=25M" >> /etc/systemd/journald.conf
 echo "ForwardToSyslog=no" >> /etc/systemd/journald.conf
 echo "ForwardToConsole=no" >> /etc/systemd/journald.conf
 systemctl enable journalctl.service

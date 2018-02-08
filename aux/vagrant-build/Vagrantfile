@@ -4,13 +4,10 @@ boxes = [
   {:name => 'precise',  :libvirt => 'fm-ubuntu1204', :image_name => /Ubuntu.*12\.04/, :os_user => 'ubuntu'},
   {:name => 'squeeze',  :libvirt => 'fm-debian6',    :image_name => /Debian.*6/,      :os_user => 'debian'},
   {:name => 'wheezy',   :libvirt => 'fm-debian7',    :image_name => /Debian.*7/,      :os_user => 'debian'},
-  {:name => 'f24',      :libvirt => 'fm-fedora24',   :image_name => /Fedora.*24.*PVHVM/, :pty => true},
-  {:name => 'f25',      :libvirt => 'fm-fedora25',   :image_name => /Fedora.*25.*PVHVM/, :pty => true},
-  {:name => 'f26',      :libvirt => 'fm-fedora25',   :image_name => /Fedora.*26.*PVHVM/, :pty => true},
   {:name => 'f27',      :libvirt => 'fm-fedora25',   :image_name => /Fedora.*27.*PVHVM/, :pty => true},
   {:name => 'f28',      :libvirt => 'fm-fedora25',   :image_name => /Fedora.*28.*PVHVM/, :pty => true},
   {:name => 'el6',      :libvirt => 'fm-centos64',   :image_name => /CentOS 6\.5 SELinux/, :default => true, :pty => true},
-  # There is no livecd-tools available in EPEL7 therefore we build on Fedora rather than CentOS7
+  # There is no livecd-tools available in EL 7.0-7.3 - use Fedora instead
   {:name => 'el7',      :libvirt => 'fm-centos70',   :image_name => /CentOS 7/, :default => true, :pty => true},
 ]
 

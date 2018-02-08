@@ -1,0 +1,11 @@
+#!/bin/bash
+source /etc/default/discovery
+source /usr/share/fdi/commonfunc.sh
+exportKCL
+[ -d /tmp/facts ] || mkdir /tmp/facts
+defaultscript=${KCL_FDI_SCRIPT:-H4sIAOj1ZloCA0tNzshXUPLLVyhOLsosKFEoSCwuTk1R4gIAIbwTwhgAAAA=}
+basescript=${1:-$defaultscript}
+cat /usr/share/fdi/script-helpers.sh > /tmp/discovery-script
+echo "$basescript" | base64 -d | gunzip >> /tmp/discovery-script
+[[ $? -eq 0 ]] && ( bash /tmp/discovery-script | tee /tmp/discovery-script.log )
+rm /tmp/discovery-script

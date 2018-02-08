@@ -212,3 +212,12 @@ Facter.add("nmprimary_ptr") do
     end
   end
 end
+
+# Keep this as the last one - overrides from file system
+Dir.glob('/tmp/facts/*') do |file|
+  Facter.add(File.basename(file)) do
+    setcode do
+      File.open(file) {|f| f.readline.chomp}
+    end
+  end
+end
