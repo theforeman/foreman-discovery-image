@@ -1,9 +1,7 @@
 # Copyright (C) 2016 Foreman developers
 # This file is distributed under the same license as the fdi package.
-
 msgid ""
 msgstr ""
-
 "Project-Id-Version: foreman-discovery-image 3.1.1\n"
 "Report-Msgid-Bugs-To: foreman-dev@googlegroups.com\n"
 "POT-Creation-Date: 2016-04-06 12:56+0200\n"
@@ -18,10 +16,13 @@ msgstr ""
 msgid "Cancel"
 msgstr "Zrušit"
 
-msgid "Configuring network via DHCP. This operation can take several minutes to complete."
+msgid ""
+"Configuring network via DHCP. This operation can take several minutes to "
+"complete."
 msgstr "Konfiguruji síť přes DHCP. Tato operace může trvat několik minut."
 
-msgid "Configuring network. This operation can take several minutes to complete."
+msgid ""
+"Configuring network. This operation can take several minutes to complete."
 msgstr "Konfiguruji síť. Tato operace může trvat několik minut."
 
 msgid "Confirm"
@@ -49,7 +50,7 @@ msgid "Discovery status"
 msgstr "Stav objevení"
 
 msgid "Enter root password to unlock the account and enable SSH service:"
-msgstr "Zadejte heslo roota pro odemnkutí a spuštění služby SSH"
+msgstr "Zadejte heslo roota pro odemnkutí a spuštění služby SSH:"
 
 msgid "Fact %s name"
 msgstr "Fakt %s"
@@ -129,10 +130,15 @@ msgstr ""
 msgid "Primary interface"
 msgstr ""
 
-msgid "Provide full URL (http(s)://host:PORT) to the Server or Proxy according to the type selected. Ports are usually 443, 8443, 8448 or 9090 according to configuration."
+msgid ""
+"Provide full URL (http(s)://host:PORT) to the Server or Proxy according to "
+"the type selected. Ports are usually 443, 8443, 8448 or 9090 according to "
+"configuration."
 msgstr ""
 
-msgid "Provide network configuration for the selected primary interface. Use CIDR netmask notation (e.g. 192.168.1.1/24) for the IP address."
+msgid ""
+"Provide network configuration for the selected primary interface. Use CIDR "
+"netmask notation (e.g. 192.168.1.1/24) for the IP address."
 msgstr ""
 
 msgid "Provide valid CIDR ipaddress with a netmask, gateway and one DNS server"
@@ -159,10 +165,19 @@ msgstr ""
 msgid "Select"
 msgstr "Vybrat"
 
-msgid "Select Manual network setup to select primary interface, configure network (no DHCP required), setup server credentials, add custom facts and trigger auto-provisioning via Discovery rules. This will lead to kernel reload (kexec) into installer. Select Discover with DHCP to select primary interface and proceed with DHCP configuration and standard discovery without any custom facts. This will reboot the host once the system is provisioned either manually or via Discovery rules."
+msgid ""
+"Select Manual network setup to select primary interface, configure network "
+"(no DHCP required), setup server credentials, add custom facts and trigger "
+"auto-provisioning via Discovery rules. This will lead to kernel reload "
+"(kexec) into installer. Select Discover with DHCP to select primary "
+"interface and proceed with DHCP configuration and standard discovery without "
+"any custom facts. This will reboot the host once the system is provisioned "
+"either manually or via Discovery rules."
 msgstr ""
 
-msgid "Select primary (provisioning) network interface with connection to server or proxy:"
+msgid ""
+"Select primary (provisioning) network interface with connection to server or "
+"proxy:"
 msgstr ""
 
 msgid "Server"
@@ -177,7 +192,11 @@ msgstr ""
 msgid "Status"
 msgstr "Stav"
 
-msgid "This system will attempt to configure all interfaces via DHCP and discover itself by sending hardware facts to Foreman instance. To interrupt this behavior, press a key to be able to do manual network configuration and additional provisioning settings."
+msgid ""
+"This system will attempt to configure all interfaces via DHCP and discover "
+"itself by sending hardware facts to Foreman instance. To interrupt this "
+"behavior, press a key to be able to do manual network configuration and "
+"additional provisioning settings."
 msgstr ""
 
 msgid "Unable to bring network via DHCP"
@@ -195,7 +214,9 @@ msgstr ""
 msgid "Unattended fact upload OK - awaiting kexec"
 msgstr ""
 
-msgid "Unattended provisioning failed: unable to upload facts. Check your network credentials."
+msgid ""
+"Unattended provisioning failed: unable to upload facts. Check your network "
+"credentials."
 msgstr ""
 
 msgid "Waiting for operation to complete"

@@ -1,17 +1,3 @@
 #!/bin/sh
-
-DOMAIN=foreman-discovery-image
-VERSION=$(git describe --abbrev=0 --tags)
-
-rxgettext \
-  --sort-output \
-  --sort-by-msgid \
-  --no-wrap \
-  --no-location \
-  -o root/usr/share/locale/fdi/${DOMAIN}.pot \
-  --package-name=${DOMAIN} \
-  --package-version="${VERSION}" \
-  --msgid-bugs-address=foreman-dev@googlegroups.com \
-  --copyright-holder="Foreman developers" \
-  --copyright-year=$(date +%Y) \
-  $(find root/usr/lib64/ruby/vendor_ruby/discovery -type f -name *.rb -o -name *.erb)
+TARGET=${1:-extract}
+make -C root/usr/share/locale/fdi/ $TARGET
