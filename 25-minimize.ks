@@ -30,7 +30,10 @@ rm -rf /usr/lib/firmware/*wifi* \
   /usr/lib/firmware/dvb* \
   /usr/lib/firmware/{yamaha,korg,liquidio,emu,dsp56k,emi26}
 
-echo " * compressing cracklib dictionary"
+echo " * dropping big and compressing small cracklib dict"
+mv -f /usr/share/cracklib/cracklib_small.hwm /usr/share/cracklib/pw_dict.hwm
+mv -f /usr/share/cracklib/cracklib_small.pwd /usr/share/cracklib/pw_dict.pwd
+mv -f /usr/share/cracklib/cracklib_small.pwi /usr/share/cracklib/pw_dict.pwi
 gzip -9 /usr/share/cracklib/pw_dict.pwd
 
 # remove things only needed during the build process
