@@ -5,20 +5,12 @@ if [ -z "$2" ]; then
   exit 2
 fi
 
-if [ $(id -u) != 0 ]; then
-  echo "Please run this script as root"
-  exit 1
-fi
-
-which mount dd mkisofs isohybrid implantisomd5 >/dev/null || ( echo "Command(s) missing, install required tools" && exit 3 )
+which isoinfo dd mkisofs isohybrid implantisomd5 >/dev/null || ( echo "Command(s) missing, install required tools" && exit 3 )
 
 function cleanup() {
-  umount $TMP_ISO
-  [ -d $TMP_ISO ] && rm -rf $TMP_ISO
   [ -d $TMP_NEW ] && rm -rf $TMP_NEW
 }
 
-TMP_ISO=$(mktemp -d)
 TMP_NEW=$(mktemp -d)
 trap cleanup EXIT
 
@@ -26,43 +18,89 @@ TIMESTAMP=$(date +%y%m%d_%H%M%S)
 OUT_ISO=${1/.iso/-$TIMESTAMP}.iso
 [ ! -z "$3" ] && OUT_ISO=$3
 
-mount -o loop -t iso9660 "$1" $TMP_ISO
-cp -r $TMP_ISO/* $TMP_NEW
+# Extract using isoinfo so root is not needed for:
+#   mount -o loop -t iso9660 "$1" $TMP_ISO
+#   cp -r $TMP_ISO/* $TMP_NEW
+# Discovery ISO has Joliet/RR extensions, use:
+#   isoinfo -i fdi.iso -f
+#
+FILES="EFI/BOOT/BOOTX64.efi
+EFI/BOOT/fonts/unicode.pf2
+EFI/BOOT/grub.cfg
+EFI/BOOT/grubx64.efi
+isolinux/boot.cat
+isolinux/efiboot.img
+isolinux/initrd0.img
+isolinux/isolinux.bin
+isolinux/isolinux.cfg
+isolinux/macboot.img
+isolinux/vesamenu.c32
+isolinux/vmlinuz0
+LiveOS/osmin.img
+LiveOS/squashfs.img"
+IFS=$'\n'
+mkdir -p $TMP_NEW/EFI/BOOT/fonts $TMP_NEW/isolinux $TMP_NEW/LiveOS
+for EFILE in $FILES; do
+  TFILE="/$(echo $EFILE | tr '[a-z]' '[A-Z]' | sed 's/VMLINUZ0/VMLINUZ0./');1"
+  echo "Extracting $EFILE ($TFILE)"
+  isoinfo -i "$1" -x "$TFILE" > $TMP_NEW/$EFILE
+done
+unset IFS
 
 cat >$TMP_NEW/isolinux/isolinux.cfg <<EOIS
 default vesamenu.c32
-timeout 1
+menu background
+menu autoboot Starting Discovery Image in # second{,s}. Press any key to interrupt.
+menu clear
+menu title Discovery Image
+menu vshift 8
+menu rows 18
+menu margin 8
+menu helpmsgrow 15
+menu tabmsgrow 13
+menu color border * #00000000 #00000000 none
+menu color sel 0 #ffffffff #00000000 none
+menu color title 0 #ff7ba3d0 #00000000 none
+menu color tabmsg 0 #ff3a6496 #00000000 none
+menu color unsel 0 #84b8ffff #00000000 none
+menu color hotsel 0 #84b8ffff #00000000 none
+menu color hotkey 0 #ffffffff #00000000 none
+menu color help 0 #ffffffff #00000000 none
+menu color scrollbar 0 #ffffffff #ff355594 none
+menu color timeout 0 #ffffffff #00000000 none
+menu color timeout_msg 0 #ffffffff #00000000 none
+menu color cmdmark 0 #84b8ffff #00000000 none
+menu color cmdline 0 #ffffffff #00000000 none
+timeout 30
 prompt 0
 label fdi
-  menu label Foreman Discovery Image
-  kernel vmlinuz0
-  append initrd=initrd0.img root=live:CDLABEL=fdi rootfstype=auto ro rd.live.image acpi=force rd.luks=0 rd.md=0 rd.dm=0 $2
-  menu default
+menu label Discovery
+kernel vmlinuz0
+append initrd=initrd0.img root=live:CDLABEL=fdi rootfstype=auto ro rd.live.image acpi=force rd.luks=0 rd.md=0 rd.dm=0 nomodeset $2
+label check
+menu label Check media
+kernel vmlinuz0
+append initrd=initrd0.img root=live:CDLABEL=fdi rootfstype=auto ro rd.live.image rd.live.check acpi=force nomodeset $2
 EOIS
 
 cat >$TMP_NEW/EFI/BOOT/grub.cfg <<EOGR
-set default="1"
-function load_video {
-  insmod efi_gop
-  insmod efi_uga
-  insmod video_bochs
-  insmod video_cirrus
-  insmod all_video
-}
-load_video
-set gfxpayload=keep
-insmod gzio
-insmod part_gpt
-insmod ext2
-set timeout=1
+loadfont unicode.pf2
+set default=0
+set gfxmode=80x25
+set gfxpayload=text
+set timeout=3
 search --no-floppy --set=root -l 'fdi'
-menuentry 'Foreman Discovery Image' --class fedora --class gnu-linux --class gnu --class os {
-  linuxefi /isolinux/vmlinuz0 root=live:LABEL=fdi ro rd.live.image acpi=force $2
+menuentry 'Discovery' --class fedora --class gnu-linux --class gnu --class os {
+  linuxefi /isolinux/vmlinuz0 root=live:LABEL=fdi rootfstype=auto ro rd.live.image acpi=force rd.luks=0 rd.md=0 rd.dm=0 nomodeset $2
+  initrdefi /isolinux/initrd0.img
+}
+menuentry 'Check media' --class fedora --class gnu-linux --class gnu --class os {
+  linuxefi /isolinux/vmlinuz0 root=live:LABEL=fdi rootfstype=auto ro rd.live.image rd.live.check acpi=force nomodeset $2
   initrdefi /isolinux/initrd0.img
 }
 EOGR
 
-if [ -f "$TMP_ISO/isolinux/efiboot.img" ]; then
+if [ -f "$TMP_NEW/isolinux/efiboot.img" ]; then
   EFI_OPTS="-eltorito-alt-boot -e isolinux/efiboot.img -no-emul-boot"
   EXTRA_MSG="(BIOS/EFI compatible)"
 else
@@ -71,7 +109,7 @@ else
 fi
 mkisofs -quiet -U -A "fdi" -V "fdi" -volset "fdi" -J -joliet-long -r -v -T \
   -o $OUT_ISO -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 \
-  -boot-info-table $EFI_OPTS $TMP_NEW
+  -input-charset utf-8 -boot-info-table $EFI_OPTS $TMP_NEW
 isohybrid --partok --uefi $OUT_ISO
 implantisomd5 $OUT_ISO
 echo "Created: $OUT_ISO $EXTRA_MSG"
