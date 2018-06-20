@@ -12,21 +12,23 @@ systemctl disable sshd.service
 
 # This seems to cause 'reboot' resulting in a shutdown on certain platforms
 # See https://tickets.puppetlabs.com/browse/RAZOR-100
-echo " * disable the mei_me module"
-mkdir -p /etc/modprobe.d
-cat > /etc/modprobe.d/mei.conf <<EOMEI
-blacklist mei_me
-install mei_me /bin/true
-blacklist mei
-install mei /bin/true
-EOMEI
+echo " * remove intel mei modules"
+rm -rf /lib/modules/*/kernel/drivers/misc/mei
 
 # See https://bugzilla.redhat.com/show_bug.cgi?id=1335830
-echo " * remove KMS DRM video drivers to prevent kexec isues"
-rm -rf /lib/modules/*/kernel/drivers/gpu/drm /lib/firmware/{amdgpu,radeon}
+echo " * remove some video drivers to prevent kexec isues"
+rm -rf /lib/modules/*/kernel/drivers/gpu/drm \
+  /lib/modules/*/kernel/drivers/video/fbdev \
+  /lib/firmware/{amdgpu,radeon}
 
-echo " * remove unused drivers"
+echo " * remove unused drivers (sound, media, nls)"
 rm -rf /lib/modules/*/kernel/{sound,drivers/media,fs/nls}
+
+echo " * remove unused firmware (sound, wifi)"
+rm -rf /usr/lib/firmware/*wifi* \
+  /usr/lib/firmware/v4l* \
+  /usr/lib/firmware/dvb* \
+  /usr/lib/firmware/{yamaha,korg,liquidio,emu,dsp56k,emi26}
 
 echo " * compressing cracklib dictionary"
 gzip -9 /usr/share/cracklib/pw_dict.pwd
