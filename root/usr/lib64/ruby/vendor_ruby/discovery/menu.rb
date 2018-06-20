@@ -144,7 +144,14 @@ def main_loop
   end
 
   Newt::Screen.new
-  Newt::Screen.push_helpline(_("Foreman Discovery Image") + " v#{fdi_version} (#{fdi_release})")
+  mode = if File.exists?("/sys/firmware/efi/")
+           "UEFI"
+         else
+           "BIOS"
+         end
+  driver = `cat /proc/fb`.strip.tr("\n", ' ')
+  driver = "NO-FB" if driver.empty?
+  Newt::Screen.push_helpline(_("Foreman Discovery Image") + " v#{fdi_version} (#{fdi_release}) #{RUBY_PLATFORM} #{mode} #{driver}")
 
   if cmdline('BOOTIF')
     # Booted via PXE
