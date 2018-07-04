@@ -24,7 +24,7 @@ Vagrant.configure("2") do |config|
     config.vm.provider :openstack do |os, override|
       os.server_name = machine.vm.hostname
       os.flavor = /4GB/
-      os.image = /CentOS 7/
+      os.image = /CentOS 7.*PV/
     end
   end
 end
