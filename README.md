@@ -141,36 +141,21 @@ Building a release
 This chapter is for The Foreman team members, skip to the next section if
 this is not for you.
 
-To build new release, use Jenkins CI job:
+To build new release, use our Jenkins CI job:
 
-http://ci.theforeman.org/view/Packaging/job/packaging_discovery_image
+http://ci.theforeman.org/job/foreman-discovery-image-publish/
 
-To initiate the build in Rackspace locally, you need to install Vagrant,
-then install vagrant rackspace plugin via `vagrant plugin install
-vagrant-rackspace" and then configure it:
+The job uses Vagrant to spin VM in OpenStack/Rackspace and then copies
+the result to our downloads.theforeman.org site.
 
-		$ cat ~/.vagrant.d/Vagrantfile
-		# vim: sw=2:ts=2:et
-
-		Vagrant.configure("2") do |config|
-		  config.vm.box = "dummy"
-		  config.ssh.private_key_path = "~/.ssh/id_rsa"
-
-		  config.vm.provider :rackspace do |rs|
-			rs.username = "username"
-			rs.api_key = "abcdef1234567890..."
-			rs.public_key_path = "~/.ssh/id_rsa.pub"
-		  end
-		end
-
-Starting the job is easy:
+It is possible to start the job locally in libvirt:
 
 		cd aux/vagrant-build
 		distro=f24
-		LC_ALL=C repoowner=theforeman branch=master proxy_repo=1.14 vagrant up $distro
+		LC_ALL=C repoowner=theforeman branch=master proxy_repo=1.18 vagrant up $distro
 
-Wait until the box starts up in Rackspace and builds the image, then connect to
-the box and download the image:
+Wait until the box starts up and builds the image, then connect to the box
+and download the image:
 
 		vagrant ssh-config $distro | tee vagrant-ssh-config.tmp
 		mkdir tmp
@@ -179,7 +164,7 @@ the box and download the image:
 
 And finally (do not forget):
 
-		LC_ALL=C repoowner=theforeman branch=master proxy_repo=1.14 vagrant destroy $distro
+		LC_ALL=C repoowner=theforeman branch=master proxy_repo=1.18 vagrant destroy $distro
 
 Extensions
 ----------
