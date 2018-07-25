@@ -137,4 +137,9 @@ cat > /etc/udev/rules.d/82-enable-lldp.rules <<'UDEV'
 ACTION=="add", SUBSYSTEM=="net", NAME!="lo", TAG+="systemd", ENV{SYSTEMD_WANTS}="enable-lldp@%k.service"
 UDEV
 
+echo " * inserting missing initramdisk drivers"
+kversion=$(rpm -q kernel --qf '%{version}-%{release}.%{arch}\n')
+ramfsfile="/boot/initramfs-$kversion.img"
+/sbin/dracut --force --add-drivers "mptbase mptscsih mptspi hv_storvsc hid_hyperv hv_netvsc hv_vmbus" $ramfsfile $kversion
+
 %end
