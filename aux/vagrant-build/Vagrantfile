@@ -1,18 +1,14 @@
 # vim: sw=2:ts=2:et:ft=ruby
 
 boxes = [
-  {:name => 'precise',  :libvirt => 'fm-ubuntu1204', :image_name => /Ubuntu.*12\.04/, :os_user => 'ubuntu'},
-  {:name => 'squeeze',  :libvirt => 'fm-debian6',    :image_name => /Debian.*6/,      :os_user => 'debian'},
-  {:name => 'wheezy',   :libvirt => 'fm-debian7',    :image_name => /Debian.*7/,      :os_user => 'debian'},
-  {:name => 'f27',      :libvirt => 'fm-fedora25',   :image_name => /Fedora.*27.*PVHVM/, :pty => true},
-  {:name => 'f28',      :libvirt => 'fm-fedora25',   :image_name => /Fedora.*28.*PVHVM/, :pty => true},
-  {:name => 'el6',      :libvirt => 'fm-centos64',   :image_name => /CentOS 6\.5 SELinux/, :default => true, :pty => true},
-  # There is no livecd-tools available in EL 7.0-7.3 - use Fedora instead
-  {:name => 'el7',      :libvirt => 'fm-centos70',   :image_name => /CentOS 7/, :default => true, :pty => true},
+  {:name => 'f27', :libvirt => 'fedora/27-cloud-base', :image_name => /Fedora 27/, :pty => true},
+  {:name => 'f28', :libvirt => 'fedora/28-cloud-base', :image_name => /Fedora 28/, :pty => true},
+  {:name => 'el6', :libvirt => 'centos/6',             :image_name => /CentOS 6/,  :pty => true},
+  {:name => 'el7', :libvirt => 'centos/7',             :image_name => /CentOS 7/,  :pty => true, :default => true},
 ]
 
 if ENV['box']
-  boxes << {:name => ENV['box'], :libvirt => ENV['box'], :image_name => ENV['box'], :os_user => ENV['box']}
+  boxes << {:name => ENV['box'], :libvirt => ENV['box'], :image_name => ENV['box']}
 end
 
 SHELLARGS = []
@@ -28,30 +24,15 @@ Vagrant.configure("2") do |config|
       machine.vm.provision :shell, :path => 'build_image.sh', :args => SHELLARGS
 
       machine.vm.provider :libvirt do |p, override|
-        override.vm.box = "#{box[:libvirt]}"
-        override.vm.box_url = "http://m0dlx.com/files/foreman/boxes/#{box[:libvirt].sub(/^fm-/, '')}.box"
+        override.vm.box = box[:libvirt]
         p.memory = 1024
       end
-
-      machine.vm.provider :rackspace do |p, override|
-        override.vm.box = 'dummy'
-        p.server_name = machine.vm.hostname
-        p.flavor = /1GB/
-        p.image = box[:image_name]
-        p.rackspace_region = :iad
-        override.ssh.pty = true if box[:pty]
-        #override.nfs.functional = false
-      end
-
-      # ~/.vagrant.d/Vagrantfile will need
-      # config.ssh.private_key_path = "~/.ssh/id_rsa"          # private key for keypair below
 
       config.vm.provider :openstack do |p, override|
         override.vm.box = 'dummy'
         p.server_name   = machine.vm.hostname
         p.flavor        = /m1.tiny/
-        p.image         = box[:image_name] # Might as well use consistent image names
-        p.ssh_username  = box[:os_user]  # login for the VM
+        p.image         = box[:image_name]
 
         # ~/.vagrant.d/Vagrantfile will need
         # p.username     = "admin"                             # e.g. "#{ENV['OS_USERNAME']}"
