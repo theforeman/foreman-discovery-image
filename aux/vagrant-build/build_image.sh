@@ -23,6 +23,7 @@ pushd $NAME
 git pull
 
 ./build-livecd fdi-centos7.ks $proxy_repo && sudo ./build-livecd-root
+aux/remaster/discovery-remaster
 ls fdi-image*tar -lah
 
 popd

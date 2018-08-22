@@ -43,8 +43,10 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+echo "* Remastering ISO with correct kernel options"
+bash -x $srcdir/aux/remaster/discovery-remaster fdi.iso fdi.local fdi-bootable.iso
+
 echo "* Filtering ISO with isohybrid"
-cp -l fdi.iso fdi-bootable.iso
 isohybrid --partok --uefi fdi-bootable.iso
 
 echo "* Implanting MD5 sum"
