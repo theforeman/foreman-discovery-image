@@ -5,12 +5,19 @@ if [ -z "$2" ]; then
   exit 2
 fi
 
-which isoinfo dd mkisofs isohybrid implantisomd5 >/dev/null || ( echo "Command(s) missing, install required tools" && exit 3 )
+REQ_CMDS="guestmount dd mkisofs isohybrid implantisomd5"
+if ! which $REQ_CMDS >/dev/null; then
+  echo "Install required tools: $REQ_CMDS"
+  exit 3
+fi
 
 function cleanup() {
+  guestunmount $TMP_ISO
+  [ -d $TMP_ISO ] && rm -rf $TMP_ISO
   [ -d $TMP_NEW ] && rm -rf $TMP_NEW
 }
 
+TMP_ISO=$(mktemp -d)
 TMP_NEW=$(mktemp -d)
 trap cleanup EXIT
 
@@ -18,35 +25,13 @@ TIMESTAMP=$(date +%y%m%d_%H%M%S)
 OUT_ISO=${1/.iso/-$TIMESTAMP}.iso
 [ ! -z "$3" ] && OUT_ISO=$3
 
-# Extract using isoinfo so root is not needed for:
-#   mount -o loop -t iso9660 "$1" $TMP_ISO
-#   cp -r $TMP_ISO/* $TMP_NEW
-# Discovery ISO has Joliet/RR extensions, use:
-#   isoinfo -i fdi.iso -f
-#
-FILES="EFI/BOOT/BOOTX64.efi
-EFI/BOOT/fonts/unicode.pf2
-EFI/BOOT/grub.cfg
-EFI/BOOT/grubx64.efi
-isolinux/boot.cat
-isolinux/efiboot.img
-isolinux/initrd0.img
-isolinux/isolinux.bin
-isolinux/isolinux.cfg
-isolinux/macboot.img
-isolinux/vesamenu.c32
-isolinux/vmlinuz0
-LiveOS/osmin.img
-LiveOS/squashfs.img"
-IFS=$'\n'
-mkdir -p $TMP_NEW/EFI/BOOT/fonts $TMP_NEW/isolinux $TMP_NEW/LiveOS
-for EFILE in $FILES; do
-  TFILE="/$(echo $EFILE | tr '[a-z]' '[A-Z]' | sed 's/VMLINUZ0/VMLINUZ0./');1"
-  echo "Extracting $EFILE ($TFILE)"
-  isoinfo -i "$1" -x "$TFILE" > $TMP_NEW/$EFILE
-done
-unset IFS
+echo "Mounting ISO in userspace via guestmount..."
+export LIBGUESTFS_BACKEND=direct
+guestmount -a "$1" -r -m /dev/sda -o uid=$(id -u) -o gid=$(id -g) -o umask=000 $TMP_ISO
+echo "Copying contents to destination directory..."
+cp -r $TMP_ISO/* $TMP_NEW
 
+echo "Configuring bootloaders..."
 cat >$TMP_NEW/isolinux/isolinux.cfg <<EOIS
 default vesamenu.c32
 menu background
@@ -100,6 +85,7 @@ menuentry 'Check media' --class fedora --class gnu-linux --class gnu --class os 
 }
 EOGR
 
+echo "Building new ISO image..."
 if [ -f "$TMP_NEW/isolinux/efiboot.img" ]; then
   EFI_OPTS="-eltorito-alt-boot -e isolinux/efiboot.img -no-emul-boot"
   EXTRA_MSG="(BIOS/EFI compatible)"
