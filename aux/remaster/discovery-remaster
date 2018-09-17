@@ -12,12 +12,10 @@ if ! which $REQ_CMDS >/dev/null; then
 fi
 
 function cleanup() {
-  guestunmount $TMP_ISO
-  [ -d $TMP_ISO ] && rm -rf $TMP_ISO
+  echo "Cleaning up temporary directory..."
   [ -d $TMP_NEW ] && rm -rf $TMP_NEW
 }
 
-TMP_ISO=$(mktemp -d)
 TMP_NEW=$(mktemp -d)
 trap cleanup EXIT
 
@@ -25,11 +23,11 @@ TIMESTAMP=$(date +%y%m%d_%H%M%S)
 OUT_ISO=${1/.iso/-$TIMESTAMP}.iso
 [ ! -z "$3" ] && OUT_ISO=$3
 
-echo "Mounting ISO in userspace via guestmount..."
-export LIBGUESTFS_BACKEND=direct
-guestmount -a "$1" -r -m /dev/sda -o uid=$(id -u) -o gid=$(id -g) -o umask=000 $TMP_ISO
 echo "Copying contents to destination directory..."
-cp -r $TMP_ISO/* $TMP_NEW
+export LIBGUESTFS_BACKEND=direct
+guestfish --ro -a "$1" -m /dev/sda copy-out / $TMP_NEW
+chmod +w -R $TMP_NEW
+find $TMP_NEW -name TRANS.TBL -exec rm -f {} \;
 
 echo "Configuring bootloaders..."
 cat >$TMP_NEW/isolinux/isolinux.cfg <<EOIS
