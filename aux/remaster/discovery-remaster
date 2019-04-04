@@ -59,11 +59,11 @@ prompt 0
 label fdi
 menu label Discovery
 kernel vmlinuz0
-append initrd=initrd0.img root=live:CDLABEL=fdi rootfstype=auto ro rd.live.image acpi=force rd.luks=0 rd.md=0 rd.dm=0 nomodeset $2
+append initrd=initrd0.img root=live:CDLABEL=fdi rootfstype=auto ro rd.live.image acpi=force rd.luks=0 rd.md=0 rd.dm=0 nomodeset nokaslr $2
 label check
 menu label Check media
 kernel vmlinuz0
-append initrd=initrd0.img root=live:CDLABEL=fdi rootfstype=auto ro rd.live.image rd.live.check acpi=force nomodeset $2
+append initrd=initrd0.img root=live:CDLABEL=fdi rootfstype=auto ro rd.live.image rd.live.check acpi=force nomodeset nokaslr $2
 EOIS
 
 cat >$TMP_NEW/EFI/BOOT/grub.cfg <<EOGR
@@ -74,11 +74,11 @@ set gfxpayload=text
 set timeout=3
 search --no-floppy --set=root -l 'fdi'
 menuentry 'Discovery' --class fedora --class gnu-linux --class gnu --class os {
-  linuxefi /isolinux/vmlinuz0 root=live:LABEL=fdi rootfstype=auto ro rd.live.image acpi=force rd.luks=0 rd.md=0 rd.dm=0 nomodeset $2
+  linuxefi /isolinux/vmlinuz0 root=live:LABEL=fdi rootfstype=auto ro rd.live.image acpi=force rd.luks=0 rd.md=0 rd.dm=0 nomodeset nokaslr $2
   initrdefi /isolinux/initrd0.img
 }
 menuentry 'Check media' --class fedora --class gnu-linux --class gnu --class os {
-  linuxefi /isolinux/vmlinuz0 root=live:LABEL=fdi rootfstype=auto ro rd.live.image rd.live.check acpi=force nomodeset $2
+  linuxefi /isolinux/vmlinuz0 root=live:LABEL=fdi rootfstype=auto ro rd.live.image rd.live.check acpi=force nomodeset nokaslr $2
   initrdefi /isolinux/initrd0.img
 }
 EOGR
