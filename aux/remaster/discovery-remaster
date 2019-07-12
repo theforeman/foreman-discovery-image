@@ -83,6 +83,12 @@ menuentry 'Check media' --class fedora --class gnu-linux --class gnu --class os 
 }
 EOGR
 
+TMP_NEW_MNT=$(mktemp -d)
+mount -o loop $TMP_NEW/isolinux/efiboot.img $TMP_NEW_MNT
+cp $TMP_NEW/EFI/BOOT/grub.cfg $TMP_NEW_MNT/EFI/BOOT/grub.cfg
+umount $TMP_NEW_MNT
+rmdir $TMP_NEW_MNT
+
 echo "Building new ISO image..."
 if [ -f "$TMP_NEW/isolinux/efiboot.img" ]; then
   EFI_OPTS="-eltorito-alt-boot -e isolinux/efiboot.img -no-emul-boot"
