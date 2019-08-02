@@ -62,9 +62,9 @@ log_msg "Some interesting facts about this system:"
 facts = Hash[Facter.to_hash.select {|k,v| k =~ /address|hardware|manufacturer|productname|memorytotal/}]
 facts.keys.sort.each {|k| log_msg " #{k}: #{facts[k]}"}
 
-# loop, but only upload on changes
+# check every 15 minutes but only upload on changes
 i = cmdline("fdi.cachefacts", 0).to_i rescue 0
-upload_sleep = cmdline("fdi.uploadsleep", 30).to_i rescue 30
+upload_sleep = cmdline("fdi.uploadsleep", 60 * 15).to_i rescue (60 * 15)
 while true do
   uninteresting_facts=/kernel|operatingsystem|osfamily|ruby|path|time|swap|free|filesystem|version|selinux/i
   facts = Facter.to_hash.reject! {|k,v| k =~ uninteresting_facts }
