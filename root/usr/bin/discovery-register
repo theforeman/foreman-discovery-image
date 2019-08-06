@@ -63,20 +63,23 @@ facts = Hash[Facter.to_hash.select {|k,v| k =~ /address|hardware|manufacturer|pr
 facts.keys.sort.each {|k| log_msg " #{k}: #{facts[k]}"}
 
 # check every 15 minutes but only upload on changes
-i = cmdline("fdi.cachefacts", 0).to_i rescue 0
 upload_sleep = cmdline("fdi.uploadsleep", 60 * 15).to_i rescue (60 * 15)
+extra_initial_uploads = cmdline("fdi.cachefacts", 0).to_i rescue 0
 while true do
   uninteresting_facts=/kernel|operatingsystem|osfamily|ruby|path|time|swap|free|filesystem|version|selinux/i
+  # force facter to do new system scan (we default to 15 minute intervals which is safe)
+  Facter.clear
   facts = Facter.to_hash.reject! {|k,v| k =~ uninteresting_facts }
   unless YAML.load(read_cache) == facts
     log_msg "Fact cache invalid, reloading to foreman"
     write_cache(YAML.dump(facts)) if upload
+  else
+    log_msg "No change in facts (next check in #{upload_sleep} seconds)"
   end
   sleep upload_sleep
-  if i > 0
-    log_msg "Clearing cache after boot, will repeat #{i} times"
+  if extra_initial_uploads > 0
+    log_msg "Performing extra initial fact upload as defined by fdi.cachefacts (#{i} left)"
     clear_cache
-    Facter.clear
-    i -= 1
+    extra_initial_uploads -= 1
   end
 end
