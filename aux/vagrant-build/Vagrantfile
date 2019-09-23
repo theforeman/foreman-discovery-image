@@ -6,18 +6,14 @@ SHELLARGS << (ENV['branch'] || '')
 SHELLARGS << (ENV['proxy_repo'] || '')
 
 Vagrant.configure("2") do |config|
-  config.ssh.username  = "root"
-  config.ssh.pty = true
-
   config.vm.define "el7", primary: true do |machine|
     machine.vm.hostname = "fdi-builder-vm"
     machine.vm.provision :shell, :path => 'build_image.sh', :args => SHELLARGS
 
     config.vm.provider :libvirt do |lv, cfg|
-      cfg.ssh.username = "vagrant"
-      lv.server_name = machine.vm.hostname
-      lv.vm.box = "centos/7"
-      lv.memory = 1024
+      cfg.vm.box = 'centos/7'
+      lv.memory = 4096
+      lv.cpus = 2
     end
 
     # WARNING: OpenStack no longer works in our infra. Use libvirt or ./build-release
