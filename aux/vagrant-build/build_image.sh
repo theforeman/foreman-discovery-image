@@ -10,7 +10,8 @@ NAME=foreman-discovery-image
 sleep 30
 ping -c1 8.8.8.8 2>&1 >/dev/null && echo NET OK || echo NET FAILURE
 yum -y install livecd-tools appliance-tools-minimizer \
-  hardlink git wget pykickstart isomd5sum syslinux
+  hardlink git wget pykickstart isomd5sum syslinux \
+  libguestfs-tools-c
 yum -y install grub2-efi shim || yum -y install grub2-efi-x64 grub2-efi-x64-cdboot shim-x64 || true
 
 # build plugin
