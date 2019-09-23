@@ -16,7 +16,8 @@ Vagrant.configure("2") do |config|
     config.vm.provider :libvirt do |lv, cfg|
       cfg.ssh.username = "vagrant"
       cfg.vm.box = 'centos/7'
-      lv.memory = 1024
+      lv.memory = 4096
+      lv.cpus = 2
     end
 
     # WARNING: OpenStack no longer works in our infra. Use libvirt or ./build-release
