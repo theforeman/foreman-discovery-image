@@ -44,6 +44,7 @@ def command(cmd, fail_on_error = true, send_to_syslog = true)
   return true if fdi_version == 'GIT'
   output = `#{cmd} 2>&1`
   if $? != 0
+    log_msg("Command returned #{$?} and output was: #{output}") if send_to_syslog
     if fail_on_error
       error_box("Command failed: #{cmd}", output)
     else
@@ -84,7 +85,9 @@ def configure_network static, mac, ip=nil, gw=nil, dns=nil, vlan=nil
   end
   wait = cmdline('fdi.nmwait', 120)
   command("nmcli -w #{wait} connection reload", false)
+  sleep 2
   up_result = command("nmcli -w #{wait} connection up primary", false)
+  sleep 2
   command("nm-online -s -q --timeout=#{wait}")
   # wait for IPv4, generate SSL self-signed cert and start proxy
   command("systemctl start foreman-proxy") && up_result
