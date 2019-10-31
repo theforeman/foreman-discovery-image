@@ -1,0 +1,14 @@
+[Unit]
+Description=Control promiscuous mode for interface %i
+After=network-online.target
+Wants=network-online.target
+ConditionKernelCommandLine=!fdi.nopromis
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/ip link set promisc on dev %i
+ExecStop=/sbin/ip link set promisc off dev %i
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

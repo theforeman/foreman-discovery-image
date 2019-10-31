@@ -137,6 +137,11 @@ cat > /etc/udev/rules.d/82-enable-lldp.rules <<'UDEV'
 ACTION=="add", SUBSYSTEM=="net", NAME!="lo", TAG+="systemd", ENV{SYSTEMD_WANTS}="enable-lldp@%k.service"
 UDEV
 
+echo " * enable promiscuous mode on all physical network interfaces"
+cat > /etc/udev/rules.d/83-enable-promiscuous-mode.rules <<'UDEV'
+ACTION=="add", SUBSYSTEM=="net", NAME!="lo", TAG+="systemd", ENV{SYSTEMD_WANTS}="enable-promiscuous-mode@%k.service"
+UDEV
+
 echo " * inserting missing initramdisk drivers"
 kversion=$(rpm -q kernel --qf '%{version}-%{release}.%{arch}\n')
 ramfsfile="/boot/initramfs-$kversion.img"
