@@ -95,10 +95,9 @@ mkdir tftpboot
 # initrd image.  The Linux kernel will do the right thing,
 # aggregating both cpio archives (initrd + ISO) into a single
 # filesystem.
-NEWISO=$STRIPPEDISO/`basename "$ISO"`
+NEWISO=$STRIPPEDISO/fdi.iso
 mkisofs --quiet -J -joliet-long -r -T -o $NEWISO --root LiveOS $CDMNT/LiveOS/squashfs.img
 ISOBASENAME=`basename "$NEWISO"`
-ISODIRNAME=`dirname "$NEWISO"`
 ( cd "$STRIPPEDISO" && echo "$ISOBASENAME" | cpio -H newc --quiet -L -o ) |
   gzip -9 |
   cat $CDMNT/isolinux/$INITRD - > tftpboot/$INITRD
