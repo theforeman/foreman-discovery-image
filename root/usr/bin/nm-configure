@@ -19,8 +19,8 @@ deploy_config() {
 
 usage() {
   echo "Usage: "
-  echo " $0 primary MAC_ADDRESS [VPN_ID]"
-  echo " $0 primary-static MAC_ADDRESS IP4_ADDR/CIDR IP4_GW IP4_DNS [VPN_ID]"
+  echo " $0 primary MAC_ADDRESS [VLAN_ID]"
+  echo " $0 primary-static MAC_ADDRESS IP4_ADDR/CIDR IP4_GW IP4_DNS [VLAN_ID]"
   echo " $0 secondary MAC_ADDRESS AUTOCONNECT (true/false)"
 }
 
