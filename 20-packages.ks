@@ -34,7 +34,7 @@ OpenIPMI
 OpenIPMI-tools
 openssl
 foreman-proxy
-rubygem-smart_proxy_discovery_image
+tfm-rubygem-smart_proxy_discovery_image
 
 # Interactive discovery
 kexec-tools
