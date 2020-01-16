@@ -15,6 +15,7 @@ acpid
 tftp
 lldpad
 isomd5sum
+elfutils-libs
 
 # Dracut missing deps (https://bugzilla.redhat.com/show_bug.cgi?id=1285810)
 tar
@@ -29,17 +30,15 @@ bind-utils
 virt-what
 
 # Foreman proxy
+foreman-discovery-image-service
 sudo
 OpenIPMI
 OpenIPMI-tools
 openssl
-foreman-proxy
-rubygem-smart_proxy_discovery_image
 
 # Interactive discovery
+foreman-discovery-image-service-tui
 kexec-tools
-rubygem-newt
-rubygem-fast_gettext
 kbd
 
 # Debugging support
@@ -106,8 +105,6 @@ system-storage-manager
 -lvm2
 
 # selinux toolchain of policycoreutils, libsemanage (libselinux is needed tho)
--policycoreutils
--checkpolicy
 -selinux-policy*
 
 # Things it would be nice to loose

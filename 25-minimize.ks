@@ -1,4 +1,5 @@
-# Try to minimize the image a bit
+# Minimize the image by dropping some unnecessary data like i18n or man pages
+# vim: set ft=bash:sw=2:ts=2:et
 %post
 
 # Ensure we don't have the same random seed on every image, which
@@ -35,10 +36,6 @@ mv -f /usr/share/cracklib/cracklib_small.hwm /usr/share/cracklib/pw_dict.hwm
 mv -f /usr/share/cracklib/cracklib_small.pwd /usr/share/cracklib/pw_dict.pwd
 mv -f /usr/share/cracklib/cracklib_small.pwi /usr/share/cracklib/pw_dict.pwi
 gzip -9 /usr/share/cracklib/pw_dict.pwd
-
-# remove things only needed during the build process
-echo " * purging packages needed only during build"
-rpm -e syslinux mtools acl
 
 # 100MB of locale archive is kind unnecessary; we only do en_US.utf8
 # this will clear out everything we don't need; 100MB => 2.1MB.
@@ -80,7 +77,6 @@ rpm -qa --queryformat '%{SIZE} %{NAME}%{VERSION}%{RELEASE}\n' | sort -n -r > /us
 echo " * cleaning up yum cache and removing rpm database"
 yum clean all
 rm -rf /var/lib/{yum,rpm}/*
-# fix the vim syntax markup */
 
 # no more python loading after this step
 echo " * removing python precompiled *.pyc files"
