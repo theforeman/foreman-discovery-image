@@ -182,7 +182,7 @@ def main_loop
           status = configure_network false, mac
         end
         log_debug "Unattended network configuration finished, result: #{status}"
-        delay = cmdline('fdi.countdown', 10)
+        delay = cmdline('fdi.countdown', 45).to_i rescue 45
         log_debug "Delay for network initialization: #{delay} seconds"
         sleep delay
         facts = new_custom_facts(mac)
