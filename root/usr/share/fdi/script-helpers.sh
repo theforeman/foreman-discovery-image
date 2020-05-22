@@ -50,18 +50,18 @@ EOF
 cfg_bond() {
   NAME=${1:-bond0}
   OPTS=${2:-miimon=100 mode=balance-rr}
+  BOOTPROTO=${3:-dhcp}
+  DEVICE=${4:-$NAME}
   cat >/etc/sysconfig/network-scripts/ifcfg-$NAME <<EOF
 TYPE=Bond
 ONBOOT=yes
-DEVICE=$NAME
+DEVICE=$DEVICE
 BONDING_MASTER=yes
 BONDING_OPTS="$OPTS"
-BOOTPROTO=dhcp
+BOOTPROTO=$BOOTPROTO
 DEFROUTE=yes
 IPV6INIT=no
 NAME=$NAME
-$3
-$4
 $5
 $6
 $7
