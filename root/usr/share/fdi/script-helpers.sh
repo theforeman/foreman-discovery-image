@@ -30,13 +30,13 @@ hwaddr() {
 }
 
 cfg_eth() {
-  NAME=${1:-eth0}
-  cat >/etc/sysconfig/network-scripts/ifcfg-$NAME <<EOF
+  DEVICE=${1:-eth0}
+  NAME=${2:-$DEVICE}
+  cat >/etc/sysconfig/network-scripts/ifcfg-$DEVICE <<EOF
 TYPE=Ethernet
-NAME=$DEV
-DEVICE=$DEV
+NAME=$NAME
+DEVICE=$DEVICE
 ONBOOT=yes
-$2
 $3
 $4
 $5
@@ -48,11 +48,11 @@ EOF
 }
 
 cfg_bond() {
-  NAME=${1:-bond0}
+  DEVICE=${1:-bond0}
   OPTS=${2:-miimon=100 mode=balance-rr}
   BOOTPROTO=${3:-dhcp}
-  DEVICE=${4:-$NAME}
-  cat >/etc/sysconfig/network-scripts/ifcfg-$NAME <<EOF
+  NAME=${4:-$DEVICE}
+  cat >/etc/sysconfig/network-scripts/ifcfg-$DEVICE <<EOF
 TYPE=Bond
 ONBOOT=yes
 DEVICE=$DEVICE
