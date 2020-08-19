@@ -16,7 +16,9 @@ while (( SECONDS < $WAIT )); do
   sleep 1
   COMMON_NAME=$(nmcli -w 1 -t -f IP4.ADDRESS con show primary 2>/dev/null | cut -f2 -d: | cut -f1 -d/)
   [ ! -z "$COMMON_NAME" ] && break
-  logger "Waiting for IP4 address to generate SSL cert ($SECONDS/$WAIT)"
+  COMMON_NAME=$(nmcli -w 1 -t -f IP6.ADDRESS con show primary 2>/dev/null | cut -f2 -d: | cut -f1 -d/)
+  [ ! -z "$COMMON_NAME" ] && break
+  logger "Waiting for IP address to generate SSL cert ($SECONDS/$WAIT)"
 done
 
 # Don't fail when IP address was not provided (HTTP can be still used).

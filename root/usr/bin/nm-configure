@@ -7,6 +7,8 @@ mac=${2:-$bootif}
 uuid=$(/usr/bin/uuid)
 timeout=${KCL_FDI_DHCP_TIMEOUT:-300}
 sendhost=${KCL_FDI_DHCP_SENDHOST:-false}
+ipv4_method=${KCL_FDI_IPV4_METHOD:-auto}
+ipv6_method=${KCL_FDI_IPV6_METHOD:-auto}
 ctype="802-3-ethernet"
 
 [[ "$sendhost" == "false" ]] || sendhost=true
@@ -21,6 +23,7 @@ usage() {
   echo "Usage: "
   echo " $0 primary MAC_ADDRESS [VLAN_ID]"
   echo " $0 primary-static MAC_ADDRESS IP4_ADDR/CIDR IP4_GW IP4_DNS [VLAN_ID]"
+  echo " $0 primary-static6 MAC_ADDRESS IP6_ADDR/CIDR IP6_GW IP6_DNS [VLAN_ID]"
   echo " $0 secondary MAC_ADDRESS AUTOCONNECT (true/false)"
 }
 
@@ -55,7 +58,35 @@ gateway=$gw
 dns=$dns;
 dhcp-send-hostname=$sendhost
 [ipv6]
-method=ignore
+method=disabled
+[vlan]
+id=$vlanid
+EONS
+  deploy_config $TMP_CFG $script
+elif [[ "$1" == "primary-static6" ]]; then
+  ip=$3
+  gw=$4
+  dns=$5
+  vlanid=${6:-$KCL_FDI_VLAN_PRIMARY}
+  [[ "$vlanid" != "" ]] && ctype="vlan"
+  script=/etc/NetworkManager/system-connections/primary
+  cat > $TMP_CFG <<EONS
+[connection]
+id=primary
+uuid=$uuid
+type=$ctype
+autoconnect=true
+autoconnect-priority=1
+[802-3-ethernet]
+mac-address=$mac
+[ipv4]
+method=disabled
+[ipv6]
+method=manual
+address1=$ip
+gateway=$gw
+dns=$dns;
+dhcp-send-hostname=$sendhost
 [vlan]
 id=$vlanid
 EONS
@@ -74,11 +105,11 @@ autoconnect-priority=1
 [802-3-ethernet]
 mac-address=$mac
 [ipv4]
-method=auto
+method=$ipv4_method
 dhcp-send-hostname=$sendhost
 dhcp-timeout=$timeout
 [ipv6]
-method=ignore
+method=$ipv6_method
 [vlan]
 id=$vlanid
 EONS
@@ -96,14 +127,14 @@ autoconnect=$autoconnect
 [802-3-ethernet]
 mac-address=$mac
 [ipv4]
-method=auto
+method=$ipv4_method
 dhcp-timeout=$timeout
 ignore-auto-dns=true
 ignore-auto-routes=true
 never-default=true
 dhcp-send-hostname=$sendhost
 [ipv6]
-method=ignore
+method=$ipv6_method
 EONS
   deploy_config $TMP_CFG $script
 else
