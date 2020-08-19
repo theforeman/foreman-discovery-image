@@ -79,7 +79,12 @@ end
 def configure_network static, mac, ip=nil, gw=nil, dns=nil, vlan=nil
   command("systemctl stop foreman-proxy", false)
   if static
-    command("nm-configure primary-static '#{mac}' '#{ip}' '#{gw}' '#{dns}' '#{vlan}'")
+    if IPAddr.new(ip).ipv6?
+      cmd = "primary-static6"
+    else
+      cmd = "primary-static"
+    end
+    command("nm-configure #{cmd} '#{mac}' '#{ip}' '#{gw}' '#{dns}' '#{vlan}'")
   else
     command("nm-configure primary '#{mac}' '#{vlan}'")
   end

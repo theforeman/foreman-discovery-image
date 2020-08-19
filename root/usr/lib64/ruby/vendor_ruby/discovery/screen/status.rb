@@ -1,4 +1,4 @@
-def generate_info extra_status = '', server = discover_server, proxy_type = proxy_type
+def generate_info extra_status = '', server = discover_server, type = proxy_type
   status = _("N/A") + ' (' + _("use Status to update") + ')'
   response = _("N/A")
   if File.exist?(f = '/tmp/discovery-http-success')
@@ -16,9 +16,10 @@ def generate_info extra_status = '', server = discover_server, proxy_type = prox
 
 #{_('Primary NIC')}: #{get_mac}
 #{_('Primary IPv4')}: #{get_ipv4}
+#{_('Primary IPv6')}: #{get_ipv6}
 
 #{_('Discovery server')}: #{discover_server || 'N/A'}
-#{_('Endpoint type')}: #{proxy_type}
+#{_('Endpoint type')}: #{type}
 
 #{_('Latest server response')}:
 #{response}
