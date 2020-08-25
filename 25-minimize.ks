@@ -1,5 +1,10 @@
 # Minimize the image by dropping some unnecessary data like i18n or man pages
 # vim: set ft=bash:sw=2:ts=2:et
+#
+# Some ideas from:
+#
+# https://github.com/weldr/lorax/blob/rhel7-branch/share/runtime-cleanup.tmpl
+#
 %post
 
 # Ensure we don't have the same random seed on every image, which
@@ -22,14 +27,19 @@ rm -rf /lib/modules/*/kernel/drivers/gpu/drm \
   /lib/modules/*/kernel/drivers/video/fbdev \
   /lib/firmware/{amdgpu,radeon}
 
-echo " * remove unused drivers (sound, media, nls)"
-rm -rf /lib/modules/*/kernel/{sound,drivers/media,fs/nls}
+echo " * remove unused drivers (sound, media, nls, fs, wifi)"
+rm -rf /lib/modules/*/kernel/sound \
+  /lib/modules/*/kernel/drivers/{media,hwmon,watchdog,rtc,input/joystick,bluetooth,edac} \
+  /lib/modules/*/kernel/net/{atm,bluetooth,sched,sctp,rds,l2tp,decnet} \
+  /lib/modules/*/kernel/fs/{nls,ocfs2,ceph,nfsd,ubifs,nilfs2} \
+  /lib/modules/*/kernel/arch/x86/kvm
 
 echo " * remove unused firmware (sound, wifi)"
 rm -rf /usr/lib/firmware/*wifi* \
   /usr/lib/firmware/v4l* \
   /usr/lib/firmware/dvb* \
-  /usr/lib/firmware/{yamaha,korg,liquidio,emu,dsp56k,emi26}
+  /usr/lib/firmware/{yamaha,korg,liquidio,emu,dsp56k,emi26} \
+  /usr/lib/firmware/{ath9k,ath10k}
 
 echo " * dropping big and compressing small cracklib dict"
 mv -f /usr/share/cracklib/cracklib_small.hwm /usr/share/cracklib/pw_dict.hwm
@@ -72,11 +82,14 @@ echo " * locking root account"
 passwd -l root
 
 echo " * store list of packages sorted by size"
-rpm -qa --queryformat '%{SIZE} %{NAME}%{VERSION}%{RELEASE}\n' | sort -n -r > /usr/PACKAGES-LIST
+rpm -qa --queryformat '%{SIZE} %{NAME} %{VERSION}%{RELEASE}\n' | sort -n -r > /usr/PACKAGES-LIST
 
 echo " * cleaning up yum cache and removing rpm database"
 yum clean all
 rm -rf /var/lib/{yum,rpm}/*
+
+echo " * finding duplicite files"
+rdfind -makehardlinks true -outputname /dev/null /usr /opt /lib
 
 # no more python loading after this step
 echo " * removing python precompiled *.pyc files"

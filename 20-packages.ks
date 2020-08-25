@@ -83,19 +83,44 @@ e2fsprogs
 bzip2
 system-storage-manager
 
+# finding duplicite files saves about 1% of the compressed size
+rdfind
+
 ######################
 # Packages to Remove #
 ######################
+#
+# Some ideas from:
+#
+# https://github.com/weldr/lorax/blob/rhel7-branch/share/runtime-cleanup.tmpl
 
 # Red Hat Enteprise Linux subscription tool
 -subscription-manager
 
-# Generic and wireless tools
+# Generic and wireless tools and firmware
 -prelink
 -setserial
 -ed
 -authconfig
 -wireless-tools
+-iwl7260-firmware
+-iwl3160-firmware
+-iwl6000g2b-firmware
+-iwl6000g2a-firmware
+-iwl5000-firmware
+-iwl6050-firmware
+-iwl2030-firmware
+-iwl135-firmware
+-iwl2000-firmware
+-iwl105-firmware
+-iwl1000-firmware
+-iwl6000-firmware
+-iwl100-firmware
+-iwl5150-firmware
+-iwl4965-firmware
+-iwl3945-firmware
+-liquidio-firmware
+-netronome-firmware
 
 # Remove the kbd bits
 -kbd
@@ -105,10 +130,22 @@ system-storage-manager
 -dmraid
 -lvm2
 
+# sound and video
+-alsa-lib
+-alsa-firmware
+-alsa-tools-firmware
+-ivtv-firmware
+
 # selinux toolchain of policycoreutils, libsemanage (libselinux is needed tho)
 -selinux-policy*
 
-# Things it would be nice to loose
+# logos and graphics
+-plymouth
+-centos-logos
 -fedora-logos
 -fedora-release-notes
+
+# other packages
+-postfix
+
 %end
