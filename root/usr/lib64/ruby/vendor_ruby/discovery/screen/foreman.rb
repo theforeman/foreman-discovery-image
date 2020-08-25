@@ -1,4 +1,6 @@
-def screen_foreman mac = nil, gw = nil, proxy_url = cmdline('proxy.url'), proxy_type = cmdline('proxy.type')
+def screen_foreman pipeline
+  proxy_url = cmdline('proxy.url', pipeline.data.proxy_url)
+  proxy_type = cmdline('proxy.type', pipeline.data.proxy_type)
   Newt::Screen.centered_window(59, 20, _("Credentials"))
   f = Newt::Form.new
   t_desc = Newt::Textbox.new(2, 2, 54, 6, Newt::FLAG_WRAP)
@@ -11,7 +13,7 @@ def screen_foreman mac = nil, gw = nil, proxy_url = cmdline('proxy.url'), proxy_
   b_ok = Newt::Button.new(34, 15, _("Next"))
   b_cancel = Newt::Button.new(46, 15, _("Cancel"))
   proxy_type ||= 'foreman'
-  t_url.set(proxy_url, 1) if proxy_url
+  t_url.set(proxy_url.to_s, 1) if proxy_url
   r_server.set(proxy_type != 'proxy' ? '*' : ' ')
   r_proxy.set(proxy_type == 'proxy' ? '*' : ' ')
   items = [t_desc, l_type, l_url, t_url, r_server, r_proxy]
@@ -34,8 +36,10 @@ def screen_foreman mac = nil, gw = nil, proxy_url = cmdline('proxy.url'), proxy_
       Newt::Screen.win_message(_("Invalid URL"), _("OK"), _("Not a valid URL") + ": #{url} (#{e})")
       return [:screen_foreman, mac, gw, url, proxy_type]
     end
-    [:screen_facts, mac, proxy_url, proxy_type]
+    pipeline.data.proxy_url = proxy_url
+    pipeline.data.proxy_type = proxy_type
+    pipeline.append :screen_facts
   else
-    :screen_welcome
+    pipeline.cancel :screen_welcome
   end
 end

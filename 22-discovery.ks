@@ -51,6 +51,9 @@ systemctl disable ipmi.service
 echo " * open foreman-proxy port via firewalld"
 firewall-offline-cmd --zone=public --add-port=8443/tcp --add-port=8448/tcp
 
+echo " * open udpcast ports via firewalld"
+firewall-offline-cmd --zone=public --add-port=9000-9100/udp
+
 echo " * setting up foreman proxy service"
 sed -i 's/After=.*/After=basic.target network-online.target nm-prepare.service/' /usr/lib/systemd/system/foreman-proxy.service
 sed -i 's/Wants=.*/Wants=basic.target network-online.target nm-prepare.service/' /usr/lib/systemd/system/foreman-proxy.service
@@ -104,9 +107,18 @@ echo "DumpCore=no" >> /etc/systemd/system.conf
 echo " * setting multi-user.target as default"
 systemctl set-default multi-user.target
 
-echo " * setting up journald and ttys"
+echo " * setting up ttys"
 systemctl disable getty@tty1.service getty@tty2.service
 systemctl mask getty@tty1.service getty@tty2.service
+cat >/etc/systemd/system/getty@tty3.service <<'CFG'
+[Service]
+ExecStart=-/sbin/agetty --autologin root --noclear %I $TERM
+CFG
+for X in 4 5 6 7 8 9; do
+  cp /etc/systemd/system/getty@tty3.service /etc/systemd/system/getty@tty$X.service
+done
+
+echo " * setting up journald"
 echo "Storage=volatile" >> /etc/systemd/journald.conf
 echo "RuntimeMaxUse=25M" >> /etc/systemd/journald.conf
 echo "ForwardToSyslog=no" >> /etc/systemd/journald.conf

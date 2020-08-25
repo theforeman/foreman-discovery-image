@@ -75,6 +75,15 @@ grub2-efi-x64
 grub2-efi-x64-cdboot
 shim-x64
 
+# Volume, filesystem and image management
+mdadm
+parted
+ssm
+xfsprogs
+
+# Optional packages - when removed some functionality will not be available
+udpcast
+
 # tools that enable the image installer plugin
 parted
 mdadm

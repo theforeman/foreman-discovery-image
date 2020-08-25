@@ -1,5 +1,5 @@
-def screen_facts mac, proxy_url, proxy_type
-  custom_facts = new_custom_facts(mac)
+def screen_facts pipeline
+  custom_facts = new_custom_facts(pipeline.data.primary_mac)
 
   b_confirm = Newt::Button.new(-1, -1, _("Confirm"))
   b_cancel = Newt::Button.new(-1, -1, _("Cancel"))
@@ -38,7 +38,7 @@ def screen_facts mac, proxy_url, proxy_type
     (0..8).each_with_index do |ix, _|
       custom_facts[names[ix].get] = values[ix].get if names[ix].get && values[ix].get
     end
-    if perform_upload(proxy_url, proxy_type, custom_facts)
+    if perform_upload(pipeline.data.proxy_url, pipeline.data.proxy_type, custom_facts)
       [:screen_status, generate_info(' - ' + _('awaiting kexec into installer'))]
     else
       [:screen_status, generate_info(' - ' + _('fact upload failed'))]
