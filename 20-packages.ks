@@ -147,5 +147,9 @@ rdfind
 
 # other packages
 -postfix
+-audit
+-rsyslog
+-authconfig
+-tuned
 
 %end
