@@ -70,7 +70,7 @@ routes are always acquired only from the primary interface and ignored for
 secondary (PEERDNS, PEERROUTES, DEFROUTE). Network cards connected to same
 networks can cause troubles due to ARP filtering.
 
-Only IPv4 is supported at the moment, IPv6 is not initialized.
+IPv4 and IPv6 are supported.
 
 Documentation
 -------------
