@@ -83,9 +83,6 @@ e2fsprogs
 bzip2
 system-storage-manager
 
-# finding duplicite files saves about 1% of the compressed size
-rdfind
-
 ######################
 # Packages to Remove #
 ######################

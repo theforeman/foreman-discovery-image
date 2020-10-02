@@ -88,9 +88,6 @@ echo " * cleaning up yum cache and removing rpm database"
 yum clean all
 rm -rf /var/lib/{yum,rpm}/*
 
-echo " * finding duplicite files"
-rdfind -makehardlinks true -outputname /dev/null /usr /opt /lib
-
 # no more python loading after this step
 echo " * removing python precompiled *.pyc files"
 find /usr/lib64/python*/ /usr/lib/python*/ -name *py[co] -print0 | xargs -0 rm -f
