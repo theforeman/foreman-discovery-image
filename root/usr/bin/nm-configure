@@ -110,6 +110,7 @@ dhcp-send-hostname=$sendhost
 dhcp-timeout=$timeout
 [ipv6]
 method=$ipv6_method
+may-fail=true
 [vlan]
 id=$vlanid
 EONS
@@ -135,6 +136,7 @@ never-default=true
 dhcp-send-hostname=$sendhost
 [ipv6]
 method=$ipv6_method
+may-fail=true
 EONS
   deploy_config $TMP_CFG $script
 else

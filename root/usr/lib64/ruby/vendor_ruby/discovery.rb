@@ -170,12 +170,12 @@ def upload(uri = discover_server, type = proxy_type, custom_facts = {})
     log_err "Upload#uri must be type of URI"
     return
   end
-  if uri.host.nil? or uri.port.nil?
+  if uri.hostname.nil? or uri.port.nil?
     log_err "Server or proxy URI host or port was not specified, cannot continue"
     return
   end
   log_msg "Registering host at (#{uri})"
-  http = Net::HTTP.new(uri.host, uri.port)
+  http = Net::HTTP.new(uri.hostname, uri.port)
   if uri.scheme == 'https' then
     http.use_ssl = true
     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
