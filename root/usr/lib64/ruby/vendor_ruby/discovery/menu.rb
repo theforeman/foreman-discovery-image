@@ -93,7 +93,7 @@ def configure_network static, mac, ip=nil, gw=nil, dns=nil, vlan=nil
   sleep 2
   up_result = command("nmcli -w #{wait} connection up primary", false)
   sleep 2
-  command("nm-online -s -q --timeout=#{wait}")
+  command("nm-online -s -q --timeout=#{wait}", false)
   # wait for IPv4, generate SSL self-signed cert and start proxy
   command("systemctl start foreman-proxy") && up_result
 end
