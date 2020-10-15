@@ -21,6 +21,12 @@ fi
 
 which livecd-creator isohybrid implantisomd5 >/dev/null || ( echo "Command(s) missing, install required tools" && exit 2 )
 
+if livecd-creator --help | grep xz1m >/dev/null; then
+  COMPRESSION_TYPE="xz1m"
+else
+  COMPRESSION_TYPE="xz"
+fi
+
 trap cleanup EXIT
 
 srcdir=$(readlink -f $(dirname $0))
@@ -35,7 +41,10 @@ cd $tmpdir
 echo Working in directory $tmpdir
 
 echo "* Running livecd-creator"
-livecd-creator -v --title="Discovery Image" --compression-type=xz --cache /var/cache/build-fdi --config $srcdir/fdi-image.ks -f fdi -t /tmp
+livecd-creator -v --title="Discovery Image" \
+  --compression-type=$COMPRESSION_TYPE \
+  --cache /var/cache/build-fdi \
+  --config $srcdir/fdi-image.ks -f fdi -t /tmp
 
 if [ $? -ne 0 ]; then
     KEEP_TMPDIR=yes
