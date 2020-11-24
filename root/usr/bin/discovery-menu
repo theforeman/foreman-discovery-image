@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/tfm-ruby
 
 exit(0) if File.exist?('/tmp/disable-menu')
 
