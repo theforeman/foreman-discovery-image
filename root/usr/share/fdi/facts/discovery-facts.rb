@@ -1,4 +1,3 @@
-#!/usr/bin/env ruby
 # vim: ts=2:sw=2:et
 #
 # Copyright (C) 2013 Red Hat, Inc.

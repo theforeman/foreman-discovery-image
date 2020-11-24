@@ -84,6 +84,7 @@ sha256sum initrd0.img vmlinuz0 > SHA256SUM
 
 cd ..
 tarball=$destdir/fdi-image-${last_tag#release-}.tar
+chmod 666 fdi-image/*
 tar cf $tarball fdi-image/
 ls -lh $tarball
 chown --reference $srcdir/build-livecd $tarball
