@@ -188,7 +188,9 @@ Some extra facts are reported in addition to the standard ones reported by
 Facter:
 
 ```
-FACTERLIB=/usr/share/fdi/facts/ facter | grep discovery
+source /etc/default/discovery
+export FACTERLIB
+facter | grep discovery
 discovery_bootif => 52:54:00:94:9e:52
 discovery_bootip => 192.168.122.51
 ```

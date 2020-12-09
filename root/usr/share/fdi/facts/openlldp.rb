@@ -43,8 +43,6 @@
 #   Copyright (C) 2012 Mike Arnold, unless otherwise noted.
 #
 
-require 'facter/util/macaddress'
-
 # http://www.ruby-forum.com/topic/3418285#1040695
 module Enumerable
   def grep_v(cond)
@@ -52,7 +50,6 @@ module Enumerable
   end
 end
 
-#if Facter::Util::Resolution.which('lldptool')
 if File.exists?('/usr/sbin/lldptool')
   lldp = {
     # LLDP Name    Numeric value
@@ -66,7 +63,7 @@ if File.exists?('/usr/sbin/lldptool')
   }
 
   # Remove interfaces that pollute the list (like lo and bond0).
-  Facter.value('interfaces').split(/,/).grep_v(/^lo$|^bond[0-9]/).each do |interface|
+  Dir.glob("/sys/class/net/*").map{|x| File.basename(x).to_s}.grep_v(/^lo$|^bond[0-9]/).each do |interface|
     # Loop through the list of LLDP TLVs that we want to present as facts.
     lldp.each_pair do |key, value|
       Facter.add("lldp_neighbor_#{key}_#{interface}") do
@@ -82,7 +79,7 @@ if File.exists?('/usr/sbin/lldptool')
             when 'chassisID'
               output.split("\n").each do |line|
                 ether = $1 if line.match(/MAC:\s+(.*)/)
-                result = Facter::Util::Macaddress.standardize(ether)
+                result = ether&.tr('-', ':')&.downcase
               end
             when 'portID'
               output.split("\n").each do |line|
