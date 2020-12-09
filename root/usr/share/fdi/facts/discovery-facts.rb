@@ -18,41 +18,36 @@
 # also available at http://www.gnu.org/copyleft/gpl.html.
 
 require 'resolv'
-require 'facter/util/ip'
-require '/usr/lib64/ruby/vendor_ruby/discovery.rb'
+if File.exist? '/opt/rh/rh-ruby25/root/usr/share/ruby/vendor_ruby/discovery'
+  require '/opt/rh/rh-ruby25/root/usr/share/ruby/vendor_ruby/discovery'
+else
+  require_relative '../../../../opt/rh/rh-ruby25/root/usr/share/ruby/vendor_ruby/discovery.rb'
+end
 
 def discovery_bootif
   # PXELinux dash-separated hexadecimal *without* the leading hardware type
   cmdline('BOOTIF', cmdline('fdi.pxmac', detect_first_nic_with_link)).gsub(/^[a-fA-F0-9]+-/, '').gsub('-', ':') rescue '00:00:00:00:00:00'
 end
 
-Facter.add("discovery_version") do
-  setcode do
-    File.open('/usr/share/fdi/VERSION') {|f| f.readline.chomp}
+if File.exist? '/usr/share/fdi/VERSION'
+  Facter.add("discovery_version") do
+    setcode do
+      File.open('/usr/share/fdi/VERSION') {|f| f.readline.chomp}
+    end
   end
 end
 
-Facter.add("discovery_release") do
-  setcode do
-    File.open('/usr/share/fdi/RELEASE') {|f| f.readline.chomp}
+if File.exist? '/usr/share/fdi/RELEASE'
+  Facter.add("discovery_release") do
+    setcode do
+      File.open('/usr/share/fdi/RELEASE') {|f| f.readline.chomp}
+    end
   end
 end
 
 Facter.add("discovery_bootif", :timeout => 10) do
   setcode do
     discovery_bootif
-  end
-end
-
-Facter.add("discovery_bootip", :timeout => 10) do
-  setcode do
-    result = Facter.fact("ipaddress").value
-    required = discovery_bootif
-    Facter::Util::IP.get_interfaces.each do |iface|
-      mac = Facter::Util::IP.get_interface_value(iface, "macaddress")
-      result = Facter::Util::IP.get_interface_value(iface, "ipaddress") if mac == required
-    end
-    result
   end
 end
 
@@ -68,45 +63,6 @@ end
   else
     Facter.debug "Processed #{n} kernel command line custom facts, we are done here"
     break
-  end
-end
-
-Facter::Util::IP.get_interfaces.each do |interface|
-  Facter.debug("Running ethtool on interface #{interface}")
-  output = (Facter::Util::Resolution.exec("ethtool #{interface} 2>/dev/null"))
-  if output.nil?
-    Facter.debug("Execution of ethtool on interface #{interface} failed")
-  else
-    attributes = {}
-    output.each_line do |line|
-      next if line.nil? or line == ""
-      case line.strip
-      when /Speed: (.*)Mb/
-        attributes[:speed] = $1
-      when /Duplex: (.*)/
-        attributes[:duplex] = $1.downcase
-      when /Port: (.*)/
-        attributes[:port] = $1
-      when /Auto-negotiation: (.*)/
-        attributes[:auto_negotiation] = ($1 == 'on').to_s
-      when /^Wake-on: (.*)/
-        attributes[:wol] = $1.include?('g')
-      when /Link detected: (.*)/
-        attributes[:link] = ($1 == 'yes').to_s
-      end
-    end
-
-    if attributes.keys.empty?
-      Facter.debug("Running ethtool on #{interface} didn't give any information")
-    end
-    attributes.each do |fact, value|
-      Facter.add("#{fact}_#{Facter::Util::IP.alphafy(interface)}", :timeout => 10) do
-        confine :kernel => "Linux"
-        setcode do
-          value
-        end
-      end
-    end
   end
 end
 

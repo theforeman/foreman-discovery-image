@@ -21,8 +21,7 @@ elfutils-libs
 tar
 gzip
 
-# Facter (both CLI and for smart-proxy image plugin)
-facter
+# Facter
 tfm-rubygem-facter
 ethtool
 net-tools
