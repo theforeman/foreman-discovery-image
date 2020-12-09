@@ -58,7 +58,7 @@ gateway=$gw
 dns=$dns;
 dhcp-send-hostname=$sendhost
 [ipv6]
-method=disabled
+method=ignore
 [vlan]
 id=$vlanid
 EONS
