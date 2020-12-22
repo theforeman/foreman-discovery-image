@@ -192,11 +192,9 @@ source /etc/default/discovery
 export FACTERLIB
 facter | grep discovery
 discovery_bootif => 52:54:00:94:9e:52
-discovery_bootip => 192.168.122.51
 ```
 
 discovery_bootif - MAC of the interface it was booted from
-discovery_bootip - IP of the interface it was booted from
 
 
 Troubleshooting
