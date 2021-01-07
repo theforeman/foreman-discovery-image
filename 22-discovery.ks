@@ -1,8 +1,7 @@
 %post
 
 echo " * ensure /etc/os-release is present (needed for RHEL 7.0)"
-yum -y install fedora-release centos-release redhat-release-server || \
-  touch /etc/os-release
+touch /etc/os-release
 
 echo " * disabling legacy network services (needed for RHEL 7.0)"
 systemctl disable network.service
@@ -143,8 +142,12 @@ ACTION=="add", SUBSYSTEM=="net", NAME!="lo", TAG+="systemd", ENV{SYSTEMD_WANTS}=
 UDEV
 
 echo " * inserting missing initramdisk drivers"
-kversion=$(rpm -q kernel --qf '%{version}-%{release}.%{arch}\n')
+# RPM database is empty, must find out kernel version differently
+kversion=$(ls -t /lib/modules | head -n1)
+echo "   found kernel version $kversion"
+echo "   contents of /boot: "
+ls -1 /boot
 ramfsfile="/boot/initramfs-$kversion.img"
-/sbin/dracut --force --add-drivers "mptbase mptscsih mptspi hv_storvsc hid_hyperv hv_netvsc hv_vmbus" $ramfsfile $kversion
+/sbin/dracut -v --force --add-drivers "mptbase mptscsih mptspi hv_storvsc hid_hyperv hv_netvsc hv_vmbus" $ramfsfile $kversion
 
 %end
