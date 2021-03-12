@@ -288,6 +288,9 @@ vim:tw=75
 License
 -------
 
-The kickstart file, utility scripts and other software in this repo is licensed under GNU GPL v2 or later. Exceptions are individually commented in file headers.
+The kickstart file, utility scripts and other software in this repo is
+licensed under GNU GPL v2 or later. Exceptions are individually commented
+in file headers.
 
-Generated image is covered by additional licenses, refer to Fedora and CentOS licensing information.
+Generated image is covered by additional licenses, refer to Fedora and
+CentOS licensing information.
