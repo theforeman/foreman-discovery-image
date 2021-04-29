@@ -9,7 +9,11 @@
 require 'facter'
 
 Facter.add(:ethtool, :timeout => 10) do
-  confine :kernel => "Linux"
+  confine kernel: "Linux"
+
+  confine :networking do |value|
+    value && value['interfaces']
+  end
 
   confine do
     Facter::Core::Execution.which('ethtool') != nil
