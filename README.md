@@ -294,3 +294,4 @@ in file headers.
 
 Generated image is covered by additional licenses, refer to Fedora and
 CentOS licensing information.
+
