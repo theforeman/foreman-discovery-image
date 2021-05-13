@@ -119,7 +119,26 @@ To build the image (make sure you have at least 3 GB free space in /tmp):
 $ sudo ./build-livecd-root
 ```
 
-Copy the resulting tarball to the TFTP boot directory:
+It's also possible to build the image inside of a docker container.  This is
+especially useful if you don't have immediate access to a Fedora or CentOS 7
+system.  You can build the docker container using the Dockerfile in this repo:
+
+```
+docker build -t fdi - < Dockerfile.centos
+```
+
+You then need only to run the final build-livecd-root command inside the docker
+container:
+
+```
+$ docker run --privileged=true -v $PWD:/home -tie /bin/bash fdi
+# cd foreman-discovery-image
+# ./build-livecd-root
+
+```
+
+Regardless of how you built the image (docker or not), the next step is to copy
+the resulting tarball to the TFTP boot directory:
 
 ```
 $ tar xvf fdi-image-*.tar -C /var/lib/tftpboot/boot
