@@ -81,6 +81,10 @@ http://theforeman.org/plugins/foreman_discovery/
 Building
 --------
 
+FDI currently builds only against CentOS 7. There is a
+[tutorial](https://community.theforeman.org/t/building-discovery-image-on-el8/23719)
+on how to build against CentOS 8.
+
 A host with either Fedora or CentOS 7 is required. RHEL 7 cannot be used as
 it is missing core dependency (livecd-tools), but this can be workarounded
 by installing it from CentOS 7 repositories (and two dependencies). Grub2
