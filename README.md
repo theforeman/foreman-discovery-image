@@ -131,7 +131,7 @@ You then need only to run the final build-livecd-root command inside the docker
 container:
 
 ```
-$ docker run --privileged=true -v $PWD:/home -tie /bin/bash fdi
+$ docker run --privileged=true -v $PWD:/home -v /dev:/dev -tie /bin/bash fdi
 # cd foreman-discovery-image
 # ./build-livecd-root
 

@@ -1,9 +1,10 @@
-FROM centos:7
+FROM centos:8
 
-RUN yum install -y pykickstart isomd5sum syslinux grub2-efi shim grub2-efi-x64 grub2-efi-x64-cdboot shim-x64 git libguestfs-tools dd mkisofs isohybrid implantisomd5
+RUN yum install -y pykickstart isomd5sum syslinux grub2-efi shim grub2-efi-x64 grub2-efi-x64-cdboot shim-x64 git libguestfs-tools mkisofs
 RUN rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
-RUN yum install -y https://www.elrepo.org/elrepo-release-7.el7.elrepo.noarch.rpm
-RUN yum install -y livecd-tools
+RUN yum install -y https://www.elrepo.org/elrepo-release-8.el8.elrepo.noarch.rpm
+RUN yum install -y http://mirror.centos.org/centos/8/extras/x86_64/os/Packages/epel-release-8-11.el8.noarch.rpm
+RUN yum install -y livecd-tools wget
 RUN git clone https://github.com/theforeman/foreman-discovery-image.git
-RUN (cd foreman-discovery-image; ./build-livecd fdi-centos7.ks)
+RUN (cd foreman-discovery-image; ./build-livecd fdi-centos8.ks)
 #RUN (cd foreman-discovery-image; ./build-livecd-root)
