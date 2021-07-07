@@ -68,9 +68,6 @@ for log in yum.log dracut.log lastlog yum.log; do
     truncate -c -s 0 /var/log/${log}
 done
 
-echo " * removing /boot, since that lives on the ISO side"
-rm -rf /boot*
-
 echo " * removing trusted CA certificates"
 truncate -s0 /usr/share/pki/ca-trust-source/ca-bundle.trust.crt
 update-ca-trust
