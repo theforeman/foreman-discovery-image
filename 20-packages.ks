@@ -1,4 +1,9 @@
 %packages --excludedocs
+syslinux-nonlinux
+dracut-live
+centos-logos
+memtest86+
+rubygem-facter
 bash
 kernel
 biosdevname
@@ -11,10 +16,7 @@ chkconfig
 rootfiles
 yum
 vim-minimal
-acpid
-tftp
 lldpad
-isomd5sum
 elfutils-libs
 
 # Dracut missing deps (https://bugzilla.redhat.com/show_bug.cgi?id=1285810)
@@ -22,18 +24,15 @@ tar
 gzip
 
 # Facter
-tfm-rubygem-facter
 ethtool
 net-tools
 dmidecode
-bind-utils
 virt-what
 
 # Foreman proxy
 foreman-discovery-image-service
 sudo
 OpenIPMI
-OpenIPMI-tools
 openssl
 
 # Interactive discovery
@@ -44,7 +43,6 @@ kbd
 # Debugging support
 less
 file
-tcpdump
 
 # Only needed because livecd-tools runs /usr/bin/firewall-offline-cmd
 # unconditionally; patch submitted upstream. Remove once released version
@@ -57,7 +55,6 @@ openssh-server
 
 # Starts all interfaces automatically for us
 NetworkManager
-uuid
 
 # Used to update code at runtime
 unzip
@@ -137,8 +134,6 @@ system-storage-manager
 
 # logos and graphics
 -plymouth
--centos-logos
--fedora-logos
 -fedora-release-notes
 
 # other packages
