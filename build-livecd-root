@@ -1,95 +1,10 @@
 #!/bin/bash -x
 
-# the portion of building a livecd that needs to be run as root
-# run this after running build-livecd
-#
-# The temp dir in which things happen is by default deleted when this
-# script ends, unless an error happens or the KEEP_TMPDIR variable is set
-
-function cleanup() {
-    if [ -n "$KEEP_TMPDIR" ]; then
-        echo "Not removing tmpdir $tmpdir"
-    else
-        [ -d $tmpdir ] && rm -rf $tmpdir
-    fi
-}
-
-if [ $(id -u) != 0 ]; then
-  echo "Please run this script as root"
-  exit 1
+rm /var/tmp/lmc-work-* -rf
+if [ ! -e CentOS-8.4.2105-x86_64-dvd1.iso ]; then
+    wget http://ftp.osuosl.org/pub/centos/8.4.2105/isos/x86_64/CentOS-8.4.2105-x86_64-dvd1.iso
 fi
-
-which livecd-creator isohybrid implantisomd5 >/dev/null || ( echo "Command(s) missing, install required tools" && exit 2 )
-
-trap cleanup EXIT
-
-srcdir=$(readlink -f $(dirname $0))
-destdir=${2:-$srcdir}
-tmpdir=$(mktemp -d /tmp/build-fdi-XXXXXX)
-
-cd $srcdir
-last_tag=${1:-$(git describe --abbrev=0 --tags)}
-last_sha=$(git log --pretty=format:'%h' -n 1)
-
-cd $tmpdir
-echo Working in directory $tmpdir
-
-echo "* Running livecd-creator"
-livecd-creator -v --title="Discovery Image" --compression-type=xz --cache /var/cache/build-fdi --config $srcdir/fdi-image.ks -f fdi -t /tmp
-
-if [ $? -ne 0 ]; then
-    KEEP_TMPDIR=yes
-    echo "Error creating livecd"
-    exit 1
-fi
-
-echo "* Remastering ISO with correct kernel options"
-bash -x $srcdir/aux/remaster/discovery-remaster fdi.iso fdi.local fdi-bootable.iso
-
-echo "* Filtering ISO with isohybrid"
-isohybrid --partok --uefi fdi-bootable.iso
-
-echo "* Implanting MD5 sum"
-implantisomd5 --force fdi-bootable.iso
-mv fdi-bootable.iso $destdir/fdi-bootable-${last_tag#release-}.iso
-
-echo "* Converting to initrd"
-bash -x $srcdir/aux/livecd-iso-to-pxeboot $tmpdir/fdi.iso
-
-if [ $? -ne 0 ]; then
-    KEEP_TMPDIR=yes
-    echo "Error converting to initrd"
-    exit 1
-fi
-
-echo "* Building tarball"
-mkdir fdi-image
-mv tftpboot/initrd0.img tftpboot/vmlinuz0 fdi-image || KEEP_TMPDIR=yes
-cd fdi-image
-cat > README <<EOF
-This is Foreman discovery image
-
-To get instructions how to use the image head over to
-
-https://github.com/theforeman/foreman_discovery
-
-Image was built from $last_tag ($last_sha)
-
-To verify the kernel and initrd in this tar, run
-
-  sha256sum -c SHA256SUM
-EOF
-
-sha256sum initrd0.img vmlinuz0 > SHA256SUM
-
-cd ..
-tarball=$destdir/fdi-image-${last_tag#release-}.tar
-chmod 666 fdi-image/*
-tar cf $tarball fdi-image/
-ls -lh $tarball
-chown --reference $srcdir/build-livecd $tarball
-
-echo "* Done"
-echo "The image was built:"
-du -h $tarball
+livemedia-creator --ks fdi-image.ks --make-iso --nomacboot --iso CentOS-8.4.2105-x86_64-dvd1.iso
+cp /var/tmp/lmc-work-*/images/boot.iso .
+du -h boot.iso
 exit 0
