@@ -231,12 +231,12 @@ end
 
 def get_ipv4(interface = 'primary')
   wait = cmdline('fdi.nmwait', 120)
-  `nmcli -w #{wait} -t -f IP4.ADDRESS con show #{interface} 2>/dev/null`..split(":", 2)[1].chomp rescue "N/A"
+  `nmcli -w #{wait} -t -f IP4.ADDRESS con show #{interface} 2>/dev/null`.split(":", 2)[1].chomp rescue "N/A"
 end
 
 def get_ipv6(interface = 'primary')
   wait = cmdline('fdi.nmwait', 120)
-  `nmcli -w #{wait} -t -f IP6.ADDRESS con show #{interface} 2>/dev/null`..split(":", 2)[1].chomp rescue "N/A"
+  `nmcli -w #{wait} -t -f IP6.ADDRESS con show #{interface} 2>/dev/null`.split(":", 2)[1].chomp rescue "N/A"
 end
 
 def detect_ipv4_credentials(interface)
