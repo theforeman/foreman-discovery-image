@@ -33,3 +33,6 @@ openssl req -x509 \
   -rand /dev/urandom \
   -batch \
   -days $DAYS
+
+chown root:foreman-proxy $DIR/key.pem $DIR/cert.pem
+chmod 640 $DIR/key.pem $DIR/cert.pem

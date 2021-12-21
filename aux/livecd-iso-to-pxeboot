@@ -1,7 +1,10 @@
 #!/bin/bash
 # Convert a live CD iso so that it can be booted over the network
 # using PXELINUX.
+#
 # Copyright 2008 Red Hat, Inc.
+#
+# Updated by Lukas Zapletal <lzap+pub@redhat.com>
 # Written by Richard W.M. Jones <rjones@redhat.com>
 # Based on a script by Jeremy Katz <katzj@redhat.com>
 # Based on original work by Chris Lalancette <clalance@redhat.com>

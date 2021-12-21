@@ -4,7 +4,7 @@
 # See: https://community.theforeman.org/t/foreman-discovery-image-3-7/21642
 #
 # To test:
-# $ FACTERLIB=/usr/share/fdi/facts ruby /opt/theforeman/tfm/root/usr/bin/facter
+# $ FACTERLIB=/usr/share/fdi/facts facter
 
 require 'facter'
 

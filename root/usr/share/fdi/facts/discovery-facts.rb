@@ -18,10 +18,10 @@
 # also available at http://www.gnu.org/copyleft/gpl.html.
 
 require 'resolv'
-if File.exist? '/opt/rh/rh-ruby27/root/usr/share/ruby/vendor_ruby/discovery'
-  require '/opt/rh/rh-ruby27/root/usr/share/ruby/vendor_ruby/discovery'
+if File.exist? '/usr/share/ruby/vendor_ruby/discovery'
+  require '/usr/share/ruby/vendor_ruby/discovery'
 else
-  require_relative '../../../../opt/rh/rh-ruby27/root/usr/share/ruby/vendor_ruby/discovery.rb'
+  require_relative '../../../../usr/share/ruby/vendor_ruby/discovery.rb'
 end
 
 def discovery_bootif

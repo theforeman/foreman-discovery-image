@@ -1,10 +1,102 @@
 #!/bin/bash -x
 
-rm /var/tmp/lmc-work-* -rf
-if [ ! -e CentOS-8.4.2105-x86_64-dvd1.iso ]; then
-    wget http://ftp.osuosl.org/pub/centos/8.4.2105/isos/x86_64/CentOS-8.4.2105-x86_64-dvd1.iso
+# Builds in /var/tmp by default, you can override this with FDI_BUILD_DIR.
+# The temp dir in which things happen is by default deleted when this
+# script ends, unless an error happens or the KEEP_TMPDIR variable is set
+
+. $0.conf.sh
+
+function cleanup() {
+	if [ -n "$KEEP_TMPDIR" ]; then
+		echo "Not removing tmpdir $tmpdir"
+	else
+		echo "* Cleaning up tmp dir"
+		[ -d $tmpdir ] && rm -rf $tmpdir
+	fi
+}
+trap cleanup EXIT
+
+if [ $(id -u) != 0 ]; then
+	echo "Please run this script as root"
+	exit 1
 fi
-livemedia-creator --ks fdi-image.ks --make-iso --nomacboot --iso CentOS-8.4.2105-x86_64-dvd1.iso
-cp /var/tmp/lmc-work-*/images/boot.iso .
-du -h boot.iso
+
+which livemedia-creator pykickstart >/dev/null || ( echo "Command(s) missing, install required tools" && exit 2 )
+
+srcdir=$(readlink -f $(dirname $0))
+destdir=${2:-$srcdir}
+kernelcmd=${3:-nomodeset nokaslr}
+tmpdir=$(mktemp -d ${FDI_BUILD_DIR:-/var/tmp}/fdi-XXXXXXXXX)
+
+pushd $srcdir
+last_tag=${1:-$(git describe --abbrev=0 --tags)}
+last_sha=$(git log --pretty=format:'%h' -n 1)
+popd
+
+if [ ! -e install.iso ]; then
+       echo "* Downloading netboot installation ISO"
+       wget -O install.iso https://isoredirect.centos.org/centos/8-stream/isos/x86_64/CentOS-Stream-8-x86_64-latest-boot.iso
+fi
+
+echo "* Building ISO (kernel cmdline: $kernelcmd)"
+# https://bugzilla.redhat.com/show_bug.cgi?id=1955836 - dmsquash-live-ntfs
+# https://bugzilla.redhat.com/show_bug.cgi?id=2034601 - product CentOS Linux workaround
+livemedia-creator --ks fdi-image.ks \
+	--make-iso \
+	--iso install.iso \
+	--nomacboot \
+	--extra-boot-args "$kernelcmd" \
+	--project "FDI" \
+	--releasever "$last_tag/$last_sha" \
+	--anaconda-arg="--product CentOS Linux" \
+	--dracut-arg="--xz" \
+	--dracut-arg="--no-hostonly" \
+	--dracut-arg="--debug" \
+	--dracut-arg="--no-early-microcode" \
+       	--dracut-arg="--omit plymouth" \
+        --dracut-arg="--add livenet dmsquash-live convertfs pollcdrom qemu qemu-net" \
+        --dracut-arg="--add-drivers mptbase mptscsih mptspi hv_storvsc hid_hyperv hv_netvsc hv_vmbus" \
+	--tmp "$tmpdir"
+
+if [ $? -ne 0 ]; then
+	echo "Error creating livecd, use KEEP_TMPDIR to investigate"
+	exit 1
+fi
+
+# Move manually, --resultdir lorax option does not work correctly on CentOS8
+echo "* Moving the ISO to the destination directory"
+DEST_ISO="$destdir/fdi-$last_tag-$last_sha.iso"
+mv -f $tmpdir/lmc-*/images/boot.iso "$DEST_ISO"
+chown --reference $srcdir/build-livecd "$DEST_ISO"
+
+echo "* Converting to initrd"
+aux/livecd-iso-to-pxeboot "$DEST_ISO"
+rm -rf tftpboot/pxelinux.{cfg,0}
+mv tftpboot/initrd.img tftpboot/initrd0.img
+mv tftpboot/vmlinuz tftpboot/vmlinuz0
+chmod 644 tftpboot/*
+chown -R --reference $srcdir/build-livecd "tftpboot"
+mv tftpboot fdi-image
+
+if [ $? -ne 0 ]; then
+	echo "Error building PXE files, use KEEP_TMPDIR to investigate"
+	exit 1
+fi
+
+echo "* Calculating SHA sums"
+pushd fdi-image
+cat > README <<EOF
+Foreman Discovery Image $last_tag ($last_sha)
+To verify the kernel and initrd, run
+	sha256sum -c SHA256SUM
+EOF
+sha256sum initrd0.img vmlinuz0 > SHA256SUM
+popd
+
+echo "* Moving to the destination folder"
+DEST_TAR="$destdir/fdi-image-$last_tag-$last_sha.tar"
+tar cf $DEST_TAR fdi-image/
+chown --reference $srcdir/build-livecd $DEST_TAR
+
+echo "* Done"
 exit 0

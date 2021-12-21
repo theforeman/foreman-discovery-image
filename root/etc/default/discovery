@@ -1,4 +1,4 @@
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/opt/extension/bin
 FACTERLIB=/usr/share/fdi/facts:/opt/extension/facts
 LD_LIBRARY_PATH=/opt/extension/lib
-RUBYLIB=/opt/rh/rh-ruby25/root/usr/share/ruby/vendor_ruby/
+RUBYLIB=/usr/share/ruby/vendor_ruby/

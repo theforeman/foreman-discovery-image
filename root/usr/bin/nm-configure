@@ -1,10 +1,10 @@
 #!/bin/bash
+# vim: ts=2:sw=2:et
 
 source /usr/share/fdi/commonfunc.sh
 exportKCL
 bootif="$(normalizeHwAddr "${BOOTMAC}")"
 mac=${2:-$bootif}
-uuid=$(/usr/bin/uuid)
 timeout=${KCL_FDI_DHCP_TIMEOUT:-300}
 sendhost=${KCL_FDI_DHCP_SENDHOST:-false}
 ipv4_method=${KCL_FDI_IPV4_METHOD:-auto}
@@ -40,12 +40,16 @@ if [[ "$1" == "primary-static" ]]; then
   gw=$4
   dns=$5
   vlanid=${6:-$KCL_FDI_VLAN_PRIMARY}
-  [[ "$vlanid" != "" ]] && ctype="vlan"
+  if [[ "$vlanid" != "" ]]; then
+    ctype="vlan"
+    vlan_section="[vlan]\nid=$vlanid"
+  else
+    vlan_section=""
+  fi
   script=/etc/NetworkManager/system-connections/primary
   cat > $TMP_CFG <<EONS
 [connection]
 id=primary
-uuid=$uuid
 type=$ctype
 autoconnect=true
 autoconnect-priority=1
@@ -57,10 +61,10 @@ address1=$ip
 gateway=$gw
 dns=$dns;
 dhcp-send-hostname=$sendhost
+dhcp-timeout=110
 [ipv6]
 method=ignore
-[vlan]
-id=$vlanid
+$vlan_section
 EONS
   deploy_config $TMP_CFG $script
 elif [[ "$1" == "primary-static6" ]]; then
@@ -68,12 +72,16 @@ elif [[ "$1" == "primary-static6" ]]; then
   gw=$4
   dns=$5
   vlanid=${6:-$KCL_FDI_VLAN_PRIMARY}
-  [[ "$vlanid" != "" ]] && ctype="vlan"
+  if [[ "$vlanid" != "" ]]; then
+    ctype="vlan"
+    vlan_section="[vlan]\nid=$vlanid"
+  else
+    vlan_section=""
+  fi
   script=/etc/NetworkManager/system-connections/primary
   cat > $TMP_CFG <<EONS
 [connection]
 id=primary
-uuid=$uuid
 type=$ctype
 autoconnect=true
 autoconnect-priority=1
@@ -87,18 +95,22 @@ address1=$ip
 gateway=$gw
 dns=$dns;
 dhcp-send-hostname=$sendhost
-[vlan]
-id=$vlanid
+dhcp-timeout=110
+$vlan_section
 EONS
   deploy_config $TMP_CFG $script
 elif [[ "$1" == "primary" ]]; then
   vlanid=${3:-$KCL_FDI_VLAN_PRIMARY}
-  [[ "$vlanid" != "" ]] && ctype="vlan"
+  if [[ "$vlanid" != "" ]]; then
+    ctype="vlan"
+    vlan_section="[vlan]\nid=$vlanid"
+  else
+    vlan_section=""
+  fi
   script=/etc/NetworkManager/system-connections/primary
   cat > $TMP_CFG <<EONS
 [connection]
 id=primary
-uuid=$uuid
 type=$ctype
 autoconnect=true
 autoconnect-priority=1
@@ -110,8 +122,7 @@ dhcp-send-hostname=$sendhost
 dhcp-timeout=$timeout
 [ipv6]
 method=$ipv6_method
-[vlan]
-id=$vlanid
+$vlan_section
 EONS
   deploy_config $TMP_CFG $script
 elif [[ "$1" == "secondary" ]]; then
@@ -121,7 +132,6 @@ elif [[ "$1" == "secondary" ]]; then
   cat > $TMP_CFG <<EONS
 [connection]
 id=$id
-uuid=$uuid
 type=802-3-ethernet
 autoconnect=$autoconnect
 [802-3-ethernet]

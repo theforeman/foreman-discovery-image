@@ -6,22 +6,16 @@ SHELLARGS << (ENV['branch'] || '')
 SHELLARGS << (ENV['proxy_repo'] || '')
 
 Vagrant.configure("2") do |config|
-  config.vm.define "el7", primary: true do |machine|
+  config.vm.define "fdi-builder", primary: true do |machine|
     machine.vm.hostname = "fdi-builder-vm"
     machine.vm.provision :shell, :path => 'build_image.sh', :args => SHELLARGS
 
-    config.vm.provider :libvirt do |lv, cfg|
-      cfg.vm.box = 'centos/7'
-      lv.memory = 4096
-      lv.cpus = 2
-    end
-
-    # WARNING: OpenStack no longer works in our infra. Use libvirt or ./build-release
-    # openstack needs credentials in ~/.vagrant.d/Vagrantfile
-    config.vm.provider :openstack do |os, override|
-      os.server_name = machine.vm.hostname
-      os.flavor = /4GB/
-      os.image = /CentOS 7.*PV/
+    config.vm.provider :libvirt do |domain, cfg|
+      cfg.vm.box = 'centos/stream8'
+      domain.memory = 7990
+      domain.cpus = 2
+      domain.nested = true
+      domain.disk_driver :cache => 'unsafe'
     end
   end
 end

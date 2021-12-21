@@ -1,40 +1,44 @@
 %packages --excludedocs
-syslinux-nonlinux
+# from lorax examples
+@core
+kernel
+kernel-modules
+kernel-modules-extra
+grub2-efi
+grub2
+shim
+syslinux
+dracut-config-generic
+-dracut-config-rescue
+dracut-network
+tar
+isomd5sum
+
+# required by lorax
 dracut-live
+# required by bootloader
 centos-logos
 memtest86+
-rubygem-facter
-bash
-kernel
 biosdevname
-grub2
-grub2-tools
-e2fsprogs
-passwd
-policycoreutils
-chkconfig
-rootfiles
-yum
 vim-minimal
-lldpad
-elfutils-libs
-curl
-
-# Dracut missing deps (https://bugzilla.redhat.com/show_bug.cgi?id=1285810)
-tar
-gzip
 
 # Facter
+rubygem-facter
 ethtool
+lldpad
 net-tools
 dmidecode
 virt-what
 
 # Foreman proxy
 foreman-discovery-image-service
+curl
+wget
+passwd
 sudo
 OpenIPMI
 openssl
+elfutils-libs
 
 # Interactive discovery
 foreman-discovery-image-service-tui
@@ -44,11 +48,6 @@ kbd
 # Debugging support
 less
 file
-
-# Only needed because livecd-tools runs /usr/bin/firewall-offline-cmd
-# unconditionally; patch submitted upstream. Remove once released version
-# with it is available
-firewalld
 
 # SSH access
 openssh-clients
@@ -66,19 +65,19 @@ binutils
 # For UEFI/Secureboot support
 efibootmgr
 grub2-efi
-shim
-# These were renamed and split in EL 7.4+
 grub2-efi-x64
 grub2-efi-x64-cdboot
+shim
 shim-x64
 
-# tools that enable the image installer plugin
+# Useful utilities for users who use FDI for image-based provisioning
+grub2-tools
+e2fsprogs
 parted
 mdadm
 xfsprogs
 e2fsprogs
 bzip2
-system-storage-manager
 
 ######################
 # Packages to Remove #
@@ -143,5 +142,4 @@ system-storage-manager
 -rsyslog
 -authconfig
 -tuned
-
 %end
