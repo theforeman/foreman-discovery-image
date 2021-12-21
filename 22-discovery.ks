@@ -141,13 +141,4 @@ cat > /etc/udev/rules.d/83-enable-promiscuous-mode.rules <<'UDEV'
 ACTION=="add", SUBSYSTEM=="net", NAME!="lo", TAG+="systemd", ENV{SYSTEMD_WANTS}="enable-promiscuous-mode@%k.service"
 UDEV
 
-echo " * inserting missing initramdisk drivers"
-# RPM database is empty, must find out kernel version differently
-kversion=$(ls -t /lib/modules | head -n1)
-echo "   found kernel version $kversion"
-echo "   contents of /boot: "
-ls -1 /boot
-ramfsfile="/boot/initramfs-$kversion.img"
-/sbin/dracut -v --force --add-drivers "mptbase mptscsih mptspi hv_storvsc hid_hyperv hv_netvsc hv_vmbus" $ramfsfile $kversion
-
 %end

@@ -70,8 +70,6 @@ routes are always acquired only from the primary interface and ignored for
 secondary (PEERDNS, PEERROUTES, DEFROUTE). Network cards connected to same
 networks can cause troubles due to ARP filtering.
 
-IPv4 and IPv6 are supported.
-
 Documentation
 -------------
 
@@ -81,64 +79,47 @@ http://theforeman.org/plugins/foreman_discovery/
 Building
 --------
 
-FDI currently builds only against CentOS 7. There is a
-[tutorial](https://community.theforeman.org/t/building-discovery-image-on-el8/23719)
-on how to build against CentOS 8.
-
-A host with either Fedora or CentOS 7 is required. RHEL 7 cannot be used as
-it is missing core dependency (livecd-tools), but this can be workarounded
-by installing it from CentOS 7 repositories (and two dependencies). Grub2
-EFI and Shim packages are only required if the resulting ISO must boot on
-UEFI systems.
+FDI currently builds only against EL 8 and building in a container will NOT
+work (docker/podman). The building host MUST be EL 8, other versions or Red Hat
+compatible systems (e.g Fedora) WILL fail to build.
 
 Install the required packages:
 
 ```
-$ sudo yum install livecd-tools pykickstart isomd5sum syslinux \
-  grub2-efi shim grub2-efi-x64 grub2-efi-x64-cdboot shim-x64
+$ sudo dnf install lorax anaconda pykickstart
 ```
 
-On older versions of Fedora or RHEL 7.0-7.3 shim and grub packages has no
-x64 suffix, the command above will install one of the two.
-
-To prepare CentOS 7 kickstart do:
+To prepare the kickstart do:
 
 ```
-$ ./build-livecd fdi-centos7.ks
+$ ./build-livecd fdi-centos8.ks
 ```
 
-To prepare Fedora 19 kickstart do:
-
-```
-$ ./build-livecd fdi-fedora19.ks
-```
-
-To build the image (make sure you have at least 3 GB free space in /tmp):
+To build the image (this must be done on a EL 8 host):
 
 ```
 $ sudo ./build-livecd-root
 ```
 
-It's also possible to build the image inside of a docker container.  This is
-especially useful if you don't have immediate access to a Fedora or CentOS 7
-system.  You can build the docker container using the Dockerfile in this repo:
+When testing the image for new features or bugfixing, it is useful to enable
+SSH access right away to boot the ISO directly. The first argument is version
+to be recorded, the second is the destination directory and the third are
+kernel command line options.
 
 ```
-docker build -t fdi - < Dockerfile.centos
+$ sudo ./build-livecd-root dev /var/lib/libvirt/images/ "nomodeset nokaslr fdi.ssh=1 fdi.rootpw=redhat"
 ```
 
-You then need only to run the final build-livecd-root command inside the docker
-container:
+Previously, it was possible to build with docker/podman, with lorax image
+builder this is no longer possible.
+
+To extract the kernel and initial RAM disk:
 
 ```
-$ docker run --privileged=true -v $PWD:/home -v /dev:/dev -tie /bin/bash fdi
-# cd foreman-discovery-image
-# ./build-livecd-root
-
+aux/livecd-iso-to-pxeboot fdi-XYZ.iso
 ```
 
-Regardless of how you built the image (docker or not), the next step is to copy
-the resulting tarball to the TFTP boot directory:
+The final step is to copy the resulting tarball to the TFTP boot directory:
 
 ```
 $ tar xvf fdi-image-*.tar -C /var/lib/tftpboot/boot
@@ -146,17 +127,6 @@ $ tar xvf fdi-image-*.tar -C /var/lib/tftpboot/boot
 
 And visit https://github.com/theforeman/foreman_discovery for more
 information about how to configure Foreman and how to use the plugin.
-
-The image is built in /tmp directory because in most modern distributions
-this is mapped to memory. This is intentional, so make sure you have enough
-RAM or you can experience some swapping. Alternatively, change the temp
-directory in the scripts.
-
-It is possible to modify SYSLINUX kernel command line by changing
-livecd-creator code in /usr/lib/python2.7/site-packages/imgcreate/live.py
-file. This workarounds missing input options for additional kernel command
-line elements and can be used for testing the ISO with special kernel
-command line options multiple times.
 
 Building a release
 ------------------
@@ -174,20 +144,19 @@ the result to our downloads.theforeman.org site.
 It is possible to start the job locally in libvirt:
 
 		cd aux/vagrant-build
-		distro=f24
-		LC_ALL=C repoowner=theforeman branch=master proxy_repo=1.18 vagrant up $distro
+		LC_ALL=C repoowner=theforeman branch=master proxy_repo=3.1 vagrant up fdi-builder
 
 Wait until the box starts up and builds the image, then connect to the box
 and download the image:
 
-		vagrant ssh-config $distro | tee vagrant-ssh-config.tmp
+		vagrant ssh-config fdi-builder | tee vagrant-ssh-config.tmp
 		mkdir tmp
-		scp -F vagrant-ssh-config.tmp $distro:foreman-discovery-image/fdi*tar tmp/
-		scp -F vagrant-ssh-config.tmp $distro:foreman-discovery-image/fdi-bootable*iso tmp/
+		scp -F vagrant-ssh-config.tmp fdi-builder:foreman-discovery-image/fdi*tar tmp/
+		scp -F vagrant-ssh-config.tmp fdi-builder:foreman-discovery-image/fdi*iso tmp/
 
 And finally (do not forget):
 
-		LC_ALL=C repoowner=theforeman branch=master proxy_repo=1.18 vagrant destroy $distro
+		LC_ALL=C repoowner=theforeman branch=master proxy_repo=3.1 vagrant destroy fdi-builder
 
 Extensions
 ----------
@@ -293,8 +262,7 @@ koji spin-livecd \
 Then extract the kernel and initial RAM disk:
 
 ```
-mv fdi-image-rhel_7_0-1.9.90-20141022.1.iso fdi.iso
-livecd-iso-to-pxeboot fdi.iso
+aux/livecd-iso-to-pxeboot fdi-XYZ.iso
 ```
 
 Contributing

@@ -1,0 +1,40 @@
+--- /usr/lib64/python3.6/site-packages/pyanaconda/modules/subscription/subscription.py	2021-12-20 13:03:13.033110377 +0000
++++ /usr/lib64/python3.6/site-packages/pyanaconda/modules/subscription/subscription.py.orig	2021-12-20 12:46:39.151815326 +0000
+@@ -522,23 +522,20 @@
+ 
+         :returns: list of installation tasks
+         """
+-        try:
+-            return [
+-                RestoreRHSMDefaultsTask(
+-	            rhsm_config_proxy=self.rhsm_observer.get_proxy(RHSM_CONFIG)
+-                ),
+-                TransferSubscriptionTokensTask(
+-	            sysroot=conf.target.system_root,
+-	            transfer_subscription_tokens=self.subscription_attached
+-                ),
+-                ConnectToInsightsTask(
+-	            sysroot=conf.target.system_root,
+-	            subscription_attached=self.subscription_attached,
+-	            connect_to_insights=self.connect_to_insights
+-                )
+-            ]
+-        except:
+-            return []
++        return [
++            RestoreRHSMDefaultsTask(
++                rhsm_config_proxy=self.rhsm_observer.get_proxy(RHSM_CONFIG)
++            ),
++            TransferSubscriptionTokensTask(
++                sysroot=conf.target.system_root,
++                transfer_subscription_tokens=self.subscription_attached
++            ),
++            ConnectToInsightsTask(
++                sysroot=conf.target.system_root,
++                subscription_attached=self.subscription_attached,
++                connect_to_insights=self.connect_to_insights
++            )
++        ]
+ 
+     # RHSM DBus API access
+ 
