@@ -56,6 +56,10 @@ livemedia-creator --ks fdi-image.ks \
        	--dracut-arg="--omit plymouth" \
         --dracut-arg="--add livenet dmsquash-live convertfs pollcdrom qemu qemu-net" \
         --dracut-arg="--add-drivers mptbase mptscsih mptspi hv_storvsc hid_hyperv hv_netvsc hv_vmbus" \
+	--compression xz \
+	--compress-arg="-b 1M" \
+	--compress-arg="-Xdict-size 1M" \
+	--compress-arg="-no-recovery" \
 	--tmp "$tmpdir"
 
 if [ $? -ne 0 ]; then
