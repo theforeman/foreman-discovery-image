@@ -35,7 +35,7 @@ popd
 
 if [ ! -e install.iso ]; then
        echo "* Downloading netboot installation ISO"
-       wget -O install.iso https://isoredirect.centos.org/centos/8-stream/isos/x86_64/CentOS-Stream-8-x86_64-latest-boot.iso
+       wget -O install.iso http://isoredirect.centos.org/centos/8-stream/isos/x86_64/CentOS-Stream-8-x86_64-latest-boot.iso
 fi
 
 echo "* Building ISO (kernel cmdline: $kernelcmd)"
