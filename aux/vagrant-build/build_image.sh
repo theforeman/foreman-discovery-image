@@ -9,18 +9,23 @@ NAME=foreman-discovery-image
 echo "Short sleep to allow things to settle down"
 sleep 10
 ping -c1 8.8.8.8 2>&1 >/dev/null && echo NET OK || echo NET FAILURE
+sudo setenforce 0
 
-sudo dnf -y install lorax qemu-kvm anaconda pykickstart git wget
+# There are several options with lorax. Recommended is building from ISO in
+# qemu, this requires nested virtualization and it is extremely slow on CI.
+# Building in mock did not work at all, therefore building directly on the host
+# VM is the approach.
 
-# some versions of lorax might require SELinux turned off
-#SELINUXMODE=$(getenforce)
-#sudo setenforce 1
+sudo dnf -y install pykickstart git wget lorax anaconda patch
 
 [ -d $NAME ] || git clone https://github.com/$repoowner/$NAME.git -b $branch
 pushd $NAME
 git pull
 
-./build-livecd fdi-centos8.ks $proxy_repo && sudo ./build-livecd-root
-ls -lah
+# required only for CentOS 8 Stream (RHEL works fine)
+sudo patch -p1 -d / < anaconda-rhsm-BZ2034601.patch
 
-#sudo setenforce $SELINUXMODE
+./build-livecd fdi-centos8.ks $proxy_repo && sudo ./build-livecd-root
+
+find .
+popd
