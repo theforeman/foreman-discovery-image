@@ -28,7 +28,7 @@ fi
 which livemedia-creator ksflatten >/dev/null || ( echo "Command(s) missing, install required tools" && exit 2 )
 
 srcdir=$(readlink -f $(dirname $0))
-destdir=${2:-$srcdir}
+destdir=${2:-$srcdir}/result
 kernelcmd=${3:-nomodeset nokaslr}
 tmpdir=$(mktemp -d ${FDI_BUILD_DIR:-/var/tmp}/fdi-XXXXXXXXX)
 
@@ -59,10 +59,12 @@ livemedia-creator --ks fdi-image.ks \
 
 if [ $? -ne 0 ]; then
 	echo "Error creating livecd, use KEEP_TMPDIR to investigate"
+	tail -n 2000 *log
 	exit 1
 fi
 
 # Move manually, --resultdir lorax option does not work correctly on CentOS8
+mkdir -p "$destdir"
 echo "* Moving the ISO to the destination directory"
 DEST_ISO="$destdir/fdi-$last_tag-$last_sha.iso"
 mv -f $tmpdir/lmc-*/images/boot.iso "$DEST_ISO"

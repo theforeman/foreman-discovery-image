@@ -144,7 +144,7 @@ the result to our downloads.theforeman.org site.
 It is possible to start the job locally in libvirt:
 
 		cd aux/vagrant-build
-		LC_ALL=C repoowner=theforeman branch=master proxy_repo=3.1 vagrant up fdi-builder
+		vagrant --repo-owner=theforeman --branch=master --proxy-repo=3.1 up fdi-builder
 
 Wait until the box starts up and builds the image, then connect to the box
 and download the image:
@@ -156,7 +156,7 @@ and download the image:
 
 And finally (do not forget):
 
-		LC_ALL=C repoowner=theforeman branch=master proxy_repo=3.1 vagrant destroy fdi-builder
+		vagrant destroy fdi-builder
 
 Extensions
 ----------
