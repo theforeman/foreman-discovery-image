@@ -1,14 +1,33 @@
 # vim: sw=2:ts=2:et:ft=ruby
 
-SHELLARGS = []
-SHELLARGS << (ENV['repoowner'] || '')
-SHELLARGS << (ENV['branch'] || '')
-SHELLARGS << (ENV['proxy_repo'] || '')
+require 'getoptlong'
+opts = GetoptLong.new(
+  [ '--repo-owner', GetoptLong::OPTIONAL_ARGUMENT ],
+  [ '--branch', GetoptLong::OPTIONAL_ARGUMENT ],
+  [ '--proxy-repo', GetoptLong::OPTIONAL_ARGUMENT ]
+)
+
+repo_owner=''
+branch=''
+proxy_repo=''
+
+opts.ordering=(GetoptLong::REQUIRE_ORDER)   ### this line.
+opts.each do |opt, arg|
+  case opt
+    when '--repo-owner'
+      repo_owner = arg
+    when '--branch'
+      branch = arg
+    when '--proxy-repo'
+      proxy_repo = arg
+  end
+end
 
 Vagrant.configure("2") do |config|
   config.vm.define "fdi-builder", primary: true do |machine|
     machine.vm.hostname = "fdi-builder-vm"
-    machine.vm.provision :shell, :path => 'build_image.sh', :args => SHELLARGS
+    machine.vm.provision :shell, :path => 'build_image.sh',
+      :args => [repo_owner, branch, proxy_repo]
 
     config.vm.provider :libvirt do |domain, cfg|
       cfg.vm.box = 'centos/stream8'
