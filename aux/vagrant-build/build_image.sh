@@ -4,6 +4,7 @@ set -x
 export repoowner=${1:-theforeman}
 export branch=${2:-master}
 export proxy_repo=${3:-nightly}
+KERNEL_CMDLINE="nomodeset nokaslr"
 NAME=foreman-discovery-image
 
 echo "Short sleep to allow things to settle down"
@@ -25,7 +26,7 @@ git pull
 # required only for CentOS 8 Stream (RHEL works fine)
 sudo patch -p1 -d / < anaconda-rhsm-BZ2034601.patch
 
-./build-livecd fdi-centos8.ks $proxy_repo && sudo ./build-livecd-root
+./build-livecd fdi-centos8.ks $proxy_repo && sudo ./build-livecd-root . ./result "$KERNEL_CMDLINE" novirt
 
 find .
 popd

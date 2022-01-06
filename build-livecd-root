@@ -1,8 +1,4 @@
 #!/bin/bash -x
-
-# STOP RIGHT HERE! Use this script only on a clean CentOS 8 Stream VM,
-# livemedia-creator in --no-virt mode can crash the host system. For more
-# info see livemedia-creator(1).
 #
 # Builds in /var/tmp by default, you can override this with FDI_BUILD_DIR.
 # The temp dir in which things happen is by default deleted when this
@@ -25,11 +21,12 @@ if [ $(id -u) != 0 ]; then
 	exit 1
 fi
 
-which livemedia-creator ksflatten >/dev/null || ( echo "Command(s) missing, install required tools" && exit 2 )
+which livemedia-creator ksflatten wget >/dev/null || ( echo "Command(s) missing, install required tools" && exit 2 )
 
 srcdir=$(readlink -f $(dirname $0))
 destdir=${2:-$srcdir}/result
 kernelcmd=${3:-nomodeset nokaslr}
+buildytype=${4:-virt}
 tmpdir=$(mktemp -d ${FDI_BUILD_DIR:-/var/tmp}/fdi-XXXXXXXXX)
 
 pushd $srcdir
@@ -37,12 +34,24 @@ last_tag=${1:-$(git describe --abbrev=0 --tags)}
 last_sha=$(git log --pretty=format:'%h' -n 1)
 popd
 
+if [[ "$buildytype" = virt ]]; then
+	echo "* Using virt mode, make sure virtualization is enabled"
+	BUILD_OPTS="--iso install.iso"
+	if [ ! -e install.iso ]; then
+		echo "* Downloading netboot installation ISO"
+		wget --quiet -O install.iso http://mirror.centos.org/centos/8-stream/BaseOS/x86_64/os/images/boot.iso
+	fi
+else
+	echo "* Using non-virt mode, make sure the host system is CentOS 8 Stream"
+	echo "  (This mode can destroy the host system, only use dedicated VMs!)"
+	BUILD_OPTS="--no-virt"
+fi
+
 echo "* Building ISO (kernel cmdline: $kernelcmd)"
 # https://bugzilla.redhat.com/show_bug.cgi?id=1955836 - dmsquash-live-ntfs
 # https://bugzilla.redhat.com/show_bug.cgi?id=2034601 - product CentOS Linux workaround
-livemedia-creator --ks fdi-image.ks \
+livemedia-creator $BUILD_OPTS --ks fdi-image.ks \
 	--make-iso \
-	--no-virt \
 	--nomacboot \
 	--extra-boot-args "$kernelcmd" \
 	--project "FDI" \
