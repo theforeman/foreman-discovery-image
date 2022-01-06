@@ -1,5 +1,11 @@
 %post
 
+echo " * ensure hostname resolves quickly"
+cat >/etc/hosts <<EOF
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4 fdi
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6 fdi
+EOF
+
 echo " * ensure /etc/os-release is present (needed for RHEL 7.0)"
 touch /etc/os-release
 
