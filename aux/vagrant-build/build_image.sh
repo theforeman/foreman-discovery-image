@@ -26,7 +26,9 @@ git pull
 # required only for CentOS 8 Stream (RHEL works fine)
 sudo patch -p1 -d / < anaconda-rhsm-BZ2034601.patch
 
-./build-livecd fdi-centos8.ks $proxy_repo && sudo ./build-livecd-root . ./result "$KERNEL_CMDLINE" novirt
+version=$(git describe --abbrev=0 --tags)
+
+./build-livecd fdi-centos8.ks $proxy_repo && sudo ./build-livecd-root "$version" ./result "$KERNEL_CMDLINE" novirt
 
 find .
 popd

@@ -24,7 +24,7 @@ fi
 which livemedia-creator ksflatten wget >/dev/null || ( echo "Command(s) missing, install required tools" && exit 2 )
 
 srcdir=$(readlink -f $(dirname $0))
-destdir=${2:-$srcdir}/result
+destdir=${2:-$srcdir}
 kernelcmd=${3:-nomodeset nokaslr}
 buildytype=${4:-virt}
 tmpdir=$(mktemp -d ${FDI_BUILD_DIR:-/var/tmp}/fdi-XXXXXXXXX)

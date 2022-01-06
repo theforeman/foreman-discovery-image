@@ -98,13 +98,13 @@ $ ./build-livecd fdi-centos8.ks
 To build the image (this must be done on a EL 8 host):
 
 ```
-$ sudo ./build-livecd-root [.] [./result] [virt]
+$ sudo ./build-livecd-root 1.2.3 [./result] [virt]
 ```
 
-The first parameter is the source directory (where KS file is), the second is
-the target directory and the third argument can be either virt or nonvirt. Do
-not build images via the nonvirt flag as this can possibly destroy the host
-system - this is intended for building inside a clean VM (see below).
+The first parameter is the version of the image, the second is the target
+directory and the third argument can be either virt or nonvirt. Do not build
+images via the nonvirt flag as this can possibly destroy the host system - this
+is intended for building inside a clean VM (see below).
 
 When testing the image for new features or bugfixing, it is useful to enable
 SSH access right away to boot the ISO directly. The first argument is version
