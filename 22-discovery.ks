@@ -126,7 +126,8 @@ chmod +s /usr/bin/ipmitool
 # Add foreman-proxy user to sudo and disable interactive tty for reboot
 echo " * setting up sudo"
 sed -i -e 's/^Defaults.*requiretty/Defaults !requiretty/g' /etc/sudoers
-echo "foreman-proxy ALL=NOPASSWD: /sbin/shutdown" >> /etc/sudoers
+echo "foreman-proxy ALL=NOPASSWD: /usr/sbin/reboot" >> /etc/sudoers
+echo "foreman-proxy ALL=NOPASSWD: /usr/sbin/shutdown" >> /etc/sudoers
 echo "foreman-proxy ALL=NOPASSWD: /usr/sbin/kexec" >> /etc/sudoers
 
 echo " * dropping some friendly aliases"
