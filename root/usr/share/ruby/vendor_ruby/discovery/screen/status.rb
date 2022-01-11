@@ -62,7 +62,7 @@ def screen_status status = generate_info, active_button = 0
   elsif answer == b_syslog
     [:screen_status, command("discovery-debug")]
   elsif answer == b_reboot
-    [:screen_status, command("shutdown -r now Reboot from TUI")]
+    [:screen_status, command("reboot -f")]
   elsif answer == b_ssh
     :screen_ssh
   elsif answer == b_resend
