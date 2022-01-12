@@ -29,10 +29,9 @@ rm -rf /lib/modules/*/kernel/drivers/gpu/drm \
 
 echo " * remove unused drivers (sound, media, nls, fs, wifi)"
 rm -rf /lib/modules/*/kernel/sound \
-  /lib/modules/*/kernel/drivers/{media,hwmon,watchdog,rtc,input/joystick,bluetooth,edac} \
+  /lib/modules/*/kernel/drivers/{media,hwmon,rtc,input/joystick,bluetooth,edac} \
   /lib/modules/*/kernel/net/{atm,bluetooth,sched,sctp,rds,l2tp,decnet} \
-  /lib/modules/*/kernel/fs/{nls,ocfs2,ceph,nfsd,ubifs,nilfs2} \
-  /lib/modules/*/kernel/arch/x86/kvm
+  /lib/modules/*/kernel/fs/{nls,ocfs2,ceph,nfsd,ubifs,nilfs2}
 
 echo " * remove unused firmware (sound, wifi)"
 rm -rf /usr/lib/firmware/*wifi* \
