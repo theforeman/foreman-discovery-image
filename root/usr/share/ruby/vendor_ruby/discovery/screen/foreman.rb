@@ -11,9 +11,9 @@ def screen_foreman mac = nil, gw = nil, proxy_url = cmdline('proxy.url'), proxy_
   b_ok = Newt::Button.new(34, 15, _("Next"))
   b_cancel = Newt::Button.new(46, 15, _("Cancel"))
   proxy_type ||= 'foreman'
-  t_url.set(proxy_url, 1) if proxy_url
-  r_server.set(proxy_type != 'proxy' ? '*' : ' ')
-  r_proxy.set(proxy_type == 'proxy' ? '*' : ' ')
+  t_url.set_text(proxy_url) if proxy_url
+  r_server.set_current if proxy_type != 'proxy'
+  r_proxy.set_current if proxy_type == 'proxy'
   items = [t_desc, l_type, l_url, t_url, r_server, r_proxy]
   if proxy_url
     f.add(b_ok, b_cancel, *items)
@@ -23,7 +23,7 @@ def screen_foreman mac = nil, gw = nil, proxy_url = cmdline('proxy.url'), proxy_
   answer = f.run
   if answer == b_ok
     begin
-      proxy_type = r_server.get == '*' ? 'foreman' : 'proxy'
+      proxy_type = r_server.get_current == r_server ? 'foreman' : 'proxy'
       url = t_url.get
       raise _("No URL was provided") if url.size < 1
       proxy_url = URI.parse(url)
