@@ -133,6 +133,20 @@ $ tar xvf fdi-image-*.tar -C /var/lib/tftpboot/boot
 And visit https://github.com/theforeman/foreman_discovery for more
 information about how to configure Foreman and how to use the plugin.
 
+Adding drivers/firmware
+-----------------------
+
+Additional kernel drivers and firmware, including 3rd party software, can be added by editing the `build-livecd-root` script and modifying `--dracut-arg` arguments to list dracut modules with `--add-drivers`. A pseudo-example (this is not a working configuration):
+
+```
+--dracut-arg="--add-drivers mlx4_core mlx4_ib mlx4_en mlxfw" \
+--dracut-arg="--install /sbin/mlnx_bf_configure" \
+```
+
+Some more complex drivers will need additional configuration files or system services to be added. The same driver and userspace utility packages need to be added into `20-packages.ks` file section `%packages`. A yum repository must be added so yum/dnf can find 3rd party drivers.
+
+To build the image, follow the instructions above.
+
 Building a release
 ------------------
 
