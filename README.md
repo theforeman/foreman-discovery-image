@@ -86,7 +86,7 @@ compatible systems (e.g Fedora) WILL fail to build.
 Install the required packages:
 
 ```
-$ sudo dnf install lorax anaconda pykickstart
+$ sudo dnf install lorax anaconda pykickstart wget qemu-kvm
 ```
 
 To prepare the kickstart do:
