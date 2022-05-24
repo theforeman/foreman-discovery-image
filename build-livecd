@@ -47,4 +47,30 @@ ksflatten -v RHEL8 -c "$1" -o $KS_TARGET
 sed "s|yum.theforeman.org/nightly|yum.theforeman.org/releases/$FOREMAN_VERSION|" -i $KS_TARGET
 sed "s|yum.theforeman.org/plugins/nightly|yum.theforeman.org/plugins/$FOREMAN_VERSION|" -i $KS_TARGET
 
+
+# set variables based on distro
+case $1 in
+	*rocky8*)
+                DISTRO_INSTALL_NAME="Rocky Linux 8"
+                DISTRO_INSTALL_ISO_URL="https://download.rockylinux.org/pub/rocky/8/isos/x86_64/Rocky-8.5-x86_64-boot.iso"
+		;;
+	*alma8*)
+                DISTRO_INSTALL_NAME="Alama Linux 8"
+                DISTRO_INSTALL_ISO_URL="https://repo.almalinux.org/almalinux/8/isos/x86_64/AlmaLinux-8.6-x86_64-boot.iso"
+		;;
+	*)
+                DISTRO_INSTALL_NAME="Centos 8 Stream"
+                DISTRO_INSTALL_ISO_URL="http://mirror.centos.org/centos/8-stream/BaseOS/x86_64/os/images/boot.iso"
+		;;
+esac
+if [ -f build-livecd-root.conf.sh ]; then
+	mv build-livecd-root.conf.sh build-livecd-root.conf.sh.PREV
+fi
+cat <<EOF > build-livecd-root.conf.sh
+#
+DISTRO_INSTALL_NAME="${DISTRO_INSTALL_NAME}"
+DISTRO_INSTALL_ISO_URL="${DISTRO_INSTALL_ISO_URL}"
+EOF
+
+
 echo "Now run as root ./build-livecd-root or submit $KS_TARGET into koji"

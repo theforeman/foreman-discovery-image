@@ -23,6 +23,22 @@ fi
 
 which livemedia-creator ksflatten wget >/dev/null || ( echo "Command(s) missing, install required tools" && exit 2 )
 
+# Use custom setings from config file
+if [ -z ${DISTRO_INSTALL_ISO_URL} ]; then
+	DISTRO_INSTALL_ISO_URL="http://mirror.centos.org/centos/8-stream/BaseOS/x86_64/os/images/boot.iso"
+fi
+
+if [ -z ${DISTRO_INSTALL_NAME} ]; then
+	DISTRO_INSTALL_NAME="Centos 8 Stream"
+fi
+
+if [ -n ${CUSTOM_LORAX_DIR} ]; then
+	LORAX_TEMPLATES="--lorax-templates ${CUSTOM_LORAX_DIR}"
+else
+	LORAX_TEMPLATES=""
+fi
+
+
 srcdir=$(readlink -f $(dirname $0))
 destdir=${2:-$srcdir}
 kernelcmd=${3:-nomodeset nokaslr}
@@ -39,24 +55,23 @@ if [[ "$buildytype" = virt ]]; then
 	BUILD_OPTS="--iso install.iso"
 	if [ ! -e install.iso ]; then
 		echo "* Downloading netboot installation ISO"
-		wget --quiet -O install.iso http://mirror.centos.org/centos/8-stream/BaseOS/x86_64/os/images/boot.iso
+		wget --quiet -O install.iso ${DISTRO_INSTALL_ISO_URL}
 	fi
 else
-	echo "* Using non-virt mode, make sure the host system is CentOS 8 Stream"
+	echo "* Using non-virt mode, make sure the host system is ${DISTRO_INSTALL_NAME}"
 	echo "  (This mode can destroy the host system, only use dedicated VMs!)"
 	BUILD_OPTS="--no-virt"
 fi
 
 echo "* Building ISO (kernel cmdline: $kernelcmd)"
-# https://bugzilla.redhat.com/show_bug.cgi?id=1955836 - dmsquash-live-ntfs
-# https://bugzilla.redhat.com/show_bug.cgi?id=2034601 - product CentOS Linux workaround
+
 livemedia-creator $BUILD_OPTS --ks fdi-image.ks \
 	--make-iso \
 	--nomacboot \
 	--extra-boot-args "$kernelcmd" \
 	--project "FDI" \
 	--releasever "$last_tag/$last_sha" \
-	--anaconda-arg="--product CentOS Linux" \
+	--anaconda-arg="--product ${DISTRO_INSTALL_NAME}" \
 	--dracut-arg="--xz" \
 	--dracut-arg="--no-hostonly" \
 	--dracut-arg="--debug" \
@@ -64,7 +79,9 @@ livemedia-creator $BUILD_OPTS --ks fdi-image.ks \
        	--dracut-arg="--omit plymouth" \
         --dracut-arg="--add livenet dmsquash-live convertfs pollcdrom qemu qemu-net" \
         --dracut-arg="--add-drivers mptbase mptscsih mptspi hv_storvsc hid_hyperv hv_netvsc hv_vmbus" \
-	--tmp "$tmpdir"
+        --ram 2048 \
+        --vcpus 2 \
+	--tmp "$tmpdir" ${LORAX_TEMPLATES}
 
 if [ $? -ne 0 ]; then
 	echo "Error creating livecd, use KEEP_TMPDIR to investigate"

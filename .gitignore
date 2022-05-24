@@ -17,3 +17,4 @@
 /00-repos-rhel*.ks
 /fdi-rhel*.ks
 /build-livecd-root.conf.sh
+/install.iso

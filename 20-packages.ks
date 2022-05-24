@@ -17,7 +17,6 @@ isomd5sum
 # required by lorax
 dracut-live
 # required by bootloader
-centos-logos
 memtest86+
 biosdevname
 vim-minimal
