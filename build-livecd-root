@@ -32,10 +32,10 @@ if [ -z ${DISTRO_INSTALL_NAME} ]; then
 	DISTRO_INSTALL_NAME="Centos 8 Stream"
 fi
 
-if [ -n ${CUSTOM_LORAX_DIR} ]; then
-	LORAX_TEMPLATES="--lorax-templates ${CUSTOM_LORAX_DIR}"
-else
+if [ -z ${CUSTOM_LORAX_DIR} ]; then
 	LORAX_TEMPLATES=""
+else
+	LORAX_TEMPLATES="--lorax-templates ${CUSTOM_LORAX_DIR}"
 fi
 
 
