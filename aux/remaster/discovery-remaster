@@ -74,24 +74,24 @@ set gfxpayload=text
 set timeout=3
 search --no-floppy --set=root -l 'fdi'
 menuentry 'Discovery' --class fedora --class gnu-linux --class gnu --class os {
-  linuxefi /isolinux/vmlinuz0 root=live:LABEL=fdi rootfstype=auto ro rd.live.image acpi=force rd.luks=0 rd.md=0 rd.dm=0 nomodeset nokaslr $2
-  initrdefi /isolinux/initrd0.img
+  linuxefi /images/pxeboot/vmlinuz root=live:LABEL=fdi rootfstype=auto ro rd.live.image acpi=force rd.luks=0 rd.md=0 rd.dm=0 nomodeset nokaslr $2
+  initrdefi /images/pxeboot/initrd.img
 }
 menuentry 'Check media' --class fedora --class gnu-linux --class gnu --class os {
-  linuxefi /isolinux/vmlinuz0 root=live:LABEL=fdi rootfstype=auto ro rd.live.image rd.live.check acpi=force nomodeset nokaslr $2
-  initrdefi /isolinux/initrd0.img
+  linuxefi /images/pxeboot/vmlinuz root=live:LABEL=fdi rootfstype=auto ro rd.live.image rd.live.check acpi=force nomodeset nokaslr $2
+  initrdefi /images/pxeboot/initrd.img
 }
 EOGR
 
 TMP_NEW_MNT=$(mktemp -d)
-mount -o loop $TMP_NEW/isolinux/efiboot.img $TMP_NEW_MNT
+mount -o loop $TMP_NEW/images/efiboot.img $TMP_NEW_MNT
 cp $TMP_NEW/EFI/BOOT/grub.cfg $TMP_NEW_MNT/EFI/BOOT/grub.cfg
 umount $TMP_NEW_MNT
 rmdir $TMP_NEW_MNT
 
 echo "Building new ISO image..."
-if [ -f "$TMP_NEW/isolinux/efiboot.img" ]; then
-  EFI_OPTS="-eltorito-alt-boot -e isolinux/efiboot.img -no-emul-boot"
+if [ -f "$TMP_NEW/images/efiboot.img" ]; then
+  EFI_OPTS="-eltorito-alt-boot -e images/efiboot.img -no-emul-boot"
   EXTRA_MSG="(BIOS/EFI compatible)"
 else
   EFI_OPTS=""
