@@ -1,11 +1,17 @@
 #!/bin/bash
 
+# lorax-based build (EL8+)
+EFIBOOTPATH=images/efiboot.img
+
+# livecd-creator build (EL7)
+#EFIBOOTPATH=isolinux/efiboot.img
+
 if [ -z "$2" ]; then
   echo "Usage: $0 fdi-bootable-x.y.z.iso 'proxy.url=https://192.168.9.1:443 proxy.type=foreman fdi.xyz=abc...' [output.iso]"
   exit 2
 fi
 
-REQ_CMDS="guestmount dd mkisofs isohybrid implantisomd5"
+REQ_CMDS="guestmount dd mkisofs isohybrid implantisomd5 mcopy"
 if ! which $REQ_CMDS >/dev/null; then
   echo "Install required tools: $REQ_CMDS"
   exit 3
@@ -23,11 +29,16 @@ TIMESTAMP=$(date +%y%m%d_%H%M%S)
 OUT_ISO=${1/.iso/-$TIMESTAMP}.iso
 [ ! -z "$3" ] && OUT_ISO=$3
 
-echo "Copying contents to destination directory..."
+echo "Copying contents to temporary directory..."
 export LIBGUESTFS_BACKEND=direct
 guestfish --ro -a "$1" -m /dev/sda copy-out / $TMP_NEW
 chmod +w -R $TMP_NEW
 find $TMP_NEW -name TRANS.TBL -exec rm -f {} \;
+echo "Making hardlinks so inodes can be cached to save space..."
+pushd $TMP_NEW
+ln -f isolinux/initrd.img images/pxeboot/initrd.img
+ln -f isolinux/vmlinuz images/pxeboot/vmlinuz
+popd
 
 echo "Configuring bootloaders..."
 cat >$TMP_NEW/isolinux/isolinux.cfg <<EOIS
@@ -74,24 +85,21 @@ set gfxpayload=text
 set timeout=3
 search --no-floppy --set=root -l 'fdi'
 menuentry 'Discovery' --class fedora --class gnu-linux --class gnu --class os {
-  linuxefi /isolinux/vmlinuz0 root=live:LABEL=fdi rootfstype=auto ro rd.live.image acpi=force rd.luks=0 rd.md=0 rd.dm=0 nomodeset nokaslr $2
-  initrdefi /isolinux/initrd0.img
+  linuxefi /images/pxeboot/vmlinuz/vmlinuz0 root=live:LABEL=fdi rootfstype=auto ro rd.live.image acpi=force rd.luks=0 rd.md=0 rd.dm=0 nomodeset nokaslr $2
+  initrdefi /images/pxeboot/vmlinuz/initrd0.img
 }
 menuentry 'Check media' --class fedora --class gnu-linux --class gnu --class os {
-  linuxefi /isolinux/vmlinuz0 root=live:LABEL=fdi rootfstype=auto ro rd.live.image rd.live.check acpi=force nomodeset nokaslr $2
-  initrdefi /isolinux/initrd0.img
+  linuxefi /images/pxeboot/vmlinuz/vmlinuz0 root=live:LABEL=fdi rootfstype=auto ro rd.live.image rd.live.check acpi=force nomodeset nokaslr $2
+  initrdefi /images/pxeboot/vmlinuz/initrd0.img
 }
 EOGR
 
-TMP_NEW_MNT=$(mktemp -d)
-mount -o loop $TMP_NEW/isolinux/efiboot.img $TMP_NEW_MNT
-cp $TMP_NEW/EFI/BOOT/grub.cfg $TMP_NEW_MNT/EFI/BOOT/grub.cfg
-umount $TMP_NEW_MNT
-rmdir $TMP_NEW_MNT
+echo "Copy grub config to the ESP image..."
+mcopy -mnoi $TMP_NEW/$EFIBOOTPATH $TMP_NEW/EFI/BOOT/grub.cfg ::EFI/BOOT/grub.cfg
 
 echo "Building new ISO image..."
-if [ -f "$TMP_NEW/isolinux/efiboot.img" ]; then
-  EFI_OPTS="-eltorito-alt-boot -e isolinux/efiboot.img -no-emul-boot"
+if [ -f "$TMP_NEW/$EFIBOOTPATH" ]; then
+  EFI_OPTS="-eltorito-alt-boot -e $EFIBOOTPATH -no-emul-boot"
   EXTRA_MSG="(BIOS/EFI compatible)"
 else
   EFI_OPTS=""
@@ -99,7 +107,7 @@ else
 fi
 mkisofs -quiet -U -A "fdi" -V "fdi" -volset "fdi" -J -joliet-long -r -v -T \
   -o $OUT_ISO -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 \
-  -input-charset utf-8 -boot-info-table $EFI_OPTS $TMP_NEW
+  -cache-inodes -input-charset utf-8 -boot-info-table $EFI_OPTS $TMP_NEW
 isohybrid --partok --uefi $OUT_ISO
 implantisomd5 $OUT_ISO
 echo "Created: $OUT_ISO $EXTRA_MSG"
