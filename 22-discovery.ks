@@ -30,6 +30,12 @@ UDEV
 echo " * configuring TFTP firewall modules"
 echo -e "ip_conntrack_tftp\nnf_conntrack_netbios_ns" > /etc/modules-load.d/tftp-firewall.conf
 
+# https://blog.thewatertower.org/2019/05/01/tftp-part-2-the-tftp-client-requires-a-firewalld-as-well/
+firewall-offline-cmd --new-policy hostTftpTraffic
+firewall-offline-cmd --policy hostTftpTraffic --add-ingress-zone HOST
+firewall-offline-cmd --policy hostTftpTraffic --add-egress-zone ANY
+firewall-offline-cmd --policy hostTftpTraffic --add-service tftp
+
 echo " * enabling NetworkManager system services (needed for RHEL 7.0)"
 systemctl enable NetworkManager.service
 systemctl enable NetworkManager-dispatcher.service
