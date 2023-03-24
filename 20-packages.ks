@@ -37,6 +37,7 @@ wget
 passwd
 sudo
 OpenIPMI
+ipmitool
 openssl
 elfutils-libs
 
