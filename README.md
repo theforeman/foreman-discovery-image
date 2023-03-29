@@ -60,6 +60,36 @@ You can also use the image standalone (without TFTP under Foreman's
 control). In this case, edit your pxelinux.cfg/default file directly and
 make sure the foreman.url points correctly.
 
+There are several bug reports with PXE-boot when GRUB2 tries to load initrd. By
+default the initrd in the tarball contains the rootfs and becomes bigger and
+bigger over time and from version to version.
+
+A workaround is to separate loading of initrd and rootfs. The initrd is loaded
+by GRUB2, the rootfs by the Linux system. For this, the ISO (containing the
+rootfs) must be provided via web server:
+
+```
+wget https://downloads.theforeman.org/discovery/releases/X.X/fdi-X.X.X-*.iso -O /tmp/fdi.iso
+mount /tmp/fdi.iso /mnt/
+mkdir /var/lib/tftpboot/boot/fdi-image-slim
+cp /mnt/isolinux/{vmlinuz,initrd.img} /var/lib/tftpboot/boot/fdi-image-slim/
+umount /mnt
+mkdir /var/www/html/pub/fdi-image-slim
+mv /tmp/fdi.iso /var/www/html/pub/fdi-image-slim
+```
+
+Integrate it via templates (e.g. `pxegrub2_discovery` snippet) in the Foreman
+application.
+
+```
+common_slim="rootflags=loop root=live:http://YOURPROXY/pub/fdi-image-slim/fdi.iso rootfstype=auto ro rd.live.image acpi=force rd.luks=0 rd.md=0 rd.dm=0 rd.lvm=0 rd.bootif=0 rd.neednet=0 nokaslr nomodeset proxy.url=https://YOURPROXY proxy.type=proxy BOOTIF=01-$net_default_mac ip=dhcp"
+
+menuentry 'Foreman Discovery Image EFI Slim' --id discovery {
+  linuxefi boot/fdi-image-slim/vmlinuz ${common_slim}
+  initrdefi boot/fdi-image-slim/initrd.img
+}
+```
+
 Networking
 ----------
 
