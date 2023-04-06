@@ -154,6 +154,9 @@ cat > /etc/udev/rules.d/83-enable-promiscuous-mode.rules <<'UDEV'
 ACTION=="add", SUBSYSTEM=="net", NAME!="lo", TAG+="systemd", ENV{SYSTEMD_WANTS}="enable-promiscuous-mode@%k.service"
 UDEV
 
+echo " * disable flushing log data"
+rm /usr/lib/systemd/system/sysinit.target.wants/systemd-journal-flush.service
+
 # extra modules for livecd-creator/livemedia-creator
 echo 'add_drivers+="mptbase mptscsih mptspi hv_storvsc hid_hyperv hv_netvsc hv_vmbus"' > /etc/dracut.conf.d/99-discovery.conf
 
