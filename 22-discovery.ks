@@ -30,6 +30,12 @@ UDEV
 echo " * configuring TFTP firewall modules"
 echo -e "ip_conntrack_tftp\nnf_conntrack_netbios_ns" > /etc/modules-load.d/tftp-firewall.conf
 
+# https://blog.thewatertower.org/2019/05/01/tftp-part-2-the-tftp-client-requires-a-firewalld-as-well/
+firewall-offline-cmd --new-policy hostTftpTraffic
+firewall-offline-cmd --policy hostTftpTraffic --add-ingress-zone HOST
+firewall-offline-cmd --policy hostTftpTraffic --add-egress-zone ANY
+firewall-offline-cmd --policy hostTftpTraffic --add-service tftp
+
 echo " * enabling NetworkManager system services (needed for RHEL 7.0)"
 systemctl enable NetworkManager.service
 systemctl enable NetworkManager-dispatcher.service
@@ -147,6 +153,9 @@ echo " * enable promiscuous mode on all physical network interfaces"
 cat > /etc/udev/rules.d/83-enable-promiscuous-mode.rules <<'UDEV'
 ACTION=="add", SUBSYSTEM=="net", NAME!="lo", TAG+="systemd", ENV{SYSTEMD_WANTS}="enable-promiscuous-mode@%k.service"
 UDEV
+
+echo " * disable flushing log data"
+systemctl mask systemd-journal-flush.service
 
 # extra modules for livecd-creator/livemedia-creator
 echo 'add_drivers+="mptbase mptscsih mptspi hv_storvsc hid_hyperv hv_netvsc hv_vmbus"' > /etc/dracut.conf.d/99-discovery.conf
