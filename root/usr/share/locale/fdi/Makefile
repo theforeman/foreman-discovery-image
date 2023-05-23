@@ -62,4 +62,4 @@ extract:
 		--msgid-bugs-address=foreman-dev@googlegroups.com \
 		--copyright-holder="Foreman developers" \
 		--copyright-year=$(shell date +%Y) \
-		$(shell find ../../../../usr/lib64/ruby/vendor_ruby -type f -name \*.rb -o -name \*.erb)
+		$(shell find ../../ruby/vendor_ruby -type f -name \*.rb -o -name \*.erb)
