@@ -1,15 +1,15 @@
 # SOME DESCRIPTIVE TITLE.
-# Copyright (C) 2018 Foreman developers
+# Copyright (C) 2023 Foreman developers
 # This file is distributed under the same license as the foreman-discovery-image package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2018.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: foreman-discovery-image 3.4.4\n"
+"Project-Id-Version: foreman-discovery-image 4.1.0\n"
 "Report-Msgid-Bugs-To: foreman-dev@googlegroups.com\n"
-"POT-Creation-Date: 2018-03-13 09:11+0100\n"
-"PO-Revision-Date: 2018-03-13 09:11+0100\n"
+"POT-Creation-Date: 2023-05-23 14:01+0200\n"
+"PO-Revision-Date: 2023-05-23 14:01+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -17,6 +17,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+msgid "Address:"
+msgstr ""
 
 msgid "Cancel"
 msgstr ""
@@ -39,6 +42,9 @@ msgstr ""
 msgid "Custom facts"
 msgstr ""
 
+msgid "DNS:"
+msgstr ""
+
 msgid "Disable"
 msgstr ""
 
@@ -48,7 +54,13 @@ msgstr ""
 msgid "Discovery"
 msgstr ""
 
+msgid "Discovery server"
+msgstr ""
+
 msgid "Discovery status"
+msgstr ""
+
+msgid "Endpoint type"
 msgstr ""
 
 msgid "Enter root password to unlock the account and enable SSH service:"
@@ -69,19 +81,19 @@ msgstr ""
 msgid "Foreman Proxy"
 msgstr ""
 
-msgid "IPv4 Address:"
-msgstr ""
-
-msgid "IPv4 DNS:"
-msgstr ""
-
-msgid "IPv4 Gateway:"
+msgid "Gateway:"
 msgstr ""
 
 msgid "Invalid IP"
 msgstr ""
 
 msgid "Invalid URL"
+msgstr ""
+
+msgid "Kernel command line"
+msgstr ""
+
+msgid "Latest server response"
 msgstr ""
 
 msgid "Logs"
@@ -132,13 +144,22 @@ msgstr ""
 msgid "Press any key"
 msgstr ""
 
+msgid "Primary IPv4"
+msgstr ""
+
+msgid "Primary IPv6"
+msgstr ""
+
+msgid "Primary NIC"
+msgstr ""
+
 msgid "Primary interface"
 msgstr ""
 
 msgid "Provide full URL (http(s)://host:PORT) to the Server or Foreman Proxy according to the type selected. Ports are usually 443, 8443, 8448 or 9090 according to configuration."
 msgstr ""
 
-msgid "Provide network configuration for the selected primary interface. Use CIDR netmask notation (e.g. 192.168.1.1/24) for the IP address."
+msgid "Provide network configuration for the selected primary interface. Use CIDR netmask notation (e.g. 192.168.1.1/24) for the IPv4 or IPv6 address."
 msgstr ""
 
 msgid "Provide valid CIDR ipaddress with a netmask, gateway and one DNS server"
