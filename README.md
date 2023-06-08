@@ -317,10 +317,10 @@ aux/livecd-iso-to-pxeboot fdi-XYZ.iso
 Contributing
 ------------
 
-Please follow our (generic contributing guidelines for
-Foreman)[http://theforeman.org/contribute.html#SubmitPatches]. Make sure
-you create (an
-issue)[http://projects.theforeman.org/projects/discovery/issues/new] and
+Please follow our [generic contributing guidelines for
+Foreman](http://theforeman.org/contribute.html#SubmitPatches). Make sure
+you create [an
+issue](http://projects.theforeman.org/projects/discovery/issues/new) and
 select "Image" Category.
 
 vim:tw=75
