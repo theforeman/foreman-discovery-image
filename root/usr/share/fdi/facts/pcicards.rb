@@ -35,11 +35,14 @@ all_devices = {}
 current_element = {}
 lspci_output.each_line do |line|
     line.chomp!
+    # Newline triggers evaluation of values read earlier
     if line == '' then
+        # Only store PCI devices that report a physical PCI slot
         if current_element.has_key?('physlot') then
             all_devices[current_element['physlot']] = current_element['device']
         end
 
+        # Clear values, process next PCI device
         current_element = {}
         next
     end
@@ -50,11 +53,9 @@ lspci_output.each_line do |line|
     current_element[key] = value
 end
 
-# Convert to facts:
+# Convert stored data to facts:
 all_devices.each do |slot, model|
   Facter.add("pci_device_#{slot}") do
-    setcode do
-        model.chomp
-    end # setcode
-  end # Facter
-end # all_devices
+    setcode { model.chomp }
+  end
+end
