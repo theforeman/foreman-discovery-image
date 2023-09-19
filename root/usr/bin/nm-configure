@@ -42,7 +42,7 @@ if [[ "$1" == "primary-static" ]]; then
   vlanid=${6:-$KCL_FDI_VLAN_PRIMARY}
   if [[ "$vlanid" != "" ]]; then
     ctype="vlan"
-    vlan_section="[vlan]\nid=$vlanid"
+    vlan_section="[vlan]"$'\n'"id=$vlanid"
   else
     vlan_section=""
   fi
@@ -74,7 +74,7 @@ elif [[ "$1" == "primary-static6" ]]; then
   vlanid=${6:-$KCL_FDI_VLAN_PRIMARY}
   if [[ "$vlanid" != "" ]]; then
     ctype="vlan"
-    vlan_section="[vlan]\nid=$vlanid"
+    vlan_section="[vlan]"$'\n'"id=$vlanid"
   else
     vlan_section=""
   fi
@@ -103,7 +103,7 @@ elif [[ "$1" == "primary" ]]; then
   vlanid=${3:-$KCL_FDI_VLAN_PRIMARY}
   if [[ "$vlanid" != "" ]]; then
     ctype="vlan"
-    vlan_section="[vlan]\nid=$vlanid"
+    vlan_section="[vlan]"$'\n'"id=$vlanid"
   else
     vlan_section=""
   fi
