@@ -79,6 +79,7 @@ mdadm
 xfsprogs
 e2fsprogs
 bzip2
+tcpdump
 
 ######################
 # Packages to Remove #
