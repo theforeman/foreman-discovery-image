@@ -34,9 +34,11 @@ rm -rf /lib/modules/*/kernel/sound \
   /lib/modules/*/kernel/fs/{nls,ocfs2,ceph,nfsd,ubifs,nilfs2}
 
 echo " * remove unused firmware (sound, wifi)"
-rm /usr/lib/firmware/v4l* \
+rm -rf /usr/lib/firmware/*wifi* \
+  /usr/lib/firmware/v4l* \
   /usr/lib/firmware/dvb* \
-  /usr/lib/firmware/{yamaha,korg,liquidio,emu,dsp56k,emi26}
+  /usr/lib/firmware/{yamaha,korg,liquidio,emu,dsp56k,emi26} \
+  /usr/lib/firmware/{ath9k,ath10k}
 
 echo " * dropping big and compressing small cracklib dict"
 mv -f /usr/share/cracklib/cracklib_small.hwm /usr/share/cracklib/pw_dict.hwm
