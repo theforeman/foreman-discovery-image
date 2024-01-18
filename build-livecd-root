@@ -39,7 +39,7 @@ if [[ "$buildytype" = virt ]]; then
 	BUILD_OPTS="--iso install.iso"
 	if [ ! -e install.iso ]; then
 		echo "* Downloading netboot installation ISO"
-		wget --quiet -O install.iso http://mirror.centos.org/centos/8-stream/BaseOS/x86_64/os/images/boot.iso
+		wget -O install.iso http://mirror.centos.org/centos/8-stream/BaseOS/x86_64/os/images/boot.iso
 	fi
 else
 	echo "* Using non-virt mode, make sure the host system is CentOS 8 Stream"
