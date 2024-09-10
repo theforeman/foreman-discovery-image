@@ -53,7 +53,7 @@ def screen_primary_iface dhcp = false
   end
   answer = f.run()
   if answer == b_select
-    primary_mac = lb_ifaces.get_current_as_string
+    primary_mac = lb_ifaces.get_current
     vlan_id = t_vlan.get
     if dhcp
       action = Proc.new { configure_network false, primary_mac, nil, nil, nil, vlan_id }

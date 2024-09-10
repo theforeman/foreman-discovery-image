@@ -122,10 +122,10 @@ $ sudo dnf install lorax anaconda pykickstart wget qemu-kvm
 To prepare the kickstart do:
 
 ```
-$ ./build-livecd fdi-centos8.ks
+$ ./ickstart fdi-centos9.ks
 ```
 
-To build the image (this must be done on a EL 8 host):
+To build the image (this must be done on a EL 9 host):
 
 ```
 $ sudo ./build-livecd-root 1.2.3 [./result] [virt]
@@ -292,7 +292,7 @@ initial script and provide empty base kickstart without any repositories
 (they will be added via koji:
 
 ```
-$ ./build-livecd fdi-empty.ks
+$ ./build-kickstart fdi-empty.ks
 ```
 Then simply build the image from kickstart called fdi-image.ks:
 

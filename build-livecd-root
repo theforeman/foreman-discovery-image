@@ -23,6 +23,9 @@ fi
 
 which livemedia-creator ksflatten wget >/dev/null || ( echo "Command(s) missing, install required tools" && exit 2 )
 
+echo "* Doing cleanup"
+rm -rf fdi-image/tftpboot result/*
+
 srcdir=$(readlink -f $(dirname $0))
 destdir=${2:-$srcdir}
 kernelcmd=${3:-nomodeset nokaslr}
@@ -39,10 +42,10 @@ if [[ "$buildytype" = virt ]]; then
 	BUILD_OPTS="--iso install.iso"
 	if [ ! -e install.iso ]; then
 		echo "* Downloading netboot installation ISO"
-		wget -O install.iso http://mirror.centos.org/centos/8-stream/BaseOS/x86_64/os/images/boot.iso
+		wget -O install.iso https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/images/boot.iso
 	fi
 else
-	echo "* Using non-virt mode, make sure the host system is CentOS 8 Stream"
+	echo "* Using non-virt mode, make sure the host system is CentOS 9 Stream"
 	echo "  (This mode can destroy the host system, only use dedicated VMs!)"
 	BUILD_OPTS="--no-virt"
 fi
@@ -61,9 +64,9 @@ livemedia-creator $BUILD_OPTS --ks fdi-image.ks \
 	--dracut-arg="--no-hostonly" \
 	--dracut-arg="--debug" \
 	--dracut-arg="--no-early-microcode" \
-       	--dracut-arg="--omit plymouth" \
-        --dracut-arg="--add livenet dmsquash-live convertfs pollcdrom qemu qemu-net" \
-        --dracut-arg="--add-drivers mptbase mptscsih mptspi hv_storvsc hid_hyperv hv_netvsc hv_vmbus" \
+	--dracut-arg="--omit plymouth" \
+	--dracut-arg="--add livenet dmsquash-live convertfs pollcdrom qemu qemu-net" \
+	--dracut-arg="--add-drivers mptbase mptscsih mptspi hv_storvsc hid_hyperv hv_netvsc hv_vmbus" \
 	--tmp "$tmpdir"
 
 if [ $? -ne 0 ]; then
@@ -77,15 +80,17 @@ mkdir -p "$destdir"
 echo "* Moving the ISO to the destination directory"
 DEST_ISO="$destdir/fdi-$last_tag-$last_sha.iso"
 mv -f $tmpdir/lmc-*/images/boot.iso "$DEST_ISO"
-chown --reference $srcdir/build-livecd "$DEST_ISO"
+chown --reference $srcdir/build-kickstart "$DEST_ISO"
 
 echo "* Converting to initrd"
+echo $DEST_ISO
+
 aux/livecd-iso-to-pxeboot "$DEST_ISO"
 rm -rf tftpboot/pxelinux.{cfg,0}
 mv tftpboot/initrd.img tftpboot/initrd0.img
 mv tftpboot/vmlinuz tftpboot/vmlinuz0
 chmod 644 tftpboot/*
-chown -R --reference $srcdir/build-livecd "tftpboot"
+chown -R --reference $srcdir/build-kickstart "tftpboot"
 mv tftpboot fdi-image
 
 if [ $? -ne 0 ]; then
@@ -106,7 +111,7 @@ popd
 echo "* Moving to the destination folder"
 DEST_TAR="$destdir/fdi-image-$last_tag-$last_sha.tar"
 tar cf $DEST_TAR fdi-image/
-chown --reference $srcdir/build-livecd $DEST_TAR
+chown --reference $srcdir/build-kickstart $DEST_TAR
 
 echo "* Done"
 exit 0

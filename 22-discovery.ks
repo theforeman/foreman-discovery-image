@@ -1,5 +1,9 @@
 %post
 
+# Workaround until https://github.com/theforeman/foreman-packaging/pull/11221
+gem install newt --no-document
+gem install fast_gettext --no-document
+
 echo " * ensure hostname resolves quickly"
 cat >/etc/hosts <<EOF
 127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4 fdi
