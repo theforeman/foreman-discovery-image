@@ -14,6 +14,13 @@ dracut-network
 tar
 isomd5sum
 
+postgresql
+# Workaround until https://github.com/theforeman/foreman-packaging/pull/11221
+ruby
+ruby-devel
+rubygems-devel
+newt-devel
+
 # required by lorax
 dracut-live
 # required by bootloader
@@ -31,7 +38,8 @@ dmidecode
 virt-what
 
 # Foreman proxy
-foreman-discovery-image-service
+# Workaround until https://github.com/theforeman/foreman-packaging/pull/11221
+# foreman-discovery-image-service
 curl
 wget
 passwd
@@ -42,7 +50,8 @@ openssl
 elfutils-libs
 
 # Interactive discovery
-foreman-discovery-image-service-tui
+# Workaround until https://github.com/theforeman/foreman-packaging/pull/11221
+# foreman-discovery-image-service-tui
 kexec-tools
 kbd
 
@@ -89,59 +98,4 @@ tcpdump
 #
 # https://github.com/weldr/lorax/blob/rhel7-branch/share/runtime-cleanup.tmpl
 
-# Red Hat Enteprise Linux subscription tool
--subscription-manager
-
-# Generic and wireless tools and firmware
--prelink
--setserial
--ed
--authconfig
--wireless-tools
--iwl7260-firmware
--iwl3160-firmware
--iwl6000g2b-firmware
--iwl6000g2a-firmware
--iwl5000-firmware
--iwl6050-firmware
--iwl2030-firmware
--iwl135-firmware
--iwl2000-firmware
--iwl105-firmware
--iwl1000-firmware
--iwl6000-firmware
--iwl100-firmware
--iwl5150-firmware
--iwl4965-firmware
--iwl3945-firmware
--liquidio-firmware
--netronome-firmware
-
-# Remove the kbd bits
--kbd
--usermode
-
-# file system stuff
--dmraid
--lvm2
-
-# sound and video
--alsa-lib
--alsa-firmware
--alsa-tools-firmware
--ivtv-firmware
-
-# selinux toolchain of policycoreutils, libsemanage (libselinux is needed tho)
--selinux-policy*
-
-# logos and graphics
--plymouth
--fedora-release-notes
-
-# other packages
--postfix
--audit
--rsyslog
--authconfig
--tuned
 %end
