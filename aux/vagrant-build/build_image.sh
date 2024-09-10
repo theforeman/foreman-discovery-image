@@ -28,7 +28,7 @@ sudo patch -p1 -d / < anaconda-rhsm-BZ2034601.patch
 
 version=$(git describe --abbrev=0 --tags)
 
-./build-livecd fdi-centos8.ks $proxy_repo && sudo ./build-livecd-root "$version" . "$KERNEL_CMDLINE" novirt
+./build-kickstart fdi-centos8.ks $proxy_repo && sudo ./build-livecd-root "$version" . "$KERNEL_CMDLINE" novirt
 
 find .
 popd

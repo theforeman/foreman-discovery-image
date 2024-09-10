@@ -1,4 +1,4 @@
-%packages --excludedocs
+%packages --excludedocs --inst-langs en_US.utf8
 # from lorax examples
 @core
 kernel
@@ -11,6 +11,7 @@ syslinux
 dracut-config-generic
 -dracut-config-rescue
 dracut-network
+dracut-squash
 tar
 isomd5sum
 
@@ -87,61 +88,52 @@ tcpdump
 #
 # Some ideas from:
 #
-# https://github.com/weldr/lorax/blob/rhel7-branch/share/runtime-cleanup.tmpl
+# https://github.com/weldr/lorax/blob/rhel9-branch/share/templates.d/99-generic/runtime-cleanup.tmpl
 
-# Red Hat Enteprise Linux subscription tool
--subscription-manager
+-geoclue2
 
-# Generic and wireless tools and firmware
--prelink
--setserial
--ed
--authconfig
--wireless-tools
--iwl7260-firmware
--iwl3160-firmware
--iwl6000g2b-firmware
--iwl6000g2a-firmware
--iwl5000-firmware
--iwl6050-firmware
--iwl2030-firmware
--iwl135-firmware
--iwl2000-firmware
--iwl105-firmware
--iwl1000-firmware
--iwl6000-firmware
--iwl100-firmware
--iwl5150-firmware
--iwl4965-firmware
--iwl3945-firmware
--liquidio-firmware
--netronome-firmware
+# Audio
+-opus
+-libtheora
+-libvisual
+-flac-libs
+-gsm
+-avahi-glib
+-avahi-libs
+-ModemManager-glib
+-flac
+-gstreamer-tools
+-libsndfile
+-pulseaudio*
+-sound-theme-freedesktop
+-speech-dispatcher
 
-# Remove the kbd bits
--kbd
+-checkpolicy
+-selinux* # remove all selinux packages
 -usermode
+-usermode-gtk
+-pinentry
 
-# file system stuff
--dmraid
--lvm2
+## no storage device monitoring
+-device-mapper-event
+-dmraid-events
+-sgpio
+-notification-daemon
+-logrotate
 
-# sound and video
--alsa-lib
--alsa-firmware
--alsa-tools-firmware
--ivtv-firmware
-
-# selinux toolchain of policycoreutils, libsemanage (libselinux is needed tho)
--selinux-policy*
-
-# logos and graphics
--plymouth
--fedora-release-notes
-
-# other packages
--postfix
--audit
--rsyslog
--authconfig
--tuned
+# various other things we remove to save space
+-db4-utils
+-jasper-libs
+-libXxf86misc
+-libhbaapi
+-libhbalinux
+-libtiff
+-mailx
+-makebootfat
+-mobile-broadband-provider-info
+-rmt
+-system-config-firewall-base
+-xorg-x11-font-utils
+-xorg-x11-server-common
+-firewalld
 %end
