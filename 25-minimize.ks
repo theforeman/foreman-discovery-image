@@ -4,6 +4,7 @@
 # Some ideas from:
 #
 # https://github.com/weldr/lorax/blob/rhel7-branch/share/runtime-cleanup.tmpl
+# https://github.com/weldr/lorax/blob/rhel9-branch/share/templates.d/99-generic/runtime-cleanup.tmpl
 #
 %post
 
@@ -46,8 +47,8 @@ mv -f /usr/share/cracklib/cracklib_small.pwd /usr/share/cracklib/pw_dict.pwd
 mv -f /usr/share/cracklib/cracklib_small.pwi /usr/share/cracklib/pw_dict.pwi
 gzip -9 /usr/share/cracklib/pw_dict.pwd
 
-# 100MB of locale archive is kind unnecessary; we only do en_US.utf8
-# this will clear out everything we don't need; 100MB => 2.1MB.
+# After using --inst-langs option in Kickstart this saves 10MB in the end.
+# Not great, not terrible.
 echo " * minimizing locale-archive binary / memory size"
 localedef --list-archive | grep -Eiv '(en_US|fdi)' | xargs localedef -v --delete-from-archive
 mv /usr/lib/locale/locale-archive /usr/lib/locale/locale-archive.tmpl
@@ -81,8 +82,8 @@ echo " * store list of packages sorted by size"
 rpm -qa --queryformat '%{SIZE} %{NAME} %{VERSION}%{RELEASE}\n' | sort -n -r > /usr/PACKAGES-LIST
 
 echo " * cleaning up yum cache and removing rpm database"
-yum clean all
-rm -rf /var/lib/{yum,rpm}/*
+dnf autoremove -y
+dnf clean all
 
 # no more python loading after this step
 echo " * removing python precompiled *.pyc files"

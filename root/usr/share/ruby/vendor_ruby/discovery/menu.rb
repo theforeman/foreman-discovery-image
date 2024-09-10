@@ -14,6 +14,8 @@ def fdi_release file = 'RELEASE'
 end
 
 def enable_root_account(pass)
+  command("sed -i 's/^.*PermitRootLogin.*$/PermitRootLogin yes/' '/etc/ssh/sshd_config'", false, false)
+  command("sed -i 's/^.*PasswordAuthentication.*$/PasswordAuthentication yes/' '/etc/ssh/sshd_config'", false, false)
   command("echo 'root:#{pass}' | chpasswd && systemctl restart sshd.service", false, false)
 end
 
