@@ -65,9 +65,7 @@ if [ -z "$ISO" -o ! -e "$ISO" ]; then
 fi
 
 if [ -d tftpboot ]; then
-    echo "Subdirectory tftpboot exists already.  I won't overwrite it."
-    echo "Delete the subdirectory before running."
-    exit 1
+    rm -rf tftpboot
 fi
 
 # Mount the ISO.

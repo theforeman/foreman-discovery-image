@@ -23,6 +23,9 @@ fi
 
 which livemedia-creator ksflatten wget >/dev/null || ( echo "Command(s) missing, install required tools" && exit 2 )
 
+echo "* Doing cleanup"
+rm -rf fdi-image/tftpboot result/*
+
 srcdir=$(readlink -f $(dirname $0))
 destdir=${2:-$srcdir}
 kernelcmd=${3:-nomodeset nokaslr}
@@ -77,7 +80,7 @@ mkdir -p "$destdir"
 echo "* Moving the ISO to the destination directory"
 DEST_ISO="$destdir/fdi-$last_tag-$last_sha.iso"
 mv -f $tmpdir/lmc-*/images/boot.iso "$DEST_ISO"
-chown --reference $srcdir/build-livecd "$DEST_ISO"
+chown --reference $srcdir/build-kickstart "$DEST_ISO"
 
 echo "* Converting to initrd"
 echo $DEST_ISO
@@ -87,7 +90,7 @@ rm -rf tftpboot/pxelinux.{cfg,0}
 mv tftpboot/initrd.img tftpboot/initrd0.img
 mv tftpboot/vmlinuz tftpboot/vmlinuz0
 chmod 644 tftpboot/*
-chown -R --reference $srcdir/build-livecd "tftpboot"
+chown -R --reference $srcdir/build-kickstart "tftpboot"
 mv tftpboot fdi-image
 
 if [ $? -ne 0 ]; then
@@ -108,7 +111,7 @@ popd
 echo "* Moving to the destination folder"
 DEST_TAR="$destdir/fdi-image-$last_tag-$last_sha.tar"
 tar cf $DEST_TAR fdi-image/
-chown --reference $srcdir/build-livecd $DEST_TAR
+chown --reference $srcdir/build-kickstart $DEST_TAR
 
 echo "* Done"
 exit 0

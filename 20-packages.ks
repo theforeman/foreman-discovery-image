@@ -1,4 +1,4 @@
-%packages --excludedocs
+%packages --excludedocs --inst-langs en_US.utf8
 # from lorax examples
 @core
 kernel
@@ -11,15 +11,11 @@ syslinux
 dracut-config-generic
 -dracut-config-rescue
 dracut-network
+dracut-squash
 tar
 isomd5sum
 
 postgresql
-# Workaround until https://github.com/theforeman/foreman-packaging/pull/11221
-ruby
-ruby-devel
-rubygems-devel
-newt-devel
 
 # required by lorax
 dracut-live
@@ -38,8 +34,7 @@ dmidecode
 virt-what
 
 # Foreman proxy
-# Workaround until https://github.com/theforeman/foreman-packaging/pull/11221
-# foreman-discovery-image-service
+foreman-discovery-image-service
 curl
 wget
 passwd
@@ -50,8 +45,7 @@ openssl
 elfutils-libs
 
 # Interactive discovery
-# Workaround until https://github.com/theforeman/foreman-packaging/pull/11221
-# foreman-discovery-image-service-tui
+foreman-discovery-image-service-tui
 kexec-tools
 kbd
 
@@ -96,6 +90,53 @@ tcpdump
 #
 # Some ideas from:
 #
-# https://github.com/weldr/lorax/blob/rhel7-branch/share/runtime-cleanup.tmpl
+# https://github.com/weldr/lorax/blob/rhel9-branch/share/templates.d/99-generic/runtime-cleanup.tmpl
 
+-geoclue2
+
+# Audio
+-opus
+-libtheora
+-libvisual
+-flac-libs
+-gsm
+-avahi-glib
+-avahi-libs
+-ModemManager-glib
+-flac
+-gstreamer-tools
+-libsndfile
+-pulseaudio*
+-sound-theme-freedesktop
+-speech-dispatcher
+
+-checkpolicy
+-selinux* # remove all selinux packages
+-fedora-release-rawhide
+-usermode
+-usermode-gtk
+-pinentry
+
+## no storage device monitoring
+-device-mapper-event
+-dmraid-events
+-sgpio
+-notification-daemon
+-logrotate
+
+# various other things we remove to save space
+-db4-utils
+-jasper-libs
+-libXxf86misc
+-libhbaapi
+-libhbalinux
+-libtiff
+-mailx
+-makebootfat
+-mobile-broadband-provider-info
+-rmt
+-system-config-firewall-base
+-xorg-x11-font-utils
+-xorg-x11-server-common
+-firewalld
 %end
