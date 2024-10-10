@@ -7,6 +7,7 @@
 /*.log
 /tftpboot
 /fdi-image
+/anaconda
 /build-local
 /root/opt/extension/autostart.d/*
 /root/opt/extension/facts/*
@@ -17,3 +18,4 @@
 /00-repos-rhel*.ks
 /fdi-rhel*.ks
 /build-livecd-root.conf.sh
+/result/*

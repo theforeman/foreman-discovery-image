@@ -65,26 +65,26 @@ if [ -z "$ISO" -o ! -e "$ISO" ]; then
 fi
 
 if [ -d tftpboot ]; then
-    echo "Subdirectory tftpboot exists already.  I won't overwrite it."
-    echo "Delete the subdirectory before running."
-    exit 1
+    rm -rf tftpboot
 fi
 
 # Mount the ISO.
 CDMNT=$(mktemp -d /var/tmp/pxeboot-mount.XXXXXX)
 STRIPPEDISO=$(mktemp -d /var/tmp/pxeboot-stripped.XXXXXX)
-mount -o loop "$ISO" $CDMNT || cleanup_error
+
+echo "Mounting $ISO on $STRIPPEDISO"
+mount -wr -o loop "$ISO" $CDMNT || cleanup_error
 
 trap cleanup_error SIGINT SIGTERM
 trap cleanup EXIT
 
 # Does it look like an ISO?
-if [[ ( ! -d $CDMNT/isolinux ) || ( ! -f $CDMNT/isolinux/initrd0.img && ! -f $CDMNT/isolinux/initrd.img  ) ]]; then
+if [[ ( ! -d $CDMNT/images/pxeboot ) || ( ! -f $CDMNT/images/pxeboot/initrd0.img && ! -f $CDMNT/images/pxeboot/initrd.img  ) ]]; then
     echo "The ISO image doesn't look like a LiveCD ISO image to me."
     cleanup_error
 fi
 
-if [[ -f $CDMNT/isolinux/initrd0.img ]]; then
+if [[ -f $CDMNT/images/pxeboot/initrd0.img ]]; then
     INITRD=initrd0.img
     VMLINUZ=vmlinuz0
 else
@@ -103,10 +103,10 @@ mkisofs --quiet -J -joliet-long -r -T -o $NEWISO --root LiveOS $CDMNT/LiveOS/squ
 ISOBASENAME=`basename "$NEWISO"`
 ( cd "$STRIPPEDISO" && echo "$ISOBASENAME" | cpio -H newc --quiet -L -o ) |
   gzip -9 |
-  cat $CDMNT/isolinux/$INITRD - > tftpboot/$INITRD
+  cat $CDMNT/images/pxeboot/$INITRD - > tftpboot/$INITRD
 
 # Kernel image.
-cp $CDMNT/isolinux/$VMLINUZ tftpboot/$VMLINUZ
+cp $CDMNT/images/pxeboot/$VMLINUZ tftpboot/$VMLINUZ
 
 # pxelinux bootloader.
 if [ -f /usr/share/syslinux/pxelinux.0 ]; then
@@ -118,8 +118,8 @@ else
 fi
 
 # Get boot append line from original cd image.
-if [ -f $CDMNT/isolinux/isolinux.cfg ]; then
-    APPEND=$(grep -m1 append $CDMNT/isolinux/isolinux.cfg | sed -e "s#CDLABEL=[^ ]*#/$ISOBASENAME#" -e "s/ *append *//")
+if [ -f $CDMNT/images/pxeboot/isolinux.cfg ]; then
+    APPEND=$(grep -m1 append $CDMNT/images/pxeboot/isolinux.cfg | sed -e "s#CDLABEL=[^ ]*#/$ISOBASENAME#" -e "s/ *append *//")
 fi
 
 # pxelinux configuration.

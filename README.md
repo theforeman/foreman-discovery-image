@@ -122,10 +122,10 @@ $ sudo dnf install lorax anaconda pykickstart wget qemu-kvm
 To prepare the kickstart do:
 
 ```
-$ ./build-livecd fdi-centos8.ks
+$ ./build-kickstart fdi-centos9.ks
 ```
 
-To build the image (this must be done on a EL 8 host):
+To build the image (this must be done on a EL 9 host):
 
 ```
 $ sudo ./build-livecd-root 1.2.3 [./result] [virt]
@@ -216,7 +216,7 @@ to build an image with extensions built-in which is helpful for PXE-less
 environments.
 
 To do that, [follow the
-documentation](https://theforeman.org/plugins/foreman_discovery/8.0/index.html#5.Extendingtheimage)
+documentation](https://docs.theforeman.org/nightly/Provisioning_Hosts/index-foreman-el.html#Extending_the_Discovery_Image_provisioning)
 to create directory structure in root/opt/extension folder. Do not put ZIP
 files into this folder, but keep the directory structure extracted (this is
 the directory where ZIP files get downloaded and extracted). Then rebuild
@@ -292,7 +292,7 @@ initial script and provide empty base kickstart without any repositories
 (they will be added via koji:
 
 ```
-$ ./build-livecd fdi-empty.ks
+$ ./build-kickstart fdi-empty.ks
 ```
 Then simply build the image from kickstart called fdi-image.ks:
 
