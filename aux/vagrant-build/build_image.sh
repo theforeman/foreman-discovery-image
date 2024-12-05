@@ -17,18 +17,15 @@ sudo setenforce 0
 # Building in mock did not work at all, therefore building directly on the host
 # VM is the approach.
 
-sudo dnf -y install pykickstart git wget lorax anaconda patch
+sudo dnf -y install pykickstart git wget lorax anaconda
 
 [ -d $NAME ] || git clone https://github.com/$repoowner/$NAME.git -b $branch
 pushd $NAME
 git pull
 
-# required only for CentOS 8 Stream (RHEL works fine)
-sudo patch -p1 -d / < anaconda-rhsm-BZ2034601.patch
-
 version=$(git describe --abbrev=0 --tags)
 
-./build-kickstart fdi-centos8.ks $proxy_repo && sudo ./build-livecd-root "$version" . "$KERNEL_CMDLINE" novirt
+./build-kickstart fdi-stream9.ks $proxy_repo && sudo ./build-livecd-root "$version" . "$KERNEL_CMDLINE" novirt
 
 find .
 popd
