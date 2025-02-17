@@ -106,22 +106,45 @@ rescue => e
   error_box("Unable to upload facts", e)
 end
 
-def new_custom_facts mac
-  ip_cidr, gw, dns = detect_ipv4_credentials('primary')
-  ip = ip_cidr.split('/').first
-  mask = IPAddr.new(ip_cidr).inspect.scan(/\d+.\d+.\d+.\d+\/\d+.\d+.\d+.\d+/).first.split('/').last
-  {
-    'discovery_kexec' => command("kexec --version"),
-    'discovery_ip_cidr' => ip_cidr,
-    'discovery_ip' => ip,
-    'discovery_netmask' => mask,
-    'discovery_gateway' => gw,
-    'discovery_dns' => dns,
-    'discovery_bootif' => mac,
-  }
-rescue => e
+# Collect fact necessary for the kexec
+# See the redhat_kexec.erb template for more details
+def new_custom_facts(mac)
+  custom_facts = {}
+  custom_facts['discovery_bootif'] = mac
+  custom_facts['discovery_kexec'] = command('kexec --version')
+
+  cred_cidr6, gw6, dns6 = detect_ipv6_credentials('primary')
+  cidr6 = IPAddr.new(cred_cidr6) if cred_cidr6
+
+  # IPv6 is prefered over the IPv4 in dual stack environment
+  # and if the IPv6 is not link-local
+  if cidr6 && !cidr6.link_local?
+    ip6 = cred_cidr6.split('/').first
+    mask6 = cidr6.inspect.split('/').last[0..-2]
+
+    custom_facts['discovery_ip_cidr'] = cred_cidr6
+    custom_facts['discovery_ip'] = ip6
+    custom_facts['discovery_netmask'] = mask6
+    custom_facts['discovery_gateway'] = gw6
+    custom_facts['discovery_dns'] = dns6
+
+    return custom_facts
+  end
+
+  cred_cidr4, gw4, dns4 = detect_ipv4_credentials('primary')
+  ip4 = cred_cidr4.split('/').first
+  cidr4 = IPAddr.new(cred_cidr4)
+  mask4 = cidr4.inspect.split('/').last[0..-2]
+
+  custom_facts['discovery_ip_cidr'] = cred_cidr4
+  custom_facts['discovery_ip'] = ip4
+  custom_facts['discovery_netmask'] = mask4
+  custom_facts['discovery_gateway'] = gw4
+  custom_facts['discovery_dns'] = dns4
+  custom_facts
+rescue StandardError => e
   log_exception e
-  {}
+  custom_facts
 end
 
 def cleanup
