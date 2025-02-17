@@ -231,21 +231,57 @@ end
 
 def get_ipv4(interface = 'primary')
   wait = cmdline('fdi.nmwait', 120)
-  `nmcli -w #{wait} -t -f IP4.ADDRESS con show #{interface} 2>/dev/null`.split(":", 2)[1].chomp rescue "N/A"
+
+  begin
+    `nmcli -w #{wait} -t -f IP4.ADDRESS con show #{interface} 2>/dev/null`.split(':', 2)[1].chomp
+  rescue StandardError
+    'N/A'
+  end
 end
 
 def get_ipv6(interface = 'primary')
   wait = cmdline('fdi.nmwait', 120)
-  `nmcli -w #{wait} -t -f IP6.ADDRESS con show #{interface} 2>/dev/null`.split(":", 2)[1].chomp rescue "N/A"
+
+  begin
+    `nmcli -w #{wait} -t -f IP6.ADDRESS con show #{interface} 2>/dev/null`.split(':', 2)[1].chomp
+  rescue StandardError
+    'N/A'
+  end
 end
 
 def detect_ipv4_credentials(interface)
   res = {}
-  str = `nmcli -t -f IP4.ADDRESS,IP4.GATEWAY,IP4.DNS con show #{interface} 2>/dev/null`
-  return ["", "", ""] if $? != 0
-  str.each_line { |x| kv = x.split(':'); res[kv[0]] = kv[1].chomp }
-  [res["IP4.ADDRESS[1]"] || '', res["IP4.GATEWAY"] || '', res["IP4.DNS[1]"] || '']
-rescue => e
+  str = `nmcli -t -f IP4.ADDRESS,IP4.GATEWAY,IP4.DNS con show '#{interface}' 2>/dev/null`
+  return [nil, nil, nil] if $? != 0
+
+  str.each_line do |x|
+    kv = x.split(':')
+    res[kv[0]] = kv[1].chomp
+  end
+
+  [res['IP4.ADDRESS[1]'], res['IP4.GATEWAY'], res['IP4.DNS[1]']]
+rescue StandardError => e
   log_err e.message
-  ["", "", ""]
+  [nil, nil, nil]
+end
+
+def detect_ipv6_credentials(interface)
+  res = {}
+  str = `nmcli -t -f IP6.ADDRESS,IP6.GATEWAY,IP6.DNS con show '#{interface}' 2>/dev/null`
+  return [nil, nil, nil] if $? != 0
+
+  str.each_line do |x|
+    kv = x.split(':')
+    res[kv[0]] = kv[1..].join(':').chomp
+  end
+
+  # Filter out link-local addresses
+  cidr6 = res6.filter { |k, _v| k.include? 'IP6.ADDRESS' }
+              .delete_if { |_k, v| IPAddr.new(v).link_local? }
+              .values.first
+
+  [cidr6, res['IP6.GATEWAY'], res['IP6.DNS[1]']]
+rescue StandardError => e
+  log_err e.message
+  [nil, nil, nil]
 end
