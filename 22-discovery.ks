@@ -146,12 +146,12 @@ mkdir -p /opt/extension/{bin,lib,lib/ruby,facts}
 echo " * setting up lldp service"
 systemctl enable lldpad.socket
 cat > /etc/udev/rules.d/82-enable-lldp.rules <<'UDEV'
-ACTION=="add", SUBSYSTEM=="net", NAME!="lo", TAG+="systemd", ENV{SYSTEMD_WANTS}="enable-lldp@%k.service"
+ACTION=="add", SUBSYSTEM=="net", NAME!="lo", TAG+="systemd", ENV{SYSTEMD_WANTS}+="enable-lldp@%k.service"
 UDEV
 
 echo " * enable promiscuous mode on all physical network interfaces"
 cat > /etc/udev/rules.d/83-enable-promiscuous-mode.rules <<'UDEV'
-ACTION=="add", SUBSYSTEM=="net", NAME!="lo", TAG+="systemd", ENV{SYSTEMD_WANTS}="enable-promiscuous-mode@%k.service"
+ACTION=="add", SUBSYSTEM=="net", NAME!="lo", TAG+="systemd", ENV{SYSTEMD_WANTS}+="enable-promiscuous-mode@%k.service"
 UDEV
 
 echo " * disable flushing log data"
