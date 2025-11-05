@@ -99,7 +99,6 @@ tcpdump
 -flac-libs
 -gsm
 -avahi-glib
--avahi-libs
 -ModemManager-glib
 -flac
 -gstreamer-tools
