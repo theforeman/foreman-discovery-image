@@ -1,0 +1,33 @@
+---
+name: Build
+
+on:
+  pull_request:
+
+concurrency:
+  group: ${{ github.ref_name }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Setup libvirt for Vagrant
+        uses: voxpupuli/setup-vagrant@v0
+      - name: Build image
+        run: repoowner=theforeman branch=${{ github.ref }} proxy_repo=nightly vagrant up fdi-builder
+        working-directory: aux/vagrant-build
+      - name: Copy image
+        run: |
+          vagrant ssh-config fdi-builder | tee vagrant-ssh-config.tmp
+          mkdir result
+          scp -F vagrant-ssh-config.tmp fdi-builder:foreman-discovery-image/fdi*tar result/
+          scp -F vagrant-ssh-config.tmp fdi-builder:foreman-discovery-image/fdi*iso result/
+        working-directory: aux/vagrant-build
+      - name: Archive image
+        uses: actions/upload-artifact@v5
+        with:
+          name: fdi
+          path: aux/vagrant-build/result/*.iso
+          retention-days: 15
