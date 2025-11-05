@@ -19,9 +19,10 @@ sudo setenforce 0
 
 sudo dnf -y install pykickstart git wget lorax anaconda
 
-[ -d $NAME ] || git clone https://github.com/$repoowner/$NAME.git -b $branch
+[ -d $NAME ] || git clone https://github.com/$repoowner/$NAME.git
 pushd $NAME
-git pull
+git fetch origin $branch
+git checkout FETCH_HEAD
 
 version=$(git describe --abbrev=0 --tags)
 
