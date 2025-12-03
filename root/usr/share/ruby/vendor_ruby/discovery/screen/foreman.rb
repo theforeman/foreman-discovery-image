@@ -36,7 +36,7 @@ def screen_foreman mac = nil, gw = nil, proxy_url = cmdline('proxy.url'), proxy_
 
   if answer == b_ok
     begin
-      proxy_type = r_server.get_current == '*' ? 'foreman' : 'proxy'
+      proxy_type = r_server.get_current == r_server ? 'foreman' : 'proxy'
       url = t_url.get
 
       raise _("No URL was provided") if url.size < 1
