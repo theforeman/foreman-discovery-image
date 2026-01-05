@@ -1,5 +1,6 @@
 #!/bin/bash
 # vim: sw=2:ts=2:et
+set -euo pipefail
 set -x
 export repoowner=${1:-theforeman}
 export branch=${2:-master}

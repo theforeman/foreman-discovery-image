@@ -6,8 +6,10 @@
 
 . $0.conf.sh
 
+set -euo pipefail
+
 function cleanup() {
-	if [ -n "$KEEP_TMPDIR" ]; then
+	if [ -n "${KEEP_TMPDIR:-}" ]; then
 		echo "Not removing tmpdir $tmpdir"
 	else
 		echo "* Cleaning up tmp dir"

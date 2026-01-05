@@ -2,6 +2,8 @@
 
 [[ -z "$1" ]] && echo "Usage: $0 fdi-name.ks [FOREMAN_VERSION] [RELEASE_NUMBER] [VERSION]" && exit 1
 
+set -euo pipefail
+
 which git date base64 ksflatten >/dev/null || ( echo "Command(s) missing, install required tools" && exit 2 )
 
 FOREMAN_VERSION=${2:-nightly}
