@@ -17,7 +17,10 @@ sudo setenforce 0
 # Building in mock did not work at all, therefore building directly on the host
 # VM is the approach.
 
-sudo dnf -y install pykickstart git wget lorax anaconda
+sudo dnf -y install pykickstart git wget lorax anaconda cloud-utils-growpart e2fsprogs
+
+sudo growpart /dev/vda 1
+sudo resize2fs /dev/vda1
 
 [ -d $NAME ] || git clone https://github.com/$repoowner/$NAME.git
 pushd $NAME
