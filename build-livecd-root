@@ -107,7 +107,7 @@ Foreman Discovery Image $last_tag ($last_sha)
 To verify the kernel and initrd, run
 	sha512sum -c SHA512SUM
 EOF
-sha512sum tftpboot/initrd0.img tftpboot/vmlinuz0 > SHA512SUM
+sha512sum initrd0.img vmlinuz0 > SHA512SUM
 popd
 
 echo "* Moving to the destination folder"
