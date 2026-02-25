@@ -109,7 +109,8 @@ tcpdump
 
 -checkpolicy
 -selinux* # remove all selinux packages
--usermode
+# usermode is required by subscription-manager in downstream (RHEL) builds
+#-usermode
 -usermode-gtk
 -pinentry
 
