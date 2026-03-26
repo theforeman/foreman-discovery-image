@@ -276,7 +276,7 @@ def detect_ipv6_credentials(interface)
   end
 
   # Filter out link-local addresses
-  cidr6 = res6.filter { |k, _v| k.include? 'IP6.ADDRESS' }
+  cidr6 = res.filter { |k, _v| k.include? 'IP6.ADDRESS' }
               .delete_if { |_k, v| IPAddr.new(v).link_local? }
               .values.first
 
