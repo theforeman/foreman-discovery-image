@@ -1,0 +1,15 @@
+[Unit]
+Description=Start built-in discovery extensions on PXE-less boots
+Wants=network-online.target
+After=network-online.target systemd-tmpfiles-setup.service
+Before=discovery-menu.service discovery-register.service foreman-proxy.service
+
+[Service]
+ExecCondition=/usr/bin/discovery-cmdline --missing BOOTIF
+Type=oneshot
+EnvironmentFile=/etc/default/discovery
+ExecStart=/usr/bin/discovery-start-extensions
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

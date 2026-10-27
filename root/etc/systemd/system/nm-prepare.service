@@ -2,12 +2,12 @@
 Description=Prepares NetworkManager configuration for primary interface
 Wants=basic.target
 Before=NetworkManager.service
-ConditionKernelCommandLine=BOOTIF
 
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/usr/bin/nm-configure primary
+ExecCondition=/usr/bin/discovery-cmdline --has BOOTIF
+ExecStart=/usr/bin/nm-configure primary-boot
 
 [Install]
 WantedBy=multi-user.target

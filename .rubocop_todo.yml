@@ -373,7 +373,6 @@ Style/HashEachMethods:
 # SupportedShorthandSyntax: always, never, either, consistent, either_consistent
 Style/HashSyntax:
   Exclude:
-    - 'aux/vagrant-build/Vagrantfile'
     - 'root/usr/share/fdi/facts/discovery-facts.rb'
     - 'root/usr/share/fdi/facts/disks_partition_table.rb'
     - 'root/usr/share/fdi/facts/efi.rb'
@@ -465,7 +464,6 @@ Style/MultilineIfThen:
 # SupportedStyles: literals, strict
 Style/MutableConstant:
   Exclude:
-    - 'aux/vagrant-build/Vagrantfile'
     - 'root/usr/bin/discovery-register'
 
 # Offense count: 1

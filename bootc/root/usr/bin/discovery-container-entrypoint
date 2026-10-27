@@ -1,0 +1,13 @@
+#!/bin/bash
+set -euo pipefail
+
+# systemd services and NetworkManager/udev helpers do not all inherit Podman's
+# environment. Keep the override available to every FDI reader before init.
+# Bare-metal boot does not use this OCI entrypoint and reads /proc/cmdline.
+if [[ ${FDI_CMDLINE+x} ]]; then
+  install -d -m 0755 /run/fdi
+  printf '%s' "$FDI_CMDLINE" > /run/fdi/cmdline
+  chmod 0644 /run/fdi/cmdline
+fi
+
+exec "$@"

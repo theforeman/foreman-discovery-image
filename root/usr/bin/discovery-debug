@@ -3,11 +3,14 @@
 source /etc/default/discovery
 export FACTERLIB
 
-echo "* LOOPBACK ISO IMAGE CHECK"
-checkisomd5 /dev/loop0
+echo "* LIVE FILESYSTEM MOUNTS *"
+findmnt -o TARGET,SOURCE,FSTYPE,OPTIONS
 
 echo "* KERNEL COMMAND LINE *"
 cat /proc/cmdline
+
+echo "* EFFECTIVE FDI COMMAND LINE *"
+discovery-cmdline
 
 echo "* PROCESSES *"
 ps axww
@@ -18,7 +21,8 @@ cat /usr/PACKAGES-LIST
 echo "* NETWORK CONFIGURATION *"
 nmcli con
 for C in /etc/NetworkManager/system-connections/*; do
-  echo $C; cat $C; echo
+  [ -f "$C" ] || continue
+  echo "$C"; cat "$C"; echo
 done
 
 echo "* IP ADDRESSES *"
@@ -31,7 +35,7 @@ echo "* NEIGHBOURS *"
 ip neigh
 
 echo "* DHCP LEASES *"
-cat /var/lib/NetworkManager/dhclient-*.lease
+nmcli -f GENERAL.DEVICE,DHCP4,DHCP6 device show
 
 echo "* DNS *"
 cat /etc/resolv.conf
@@ -43,4 +47,4 @@ echo "* FACTER *"
 facter --json
 
 echo "* JOURNAL (last 500 lines) *"
-journalctl -n300 -ocat
+journalctl -n500 -ocat

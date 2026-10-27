@@ -1,0 +1,6 @@
+name = "foreman-discovery-image"
+description = "Stateless Foreman Discovery PXE image"
+version = "0.0.1"
+
+[customizations.kernel]
+append = "acpi=force nomodeset nokaslr rd.luks=0 rd.md=0 rd.dm=0 rd.lvm=0"

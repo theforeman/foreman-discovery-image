@@ -3,6 +3,17 @@ name: Build
 
 on:
   pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+env:
+  # image-builder 87.0.0, including its OSBuild runtime.
+  IMAGE_BUILDER: ghcr.io/osbuild/image-builder-cli@sha256:df3f4e525945c868d8014b859cd4f1d2efd8d749e40d8e3b9b9e6a05ca3b95b0
+  ARTIFACT_SUFFIX: ${{ github.event_name == 'push' && 'master' || format('pr-{0}', github.event.pull_request.number) }}
+  ARTIFACT_RETENTION_DAYS: ${{ github.event_name == 'push' && 90 || 15 }}
 
 concurrency:
   group: ${{ github.ref_name }}-${{ github.workflow }}
@@ -11,23 +22,130 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-24.04
+    outputs:
+      artifact-id: ${{ steps.archive.outputs.artifact-id }}
     steps:
       - uses: actions/checkout@v5
-      - name: Setup libvirt for Vagrant
-        uses: voxpupuli/setup-vagrant@v0
-      - name: Build image
-        run: repoowner=theforeman branch=${{ github.ref }} proxy_repo=nightly vagrant up fdi-builder
-        working-directory: aux/vagrant-build
-      - name: Copy image
+      - name: Check artifact retention policy
+        run: node --test test/artifact-retention.cjs
+      - name: Install Podman
+        run: sudo apt-get update && sudo apt-get install -y podman
+      - name: Build bootc container as the runner user
         run: |
-          vagrant ssh-config fdi-builder | tee vagrant-ssh-config.tmp
-          mkdir result
-          scp -F vagrant-ssh-config.tmp fdi-builder:foreman-discovery-image/fdi*tar result/
-          scp -F vagrant-ssh-config.tmp fdi-builder:foreman-discovery-image/fdi*iso result/
-        working-directory: aux/vagrant-build
-      - name: Archive image
+          podman build --pull=always \
+            --build-arg "FDI_VERSION=ci-${GITHUB_SHA}" \
+            --build-arg "FDI_RELEASE=${GITHUB_RUN_NUMBER}" \
+            -t localhost/fdi:ci .
+      - name: Check container defaults and runtime dependencies
+        run: |
+          podman run --rm localhost/fdi:ci /bin/bash -euxo pipefail -c '
+            test "$(uname -m)" = x86_64
+            passwd -S root | grep -q " L "
+            test "$(systemctl is-enabled sshd.service)" = disabled
+            test "$(systemctl is-enabled discovery-menu.service)" = enabled
+            test "$(readlink /opt/extension)" = /var/opt/extension
+            test -s /usr/PACKAGES-LIST
+            test -s /usr/lib/modules/*/initramfs.img
+            bash -n /usr/bin/nm-configure /usr/bin/nm-prepare /usr/bin/discovery-debug
+            ruby -r discovery -r newt -e "puts RUBY_VERSION"
+            for tool in lspci dmidecode ethtool lldptool ipmitool parted kexec; do
+              command -v "$tool"
+            done
+          '
+      - name: Check FDI command-line overrides and network profiles
+        run: podman run --rm -i localhost/fdi:ci /bin/bash < test/cmdline.sh
+      - name: Check EL10 extension network helpers
+        run: podman run --rm -i localhost/fdi:ci /bin/bash < test/network-helpers.sh
+      - name: Check repeated fact registration with Ruby 3.3
+        run: podman run --rm -i --network none localhost/fdi:ci ruby < test/register_cache.rb
+      - name: Export OCI archive
+        run: podman save --format oci-archive --output fdi.oci localhost/fdi:ci
+      - name: Archive container
+        id: archive
         uses: actions/upload-artifact@v5
         with:
-          name: fdi
-          path: aux/vagrant-build/result/*.iso
+          name: fdi-bootc-oci-${{ env.ARTIFACT_SUFFIX }}
+          path: fdi.oci
+          compression-level: 0
+          retention-days: ${{ env.ARTIFACT_RETENTION_DAYS }}
+          overwrite: true
+          if-no-files-found: error
+
+  pxe:
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v5
+        with:
+          artifact-ids: ${{ needs.build.outputs.artifact-id }}
+          path: input
+          merge-multiple: true
+      - name: Build and validate PXE image
+        run: |
+          set -euo pipefail
+          mkdir output
+          df -h .
+          printf 'source_commit=%s\nworkflow_run=%s\nbuilder=%s\n' \
+            "$GITHUB_SHA" "$GITHUB_RUN_ID" "$IMAGE_BUILDER" > output/build-info.txt
+          docker run --rm --privileged -i --entrypoint /bin/bash \
+            -v "$PWD/input:/input:ro" \
+            -v "$PWD/bootc/pxe.toml:/config/pxe.toml:ro" \
+            -v "$PWD/.github/scripts/validate-pxe.py:/validate-pxe.py:ro" \
+            -v "$PWD/output:/output" \
+            "$IMAGE_BUILDER" -s <<'BUILD' 2>&1 | tee output/image-builder.log
+          set -euo pipefail
+          # These tools validate the output; they do not change the FDI image.
+          dnf -y --setopt=install_weak_deps=False install grub2-tools squashfs-tools
+          image-builder version >> /output/build-info.txt
+          podman load --input /input/fdi.oci
+          podman image inspect --format 'container_id={{.Id}}' localhost/fdi:ci >> /output/build-info.txt
+          image-builder build pxe-tar-xz \
+            --bootc-ref localhost/fdi:ci \
+            --arch x86_64 --blueprint /config/pxe.toml \
+            --output-dir /output --output-name fdi-stream10-x86_64 \
+            --with-manifest --with-buildlog --progress verbose
+          python3 /validate-pxe.py /output/fdi-stream10-x86_64.tar.xz
+          BUILD
+          df -h .
+      - name: Archive PXE image
+        uses: actions/upload-artifact@v5
+        with:
+          name: fdi-pxe-${{ env.ARTIFACT_SUFFIX }}
+          path: |
+            output/*.tar.xz
+            output/SHA256SUMS
+            output/build-info.txt
+            output/validation.json
+          compression-level: 0
+          retention-days: ${{ env.ARTIFACT_RETENTION_DAYS }}
+          overwrite: true
+          if-no-files-found: error
+      - name: Archive PXE diagnostics
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: fdi-pxe-logs-${{ env.ARTIFACT_SUFFIX }}
+          path: |
+            output/*.log
+            output/*.buildlog
+            output/*.osbuild-manifest.json
+            output/build-info.txt
           retention-days: 15
+          overwrite: true
+
+  prune-master-artifacts:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    needs: [build, pxe]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/github-script@v8
+        with:
+          script: |
+            const prune = require('./.github/scripts/prune-master-artifacts.cjs');
+            await prune({ github, context, core });

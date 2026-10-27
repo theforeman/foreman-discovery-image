@@ -50,7 +50,7 @@ module Enumerable
   end
 end
 
-if File.exists?('/usr/sbin/lldptool')
+if File.exist?('/usr/sbin/lldptool')
   lldp = {
     # LLDP Name    Numeric value
     'chassisID'    => '1',

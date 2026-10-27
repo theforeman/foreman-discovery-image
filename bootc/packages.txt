@@ -1,0 +1,57 @@
+# FDI runtime packages. The bootc base supplies the core OS,
+# kernel boot integration and SELinux policy. ISO authoring/menus are not needed.
+kernel
+kernel-modules
+kernel-modules-extra
+dracut-config-generic
+dracut-network
+dracut-squash
+dracut-live
+squashfs-tools
+tar
+xz
+biosdevname
+vim-minimal
+rubygem-facter
+ethtool
+lldpad
+net-tools
+dmidecode
+pciutils
+virt-what
+# The EL9 FDI metapackages are not published for EL10. Their dependencies are
+# listed explicitly; the image overlay supplies the discovery scripts and TUI.
+foreman-proxy
+rubygem-smart_proxy_discovery_image
+ruby
+rubygems
+rubygem-fast_gettext
+rubygem-newt
+curl
+wget
+shadow-utils
+sudo
+OpenIPMI
+ipmitool
+openssl
+elfutils-libs
+kexec-tools
+kbd
+less
+file
+openssh-clients
+openssh-server
+NetworkManager
+unzip
+binutils
+efibootmgr
+grub2-tools
+grub2-efi-x64
+shim-x64
+e2fsprogs
+parted
+mdadm
+xfsprogs
+bzip2
+tcpdump
+glibc-langpack-en

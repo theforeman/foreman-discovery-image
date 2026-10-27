@@ -157,7 +157,7 @@ log_msg "Kernel opts: #{cmdline}"
 # fast_gettext initialization
 begin
   FastGettext.add_text_domain('foreman-discovery-image',
-    :path => File.exists?('/usr/share/locale/fdi') ? '/usr/share/locale/fdi' : 'root/usr/share/locale/fdi',
+    :path => File.exist?('/usr/share/locale/fdi') ? '/usr/share/locale/fdi' : 'root/usr/share/locale/fdi',
     :type => :po,
     :ignore_fuzzy => true,
     :report_warning => false)
@@ -177,7 +177,7 @@ def main_loop
   end
 
   Newt::Screen.new
-  mode = if File.exists?("/sys/firmware/efi/")
+  mode = if File.exist?("/sys/firmware/efi/")
            "UEFI"
          else
            "BIOS"

@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Used by FDI services so their conditions match the shell and Ruby readers,
+# including FDI_CMDLINE in a container. Exit 1 skips a systemd ExecCondition.
+source /usr/share/fdi/commonfunc.sh
+
+if [[ $# -eq 0 ]]; then
+  readKCL
+  exit
+fi
+if [[ $# -ne 2 || ( "$1" != --has && "$1" != --missing ) ]]; then
+  echo "Usage: $0 [--has|--missing OPTION]" >&2
+  exit 255
+fi
+
+IFS=$' \t\n' read -r -a options <<< "$(readKCL | tr '\n' ' ')"
+found=1
+for option in "${options[@]}"; do
+  if [[ "$option" == "$2" || "${option%%=*}" == "$2" ]]; then
+    found=0
+    break
+  fi
+done
+if [[ "$1" == --has ]]; then
+  exit "$found"
+fi
+exit "$((1 - found))"

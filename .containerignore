@@ -1,0 +1,8 @@
+# Include the image recipe and both overlays, including optional built-in
+# extensions ignored by git. Never send .git or generated images to the builder.
+**
+!Containerfile
+!bootc/
+!bootc/**
+!root/
+!root/**

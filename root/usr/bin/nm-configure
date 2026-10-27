@@ -21,6 +21,7 @@ deploy_config() {
 
 usage() {
   echo "Usage: "
+  echo " $0 primary-boot (BOOTIF, with optional fdi.pxip/pxgw/pxdns)"
   echo " $0 primary MAC_ADDRESS [VLAN_ID]"
   echo " $0 primary-static MAC_ADDRESS IP4_ADDR/CIDR IP4_GW IP4_DNS [VLAN_ID]"
   echo " $0 primary-static6 MAC_ADDRESS IP6_ADDR/CIDR IP6_GW IP6_DNS [VLAN_ID]"
@@ -28,6 +29,18 @@ usage() {
 }
 
 [[ -z "$mac" ]] && echo "MAC address was not provided or detected, leaving unconfigured" && exit 0
+
+# Configure a PXE primary before NetworkManager starts. Keep the explicit
+# 'primary' command as DHCP so the TUI can still switch back to DHCP later.
+if [[ "$1" == primary-boot ]]; then
+  if [[ -n "${KCL_FDI_PXIP:-}" ]]; then
+    mode=primary-static
+    [[ "$KCL_FDI_PXIP" == *:* ]] && mode=primary-static6
+    set -- "$mode" "$mac" "$KCL_FDI_PXIP" "${KCL_FDI_PXGW:-}" "${KCL_FDI_PXDNS:-}"
+  else
+    set -- primary "$mac"
+  fi
+fi
 
 function cleanup() {
   [ -f $TMP_CFG ] && rm -f $TMP_CFG

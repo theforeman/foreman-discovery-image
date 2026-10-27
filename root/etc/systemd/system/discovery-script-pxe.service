@@ -2,9 +2,9 @@
 Description=Script PXE
 Wants=basic.target
 After=foreman-proxy.service NetworkManager.service
-ConditionKernelCommandLine=BOOTIF
 
 [Service]
+ExecCondition=/usr/bin/discovery-cmdline --has BOOTIF
 Type=oneshot
 EnvironmentFile=/etc/default/discovery
 RemainAfterExit=yes

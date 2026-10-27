@@ -32,7 +32,7 @@ hwaddr() {
 cfg_eth() {
   DEVICE=${1:-eth0}
   NAME=${2:-$DEVICE}
-  cat >/etc/sysconfig/network-scripts/ifcfg-$DEVICE <<EOF
+  ruby /usr/share/fdi/ifcfg_to_keyfile.rb "$DEVICE" <<EOF
 TYPE=Ethernet
 NAME=$NAME
 DEVICE=$DEVICE
@@ -52,7 +52,7 @@ cfg_bond() {
   OPTS=${2:-miimon=100 mode=balance-rr}
   BOOTPROTO=${3:-dhcp}
   NAME=${4:-$DEVICE}
-  cat >/etc/sysconfig/network-scripts/ifcfg-$DEVICE <<EOF
+  ruby /usr/share/fdi/ifcfg_to_keyfile.rb "$DEVICE" <<EOF
 TYPE=Bond
 ONBOOT=yes
 DEVICE=$DEVICE
@@ -73,7 +73,7 @@ EOF
 cfg_slave() {
   MASTER=${1:-bond0}
   DEV=${2:-eth0}
-  cat >/etc/sysconfig/network-scripts/ifcfg-slave-$DEV <<EOF
+  ruby /usr/share/fdi/ifcfg_to_keyfile.rb "slave-$DEV" <<EOF
 TYPE=Ethernet
 NAME=slave-$DEV
 DEVICE=$DEV
